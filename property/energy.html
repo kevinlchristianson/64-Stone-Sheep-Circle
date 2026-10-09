@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="style.css">
 <script src="pwa.js" defer></script>
 <title>Heating &amp; Cooling</title>
-<meta name="description" content="Hour-by-hour heating and cooling for 64 Stone Sheep Circle on a typical Casper year, with editable insulation, windows, air sealing and fuel.">
+<meta name="description" content="Hour-by-hour heating and cooling for 64 Stone Sheep Circle on a typical year of Powell, WY weather, with editable insulation, windows, air sealing and fuel.">
 <style>
   .chart { width: 100%; height: auto; display: block; }
   .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
@@ -27,7 +27,7 @@
 <div class="page">
   <p class="eyebrow">64 Stone Sheep Circle</p>
   <h1>Heating &amp; cooling</h1>
-  <p class="lede">Every hour of a typical year of Casper weather, run through the house as drawn: wall, ceiling and window areas measured from the plans, your insulation and air-sealing targets, sun through each window, and the mass of the slab. Change anything below and the year re-runs.</p>
+  <p class="lede">Every hour of a typical year of Powell weather (Cody station, the nearest one), run through the house as drawn: wall, ceiling and window areas measured from the plans, your insulation and air-sealing targets, sun through each window, and the mass of the slab. Change anything below and the year re-runs.</p>
 
   <div class="kpis" id="kpis"></div>
   <p class="note" id="verdict"></p>
@@ -37,7 +37,7 @@
   <svg class="chart" id="months" viewBox="0 0 720 230" role="img" aria-label="Monthly heating and cooling cost"></svg>
 
   <h2>The coldest week</h2>
-  <p class="muted small">Casper's TMY coldest week (Jan 29 to Feb 4). The line is outdoor temperature; the shading is the heat the house needs each hour, with any part the heat pump can't cover in red.</p>
+  <p class="muted small"><span id="weekLabel">The coldest week of the typical year</span>. The line is outdoor temperature; the shading is the heat the house needs each hour, with any part the heat pump can't cover in red.</p>
   <div class="legend"><span><i style="background:var(--muted)"></i>Outdoor °F</span><span><i style="background:var(--warm)"></i>Heat needed</span><span><i style="background:var(--bad)"></i>Backup heat</span></div>
   <svg class="chart" id="week" viewBox="0 0 720 240" role="img" aria-label="Coldest week, hourly"></svg>
 
@@ -56,7 +56,7 @@
         <label class="f">Front porch faces
           <select data-k="front"><option value="180">South</option><option value="135">Southeast</option><option value="225">Southwest</option><option value="90">East</option><option value="270">West</option><option value="0">North</option><option value="45">Northeast</option><option value="315">Northwest</option></select></label>
       </div>
-      <p class="muted small">The plans have a north arrow but no lot or street, so south is a placeholder. Weather is Casper (Natrona Co. airport) until the site is confirmed.</p>
+      <p class="muted small">The plans have a north arrow but no lot or street, so south is a placeholder. Weather is from Cody, the nearest station to Powell.</p>
       <h3>Envelope</h3>
       <div class="fields">
         <label class="f">Wall R (whole wall)<input type="number" step="1" data-k="wallR"></label>
@@ -106,8 +106,10 @@ const $ = s => document.querySelector(s);
 const fmt = (n, d = 0) => n.toLocaleString(undefined, { maximumFractionDigits: d, minimumFractionDigits: d });
 const usd = n => '$' + fmt(Math.round(n));
 let saved = {}; try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
+const [house, wx] = await Promise.all(['data/house-data.json', 'data/weather-tmy3.json'].map(u => fetch(u).then(r => r.json())));
+// the equipment defaults follow the M-1 sheet's sizing
+DEFAULTS.tons = house.trades.m1.tons; DEFAULTS.backupKw = house.trades.m1.backup_kw;
 const params = { ...DEFAULTS, ...saved };
-const [house, wx] = await Promise.all(['data/house-data.json', 'data/casper-tmy3.json'].map(u => fetch(u).then(r => r.json())));
 
 document.querySelectorAll('[data-k]').forEach(el => {
   el.value = params[el.dataset.k];
@@ -119,6 +121,12 @@ document.querySelectorAll('[data-k]').forEach(el => {
 });
 $('#reset').onclick = () => { Object.assign(params, DEFAULTS); try { localStorage.removeItem(KEY); } catch {} document.querySelectorAll('[data-k]').forEach(el => el.value = params[el.dataset.k]); run(); };
 function save() { try { const diff = {}; for (const k in params) if (params[k] !== DEFAULTS[k]) diff[k] = params[k]; localStorage.setItem(KEY, JSON.stringify(diff)); } catch {} }
+// find the coldest week once: the 7-day run (midnight to midnight) with the lowest mean temperature
+const dayName = d => new Date(Date.UTC(2026, 0, 1 + d)).toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' });
+let coldStart = 0; { const T = wx.hourly.t; let best = Infinity;
+  for (let d = 0; d + 7 <= 365; d++) { let s = 0; for (let i = d * 24; i < (d + 7) * 24; i++) s += T[i]; if (s < best) { best = s; coldStart = d * 24; } } }
+const weekDays = Array.from({ length: 7 }, (_, k) => dayName(coldStart / 24 + k));
+document.getElementById('weekLabel').textContent = `The coldest week of the typical year (${weekDays[0]} to ${weekDays[6]})`;
 let timer; function schedule() { clearTimeout(timer); timer = setTimeout(run, 150); }
 
 const NAMES = { hp: 'Cold-climate heat pump', propane: 'Propane furnace + AC', gas: 'Natural gas furnace + AC' };
@@ -160,8 +168,9 @@ function run() {
   });
   $('#months').innerHTML = s;
 
-  // coldest week, hours 672..839 (Jan 29 to Feb 4)
-  const a = 28 * 24, n = 7 * 24, hh = r.hourly, Hw = 240;
+  // the coldest 7 days of the weather year, starting at midnight
+  const n = 7 * 24, hh = r.hourly, Hw = 240;
+  const a = coldStart;
   const tmin = Math.floor(Math.min(...hh.tout.slice(a, a + n)) / 10) * 10, tmax = Math.ceil(Math.max(...hh.tout.slice(a, a + n), 40) / 10) * 10;
   const qmax = Math.max(1, ...hh.heat.slice(a, a + n));
   const xs = i => L + (W - L - 46) * i / (n - 1), yt = t => T + (Hw - T - B) * (1 - (t - tmin) / (tmax - tmin)), yq = q => T + (Hw - T - B) * (1 - q / qmax / 1.1);
@@ -176,7 +185,7 @@ function run() {
   if (params.system === 'hp') w += `<path d="${back}" fill="var(--bad)" opacity=".7"/>`;
   let line = ''; for (let i = 0; i < n; i++) line += (i ? 'L' : 'M') + xs(i) + ',' + yt(hh.tout[a + i]);
   w += `<path d="${line}" fill="none" stroke="var(--ink-2)" stroke-width="1.5"/>`;
-  ['Jan 29', 'Jan 30', 'Jan 31', 'Feb 1', 'Feb 2', 'Feb 3', 'Feb 4'].forEach((d, k) => w += `<text x="${xs(k * 24 + 12)}" y="${Hw - 6}" text-anchor="middle">${d}</text>`);
+  weekDays.forEach((d, k) => w += `<text x="${xs(k * 24 + 12)}" y="${Hw - 6}" text-anchor="middle">${d}</text>`);
   $('#week').innerHTML = w;
 
   // system comparison
@@ -191,9 +200,9 @@ function run() {
     `</tbody><tfoot><tr><td>Whole house</td><td></td><td class="num">${fmt(r.UA, 0)}</td><td class="num">100%</td><td></td></tr></tfoot>`;
 
   $('#method').innerHTML = [
-    `Weather: ${wx.station}, ${wx.dataset} (8,760 hours of temperature and sun). Swap this file when the site is confirmed.`,
+    `Weather: ${wx.station}, ${wx.dataset} (8,760 hours of temperature and sun). Powell has no station of its own; Cody is 22 miles away.`,
     `Areas come from the plans: ${house.envelope.walls} sq ft of net wall, ${house.envelope.windows} sq ft of windows, ${house.envelope.ceiling} sq ft of flat ceiling and ${house.envelope.vault} sq ft of vault, ${fmt(house.envelope.volume)} cu ft inside.`,
-    `Air leakage is the blower-door target divided by ${params.nFactor}; fresh air is ASHRAE 62.2 (${fmt(r.ventCfm)} CFM) through the ERV. Both are corrected for Casper's altitude.`,
+    `Air leakage is the blower-door target divided by ${params.nFactor}; fresh air is ASHRAE 62.2 (${fmt(r.ventCfm)} CFM) through the ERV. Both are corrected for Powell's altitude.`,
     `Sun: each window's side of the house is turned to the porch direction you pick; windows under the rear patio roof get only sky light.`,
     `Internal gains: ${fmt(r.internal)} BTU/h around the clock (RESNET, ${house.rooms.filter(r => r.kind === 'bed').length} bedrooms). Mass: ${fmt(r.C)} BTU/°F, so the house coasts through sunny afternoons and mild nights.`,
     `Heat pump capacity falls to 85% of nominal at −10 °F and its efficiency from COP 3.8 at 47 °F to 1.7 at −10 °F (a cold-climate unit); what it can't cover goes to the strips.`,

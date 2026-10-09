@@ -596,11 +596,11 @@ Rough-order quantities from the routing above, for pricing. The plumber takes of
 
 ## M-1 HVAC
 
-Room loads at Casper, WY (assumed) design conditions, one ducted heat pump with backup heat, ducts in the attic.
+Room loads at Powell, WY design conditions, one ducted heat pump with backup heat, ducts in the attic.
 
 ### Notes
 
-1. Design conditions: Casper, WY (assumed) (ASHRAE 2009, Casper Natrona Co Intl AP, 99.6 % heating / 1 % cooling). Heating -10.3°F, cooling 89.6°F; inside 70°F / 75°F. Location to confirm: these change with it.
+1. Design conditions: Powell, WY (ASHRAE 2009, Cody Muni AWOS (nearest station to Powell), 99.6 % heating / 1 % cooling). Heating -11.4°F, cooling 87.8°F; inside 70°F / 75°F. Location to confirm: these change with it.
 2. Envelope: walls U-0.045 (R-20 + R-5 ci), ceiling R-49 (vault R-38), windows U-0.3 SHGC 0.4, slab edge R-10, 3.0 ACH50 (IECC 2021 zone 6).
 3. One ducted cold-climate heat pump; the air handler fits the 3'x8' mechanical closet (about 22"x22" footprint, return plenum below or beside). Trunks run in the attic over the flat ceilings: east along the front band and up the bedroom hall, west over the mud room and master hall.
 4. The kitchen and living vault (4:12) has no flat attic over it: its supplies are high-sidewall grilles fed from the flat-ceiling attics beside it, or soffit runs.
@@ -610,7 +610,7 @@ Room loads at Casper, WY (assumed) design conditions, one ducted heat pump with 
 
 ### Open items
 
-- Location: the design temperatures, and with them every number on this sheet, use Casper, WY until the site is confirmed.
+- Location: Powell, WY, using design temperatures from Cody (the nearest ASHRAE station, ~700 ft higher, so slightly conservative). Confirm the lot's orientation.
 - Fuel: heat pump with electric backup is assumed. A gas furnace with AC is the other common choice; it needs a gas line, a flue and combustion air in the closet.
 - Mechanical closet opens from the garage: confirm the AHJ allows the air handler there, and air-seal it (gasketed door, sealed plenum, no return openings).
 - Insulation values and air-tightness target for the house.
@@ -620,38 +620,38 @@ Room loads at Casper, WY (assumed) design conditions, one ducted heat pump with 
 
 | Room | Floor sf | Ext. wall sf | Glass sf | Heat Btu/h | Cool Btu/h | CFM | Registers | Duct |
 |---|---|---|---|---|---|---|---|---|
-| Master Bed | 240 | 102 | 25 | 2,724 | 1,768 | 99 | 1 | 7" |
-| Master Bath | 192 | 247 | 14 | 3,389 | 1,005 | 103 | 1 | 7" |
-| Master Closet | 96 | 84 | 0 | 1,335 | 291 | 40 | 0 | — |
-| Master Hall | 22 | 0 | 0 | 105 | 36 | 3 | 0 | — |
-| Laundry | 101 | 0 | 0 | 478 | 565 | 32 | 1 | 6" |
-| Powder | 30 | 0 | 0 | 145 | 50 | 4 | 1 | 6" |
-| Mud Room | 133 | 0 | 0 | 1,207 | 380 | 37 | 1 | 6" |
-| Dining | 136 | 149 | 62 | 3,707 | 3,089 | 172 | 2 | 7" |
-| Kitchen | 370 | 0 | 0 | 2,203 | 2,412 | 135 | 2 | 6" |
-| Pantry | 77 | 70 | 16 | 1,414 | 715 | 43 | 0 | — |
-| Mechanical | 25 | 28 | 0 | 484 | 106 | 15 | 0 | — |
-| Living | 524 | 111 | 25 | 5,781 | 3,194 | 178 | 2 | 7" |
-| Entry | 76 | 40 | 0 | 1,199 | 275 | 36 | 1 | 6" |
-| Coat Closet | 6 | 0 | 0 | 29 | 10 | 1 | 0 | — |
-| Office | 134 | 99 | 16 | 1,937 | 1,600 | 89 | 1 | 7" |
-| Bedroom Hall | 86 | 0 | 0 | 408 | 141 | 12 | 0 | — |
-| Bedroom 1 | 176 | 214 | 25 | 3,360 | 1,776 | 102 | 1 | 7" |
-| Bedroom 1 Closet | 18 | 0 | 0 | 83 | 29 | 3 | 0 | — |
-| Bath 1 | 53 | 139 | 0 | 1,419 | 227 | 43 | 1 | 6" |
-| Closet (Bedroom 2) | 26 | 46 | 0 | 512 | 90 | 16 | 0 | — |
-| Bedroom 2 | 178 | 88 | 25 | 2,314 | 1,652 | 92 | 1 | 7" |
-| Bath 2 | 79 | 50 | 0 | 799 | 181 | 24 | 1 | 6" |
-| Bedroom 3 | 169 | 218 | 16 | 3,104 | 1,478 | 94 | 1 | 7" |
-| Closet (Bedroom 3) | 26 | 92 | 0 | 901 | 137 | 27 | 0 | — |
+| Master Bed | 240 | 102 | 25 | 2,785 | 1,725 | 113 | 1 | 8" |
+| Master Bath | 192 | 247 | 14 | 3,455 | 960 | 117 | 1 | 8" |
+| Master Closet | 96 | 84 | 0 | 1,363 | 271 | 46 | 0 | — |
+| Master Hall | 22 | 0 | 0 | 108 | 34 | 4 | 0 | — |
+| Laundry | 101 | 0 | 0 | 495 | 556 | 36 | 1 | 6" |
+| Powder | 30 | 0 | 0 | 150 | 47 | 5 | 1 | 6" |
+| Mud Room | 133 | 0 | 0 | 1,236 | 356 | 42 | 1 | 6" |
+| Dining | 136 | 149 | 62 | 3,771 | 3,031 | 198 | 2 | 7" |
+| Kitchen | 370 | 0 | 0 | 2,280 | 2,370 | 155 | 2 | 6" |
+| Pantry | 77 | 70 | 16 | 1,441 | 694 | 49 | 0 | — |
+| Mechanical | 25 | 28 | 0 | 493 | 99 | 17 | 0 | — |
+| Living | 524 | 111 | 25 | 5,927 | 3,095 | 203 | 2 | 7" |
+| Entry | 76 | 40 | 0 | 1,223 | 256 | 41 | 1 | 6" |
+| Coat Closet | 6 | 0 | 0 | 30 | 9 | 1 | 0 | — |
+| Office | 134 | 99 | 16 | 1,977 | 1,571 | 103 | 1 | 7" |
+| Bedroom Hall | 86 | 0 | 0 | 422 | 133 | 14 | 0 | — |
+| Bedroom 1 | 176 | 214 | 25 | 3,424 | 1,729 | 116 | 1 | 8" |
+| Bedroom 1 Closet | 18 | 0 | 0 | 86 | 27 | 3 | 0 | — |
+| Bath 1 | 53 | 139 | 0 | 1,443 | 211 | 49 | 1 | 6" |
+| Closet (Bedroom 2) | 26 | 46 | 0 | 521 | 84 | 18 | 0 | — |
+| Bedroom 2 | 178 | 88 | 25 | 2,363 | 1,615 | 106 | 1 | 7" |
+| Bath 2 | 79 | 50 | 0 | 817 | 170 | 28 | 1 | 6" |
+| Bedroom 3 | 169 | 218 | 16 | 3,163 | 1,436 | 107 | 1 | 7" |
+| Closet (Bedroom 3) | 26 | 92 | 0 | 916 | 127 | 31 | 0 | — |
 
 ### System
 
 | Item | Size | Basis |
 |---|---|---|
-| Heating load | 39,035 Btu/h | 70°F inside, -10.3°F outside |
-| Cooling load | 21,207 sensible + 1,697 latent Btu/h | 75°F inside, 89.6°F outside |
-| Heat pump | 3.5 tons, 1,400 CFM | sized to cooling (Manual S); cold-climate model |
+| Heating load | 39,889 Btu/h | 70°F inside, -11.4°F outside |
+| Cooling load | 20,606 sensible + 1,648 latent Btu/h | 75°F inside, 87.8°F outside |
+| Heat pump | 4 tons, 1,600 CFM | sized to carry the heating load at design on the heat pump alone; cold-climate model |
 | Backup heat | 5 kW | covers what the heat pump can't at the heating design temperature |
 | Supply registers | 18 | 4x10 to 6x12 ceiling, 6-8" R-8 flex |
 | Ventilation | 133 CFM ERV | ASHRAE 62.2 continuous |
@@ -662,7 +662,7 @@ Rough-order quantities from the layout, for pricing. The HVAC contractor takes o
 
 | Item | Qty | Notes |
 |---|---|---|
-| Heat pump + air handler | 1 set | 3.5 tons, cold-climate, variable speed, 5 kW strips |
+| Heat pump + air handler | 1 set | 4 tons, cold-climate, variable speed, 5 kW strips |
 | Supply registers | 18 | ceiling and high sidewall, with boots |
 | Return grilles | 3 | filter grille in the hall, living and master hall |
 | Transfer grilles / jump ducts | 5 | bedrooms and office |

@@ -5,7 +5,7 @@ const SHELL = [
   './home.html', './budget.html', './energy.html', './rooms.html', './contractor.html',
   './style.css', './pwa.js', './manifest.json', './model/energy.js', './model/budget.js',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png',
-  './data/house-data.json', './data/casper-tmy3.json', './data/budget-seed.json'
+  './data/house-data.json', './data/weather-tmy3.json', './data/budget-seed.json'
 ];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

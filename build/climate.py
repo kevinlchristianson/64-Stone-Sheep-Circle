@@ -1,21 +1,22 @@
 """Design climate and envelope assumptions, in one place.
 
-The plans don't say where 64 Stone Sheep Circle is. Until that's confirmed
-these are Casper, WY values (ASHRAE 2009 design conditions for Casper Natrona
-Co Intl AP, WMO 725690, the same station as data/casper-tmy3.json in the
-Property App). Change LOCATION here and rerun build.py; M-1 and the Property
-App's energy model both read these.
+64 Stone Sheep Circle is in Powell, WY (Park County, IECC zone 6B). Powell has
+no TMY3 or ASHRAE station of its own, so the design temperatures and the
+Property App's weather year (property/data/weather-tmy3.json) come from the
+nearest one, Cody Municipal (WMO 726700), about 22 miles southwest and ~700 ft
+higher. The air-density correction uses Powell's own elevation. Change the values
+here and rerun build.py; M-1 and the Property App's energy model both read these.
 """
 
 CLIMATE = dict(
-    name='Casper, WY (assumed)',
-    source='ASHRAE 2009, Casper Natrona Co Intl AP, 99.6 % heating / 1 % cooling',
-    heat_design_f=-10.3,
-    cool_design_f=89.6,
+    name='Powell, WY',
+    source='ASHRAE 2009, Cody Muni AWOS (nearest station to Powell), 99.6 % heating / 1 % cooling',
+    heat_design_f=-11.4,
+    cool_design_f=87.8,
     indoor_heat_f=70,
     indoor_cool_f=75,
-    elevation_ft=5338,
-    altitude_factor=0.82,       # air density at ~5,300 ft
+    elevation_ft=4370,
+    altitude_factor=0.85,       # air density at Powell's ~4,370 ft
     solar_btu_sf=70,            # average peak solar through glass per sq ft per unit SHGC, mixed orientations
     hp_capacity_at_design=0.85,  # cold-climate (variable-speed) heat pump: share of rated capacity left at the heating design temperature
     iecc_zone='6B',

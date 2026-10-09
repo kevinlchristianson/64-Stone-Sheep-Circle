@@ -5,7 +5,7 @@ Two web apps built from the owner's plans for 64 Stone Sheep Circle ("Larson Hou
 | Folder | App | Who it's for |
 | --- | --- | --- |
 | `contractor/` | **Contractor App**: one page with a 3D model, the A-1 plan, S-1 framing, E-1 electrical, P-1 plumbing and M-1 HVAC sheets (every symbol tappable), printable packets, the owner's original sheets, and crew chat. Installs as a phone app. | The crews |
-| `property/` | **Property App**: construction budget and payment ledger, rooms and open questions, hour-by-hour heating and cooling on Casper weather, and the contractor app inside it. Installs as a phone app. | The owner |
+| `property/` | **Property App**: construction budget and payment ledger, rooms and open questions, hour-by-hour heating and cooling on Powell, WY weather, and the contractor app inside it. Installs as a phone app. | The owner |
 
 `index.html` at the root links to both. Everything is static files, so any static host works (GitHub Pages from the repo root, for example).
 
@@ -39,4 +39,4 @@ The chat tab is off until a Firebase project is set up for it. See `contractor/C
 
 ## Assumptions to confirm
 
-The plans have no site dimensions, structural or MEP sheets. The apps assume Casper, WY weather, an all-electric house with a cold-climate heat pump, and a south-facing front porch. Each sheet lists its open questions, and `property/rooms.html` gathers them in one place.
+The plans have no site dimensions, structural or MEP sheets. The house is in Powell, WY; weather and design temperatures come from Cody, the nearest station. The apps assume an all-electric house with a cold-climate heat pump, and a south-facing front porch. Each sheet lists its open questions, and `property/rooms.html` gathers them in one place.

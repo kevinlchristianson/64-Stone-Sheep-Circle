@@ -58,7 +58,7 @@ Sizes and areas as printed on A-1; "measured" is the interior-face area from the
 
 ## Gaps and things to settle
 
-1. **Location and climate.** Neither the plans nor a quick search say where 64 Stone Sheep Circle is. The energy model and HVAC sizing default to the Casper, WY weather file already in the 7824 Zero Rd apps until this is confirmed.
+1. **Location and climate.** Kevin confirmed the house is in Powell, WY (zone 6B). Powell has no weather station of its own, so the energy model and HVAC sizing use Cody Municipal (22 miles away): −11.4 °F heating and 87.8 °F cooling design temperatures. The lot's orientation is still open.
 2. **Living room label.** A-1 prints 17'-4" × 25'-7" but the walls put it at about 20'-5" × 25'-7"; the printed 512 sq ft matches the wider figure.
 3. **Bedroom egress.** Bedroom 3 has one 4' × 4' window whose sill scales at about 4'-0", above the 44" egress limit; every bedroom window needs a confirmed 5.7 sq ft net opening.
 4. **Garage separation.** The door from the garage to the mud room and the mechanical closet's double doors open off the garage; they need the fire-rated, self-closing treatment the code asks for, and the mechanical closet's combustion air depends on what goes in it.

@@ -167,7 +167,8 @@ def build():
     sh.rect(1.0, 31.0, 4.0, 34.0, '#fff', AIR, 1.8); sh.text(2.5, 32.5, 'HP-1', 5.5, AIR, '700')
     sh.close_group()
     sh.path([(4.0, 32.5), (5.6, 32.5), (5.6, 36.0), (29.6, 36.0), (29.6, 48.9), (31.4, 48.9)], '#8a5a1a', 1.0, '1,2')
-    backup = math.ceil(max(0, Qh - tons * 12000 * CLIMATE['hp_capacity_at_design']) / 3412 / 5) * 5
+    # at least 5 kW for defrost and for a heat pump that's down in a Powell cold snap
+    backup = max(5, math.ceil(max(0, Qh - tons * 12000 * CLIMATE['hp_capacity_at_design']) / 3412 / 5) * 5)
     picks['AH1'] = dict(tag='AH-1', sub='Mechanical closet', fields=[('Equipment', f'{tons:g}-ton variable-speed air handler, {cfm_sys:,.0f} CFM, with {backup} kW backup heat strips'),
                                                                 ('Location', 'Mechanical closet off the garage: the closet must be air-sealed from the garage (gasketed door, sealed plenums) because nothing may pull garage air into the house'),
                                                                 ('Filter', 'MERV 11 at the air handler'), ('Condensate', 'to the closet floor drain with a secondary pan')])
@@ -184,7 +185,7 @@ def build():
     total_rows = [
         (None, ['Heating load', f'{Qh:,.0f} Btu/h', f"{CLIMATE['indoor_heat_f']}°F inside, {CLIMATE['heat_design_f']}°F outside"]),
         (None, ['Cooling load', f'{Qc:,.0f} sensible + {Qc_latent:,.0f} latent Btu/h', f"{CLIMATE['indoor_cool_f']}°F inside, {CLIMATE['cool_design_f']}°F outside"]),
-        (None, ['Heat pump', f'{tons:g} tons, {cfm_sys:,.0f} CFM', 'sized to cooling (Manual S); cold-climate model']),
+        (None, ['Heat pump', f'{tons:g} tons, {cfm_sys:,.0f} CFM', 'sized to carry the heating load at design on the heat pump alone; cold-climate model']),
         (None, ['Backup heat', f'{backup} kW', 'covers what the heat pump can\'t at the heating design temperature']),
         (None, ['Supply registers', str(reg_total), '4x10 to 6x12 ceiling, 6-8" R-8 flex']),
         (None, ['Ventilation', f'{vent:.0f} CFM ERV', 'ASHRAE 62.2 continuous']),
@@ -199,7 +200,7 @@ def build():
         'The wood fireplace insert needs its own outside combustion-air kit and a listed chimney.',
     ]
     open_items = [
-        'Location: the design temperatures, and with them every number on this sheet, use Casper, WY until the site is confirmed.',
+        'Location: Powell, WY, using design temperatures from Cody (the nearest ASHRAE station, ~700 ft higher, so slightly conservative). Confirm the lot\'s orientation.',
         'Fuel: heat pump with electric backup is assumed. A gas furnace with AC is the other common choice; it needs a gas line, a flue and combustion air in the closet.',
         'Mechanical closet opens from the garage: confirm the AHJ allows the air handler there, and air-seal it (gasketed door, sealed plenum, no return openings).',
         'Insulation values and air-tightness target for the house.',

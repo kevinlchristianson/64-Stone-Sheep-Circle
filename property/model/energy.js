@@ -1,5 +1,5 @@
-// Hour-by-hour heating and cooling for 64 Stone Sheep Circle on a typical Casper
-// year (TMY3). One thermal node: the house's envelope conductance (UA), air leakage
+// Hour-by-hour heating and cooling for 64 Stone Sheep Circle on a typical year
+// of weather near Powell, WY (TMY3, Cody station). One thermal node: the house's envelope conductance (UA), air leakage
 // and ventilation, sun through the windows, internal gains and the thermal mass of
 // the slab and framing. The thermostat holds the heating and cooling setpoints and
 // the model records what the equipment had to supply each hour.
@@ -17,7 +17,8 @@ export const DEFAULTS = {
   heatSet: 70, coolSet: 75,
   massPerSf: 6,          // BTU/°F per sq ft of floor (slab, drywall, framing, furniture)
   system: 'hp',          // hp | propane | gas
-  tons: 3.5, backupKw: 5, seer2: 17, afue: 0.95,
+  tons: 4, backupKw: 5,  // the page replaces these with the M-1 sizing
+  seer2: 17, afue: 0.95,
   elec: 0.13, propane: 2.60, gas: 1.05, // $/kWh, $/gal, $/therm
 };
 

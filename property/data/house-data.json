@@ -52,14 +52,14 @@
   "porch_sf": 399
  },
  "climate": {
-  "name": "Casper, WY (assumed)",
-  "source": "ASHRAE 2009, Casper Natrona Co Intl AP, 99.6 % heating / 1 % cooling",
-  "heat_design_f": -10.3,
-  "cool_design_f": 89.6,
+  "name": "Powell, WY",
+  "source": "ASHRAE 2009, Cody Muni AWOS (nearest station to Powell), 99.6 % heating / 1 % cooling",
+  "heat_design_f": -11.4,
+  "cool_design_f": 87.8,
   "indoor_heat_f": 70,
   "indoor_cool_f": 75,
-  "elevation_ft": 5338,
-  "altitude_factor": 0.82,
+  "elevation_ft": 4370,
+  "altitude_factor": 0.85,
   "solar_btu_sf": 70,
   "hp_capacity_at_design": 0.85,
   "iecc_zone": "6B"
@@ -429,147 +429,147 @@
  "loads": [
   {
    "name": "Master Bed",
-   "heat": 2724,
-   "cool": 1768,
-   "cfm": 99
+   "heat": 2785,
+   "cool": 1725,
+   "cfm": 113
   },
   {
    "name": "Master Bath",
-   "heat": 3389,
-   "cool": 1005,
-   "cfm": 103
+   "heat": 3455,
+   "cool": 960,
+   "cfm": 117
   },
   {
    "name": "Master Closet",
-   "heat": 1335,
-   "cool": 291,
-   "cfm": 40
+   "heat": 1363,
+   "cool": 271,
+   "cfm": 46
   },
   {
    "name": "Master Hall",
-   "heat": 105,
-   "cool": 36,
-   "cfm": 3
-  },
-  {
-   "name": "Laundry",
-   "heat": 478,
-   "cool": 565,
-   "cfm": 32
-  },
-  {
-   "name": "Powder",
-   "heat": 145,
-   "cool": 50,
+   "heat": 108,
+   "cool": 34,
    "cfm": 4
   },
   {
-   "name": "Mud Room",
-   "heat": 1207,
-   "cool": 380,
-   "cfm": 37
-  },
-  {
-   "name": "Dining",
-   "heat": 3707,
-   "cool": 3089,
-   "cfm": 172
-  },
-  {
-   "name": "Kitchen",
-   "heat": 2203,
-   "cool": 2412,
-   "cfm": 135
-  },
-  {
-   "name": "Pantry",
-   "heat": 1414,
-   "cool": 715,
-   "cfm": 43
-  },
-  {
-   "name": "Mechanical",
-   "heat": 484,
-   "cool": 106,
-   "cfm": 15
-  },
-  {
-   "name": "Living",
-   "heat": 5781,
-   "cool": 3194,
-   "cfm": 178
-  },
-  {
-   "name": "Entry",
-   "heat": 1199,
-   "cool": 275,
+   "name": "Laundry",
+   "heat": 495,
+   "cool": 556,
    "cfm": 36
   },
   {
+   "name": "Powder",
+   "heat": 150,
+   "cool": 47,
+   "cfm": 5
+  },
+  {
+   "name": "Mud Room",
+   "heat": 1236,
+   "cool": 356,
+   "cfm": 42
+  },
+  {
+   "name": "Dining",
+   "heat": 3771,
+   "cool": 3031,
+   "cfm": 198
+  },
+  {
+   "name": "Kitchen",
+   "heat": 2280,
+   "cool": 2370,
+   "cfm": 155
+  },
+  {
+   "name": "Pantry",
+   "heat": 1441,
+   "cool": 694,
+   "cfm": 49
+  },
+  {
+   "name": "Mechanical",
+   "heat": 493,
+   "cool": 99,
+   "cfm": 17
+  },
+  {
+   "name": "Living",
+   "heat": 5927,
+   "cool": 3095,
+   "cfm": 203
+  },
+  {
+   "name": "Entry",
+   "heat": 1223,
+   "cool": 256,
+   "cfm": 41
+  },
+  {
    "name": "Coat Closet",
-   "heat": 29,
-   "cool": 10,
+   "heat": 30,
+   "cool": 9,
    "cfm": 1
   },
   {
    "name": "Office",
-   "heat": 1937,
-   "cool": 1600,
-   "cfm": 89
+   "heat": 1977,
+   "cool": 1571,
+   "cfm": 103
   },
   {
    "name": "Bedroom Hall",
-   "heat": 408,
-   "cool": 141,
-   "cfm": 12
+   "heat": 422,
+   "cool": 133,
+   "cfm": 14
   },
   {
    "name": "Bedroom 1",
-   "heat": 3360,
-   "cool": 1776,
-   "cfm": 102
+   "heat": 3424,
+   "cool": 1729,
+   "cfm": 116
   },
   {
    "name": "Bedroom 1 Closet",
-   "heat": 83,
-   "cool": 29,
+   "heat": 86,
+   "cool": 27,
    "cfm": 3
   },
   {
    "name": "Bath 1",
-   "heat": 1419,
-   "cool": 227,
-   "cfm": 43
+   "heat": 1443,
+   "cool": 211,
+   "cfm": 49
   },
   {
    "name": "Closet (Bedroom 2)",
-   "heat": 512,
-   "cool": 90,
-   "cfm": 16
+   "heat": 521,
+   "cool": 84,
+   "cfm": 18
   },
   {
    "name": "Bedroom 2",
-   "heat": 2314,
-   "cool": 1652,
-   "cfm": 92
+   "heat": 2363,
+   "cool": 1615,
+   "cfm": 106
   },
   {
    "name": "Bath 2",
-   "heat": 799,
-   "cool": 181,
-   "cfm": 24
+   "heat": 817,
+   "cool": 170,
+   "cfm": 28
   },
   {
    "name": "Bedroom 3",
-   "heat": 3104,
-   "cool": 1478,
-   "cfm": 94
+   "heat": 3163,
+   "cool": 1436,
+   "cfm": 107
   },
   {
    "name": "Closet (Bedroom 3)",
-   "heat": 901,
-   "cool": 137,
-   "cfm": 27
+   "heat": 916,
+   "cool": 127,
+   "cfm": 31
   }
  ],
  "trades": {
@@ -598,10 +598,10 @@
    "peak_gpm": 11.3
   },
   "m1": {
-   "heat": 39035,
-   "cool": 21207,
-   "tons": 3.5,
-   "cfm": 1400.0,
+   "heat": 39889,
+   "cool": 20606,
+   "tons": 4.0,
+   "cfm": 1600.0,
    "registers": 18,
    "backup_kw": 5
   }
@@ -640,7 +640,7 @@
    "Fixture models: A-5 tags the drains K-9135 and K-9136; tub, toilet, faucet and valve models still to pick."
   ],
   "M-1": [
-   "Location: the design temperatures, and with them every number on this sheet, use Casper, WY until the site is confirmed.",
+   "Location: Powell, WY, using design temperatures from Cody (the nearest ASHRAE station, ~700 ft higher, so slightly conservative). Confirm the lot's orientation.",
    "Fuel: heat pump with electric backup is assumed. A gas furnace with AC is the other common choice; it needs a gas line, a flue and combustion air in the closet.",
    "Mechanical closet opens from the garage: confirm the AHJ allows the air handler there, and air-seal it (gasketed door, sealed plenum, no return openings).",
    "Insulation values and air-tightness target for the house.",

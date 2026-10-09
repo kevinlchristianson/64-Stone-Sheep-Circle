@@ -20,7 +20,7 @@
   // Cloudflare Access team name (the part before .cloudflareaccess.com) and the
   // Access application's Audience (AUD) tag. Until both are set, the private
   // paths answer "finish the Access setup" instead of serving anything.
-  "vars": { "ACCESS_TEAM": "", "ACCESS_AUD": "" },
+  "vars": { "ACCESS_TEAM": "lingering-field-6a7f", "ACCESS_AUD": "29f208a85c285c140efe24726e968a3c2577498c5891cfc79550b6c91236c57d" },
   "durable_objects": { "bindings": [{ "name": "STORE", "class_name": "Store" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Store"] }]
 }

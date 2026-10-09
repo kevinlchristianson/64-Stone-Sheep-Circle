@@ -7,7 +7,22 @@ Two web apps built from the owner's plans for 64 Stone Sheep Circle ("Larson Hou
 | `contractor/` | **Contractor App**: one page with a 3D model, the A-1 plan, S-1 framing, E-1 electrical, P-1 plumbing and M-1 HVAC sheets (every symbol tappable), printable packets, the owner's original sheets, and crew chat. Installs as a phone app. | The crews |
 | `property/` | **Property App**: construction budget and payment ledger, rooms and open questions, hour-by-hour heating and cooling on Powell, WY weather, and the contractor app inside it. Installs as a phone app. | The owner |
 
-`index.html` at the root links to both. Everything is static files, so any static host works (GitHub Pages from the repo root, for example).
+`index.html` at the root links to both. Everything is static files, so any static host works.
+
+## Hosting
+
+- **GitHub Pages** (Settings > Pages > deploy from `main`, root) gives the crews a public address for the contractor app: `https://kevinlchristianson.github.io/64-Stone-Sheep-Circle/contractor/`.
+- **Cloudflare** hosts the owner's copy privately and keeps the budget in step between devices. `wrangler.jsonc` and `worker/index.js` define it: the Worker serves the repo's files, and `/property/*` and `/api/*` are served only to a Cloudflare Access sign-in, checked by the Worker itself.
+
+### Hosting on Cloudflare
+
+1. Cloudflare dashboard > **Workers & Pages > Create > Import a repository**: pick `64-Stone-Sheep-Circle`, branch `main`, and keep the default deploy command (`npx wrangler deploy`). It deploys as `stone-sheep-circle.<your-subdomain>.workers.dev`, and redeploys on every push to `main`.
+2. In the new Worker: **Settings > Domains & Routes > workers.dev > Enable Cloudflare Access**. Open the Access application it creates (**Zero Trust > Access > Applications**), set its policy to allow only your email, and copy its **Application Audience (AUD) tag**. Your **team name** is under **Zero Trust > Settings > Custom pages** (the part before `.cloudflareaccess.com`).
+3. Put both in `wrangler.jsonc` as `ACCESS_TEAM` and `ACCESS_AUD` and push. Until they're set, the property pages answer "finish the Access setup" instead of opening.
+
+The budget then saves to the Worker's store as well as the browser, and every device signed in sees the same ledger (the newer copy wins). Opened anywhere else (GitHub Pages, from disk) it stays in that browser only.
+
+## Crew chat
 
 ## How it is built
 
@@ -32,8 +47,6 @@ node build/render_packets.mjs        # needs Playwright and Chromium
 Then bump `VERSION` in `build/build.py`, `contractor/sw.js` and `property/sw.js` so installed phones pick up the new copy.
 
 Coordinates on every sheet are feet from the outside of the garage-door wall (X) and from the outside of the master bedroom's rear wall (Y).
-
-## Crew chat
 
 The chat tab is off until a Firebase project is set up for it. See `contractor/CHAT-SETUP.md`.
 

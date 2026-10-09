@@ -1,0 +1,16 @@
+{
+  "name": "64 Stone Sheep Circle",
+  "short_name": "Stone Sheep",
+  "description": "The owner's models of 64 Stone Sheep Circle: construction budget and spending, rooms, heating and cooling, and the contractor app.",
+  "start_url": "./home.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fbfaf7",
+  "theme_color": "#fbfaf7",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

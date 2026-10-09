@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stone Sheep">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1a17" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="pwa.js" defer></script>
+<title>64 Stone Sheep Circle</title>
+<meta name="description" content="Home screen for the 64 Stone Sheep Circle models: construction budget, rooms, heating and cooling, and the contractor app.">
+<style>
+  .page { max-width: 760px; }
+  .apps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .apps a { display: grid; gap: 2px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 6px; color: inherit; text-decoration: none; }
+  .apps a:hover { border-color: var(--muted); }
+  .apps a.lead { border-color: var(--ink); box-shadow: inset 4px 0 0 var(--accent); }
+  .apps b { font: 700 22px/1.1 var(--display); }
+  .apps span { color: var(--muted); font-size: 13.5px; }
+</style>
+<body>
+<div class="page">
+  <p class="eyebrow">64 Stone Sheep Circle</p>
+  <h1>Property models</h1>
+  <p class="lede" id="facts">The Larson House plans (6/11/26), rebuilt as working models.</p>
+  <ul class="apps">
+    <li><a class="lead" href="budget.html"><b>Construction budget</b><span>Budget by trade, every payment, and what's left.</span></a></li>
+    <li><a href="contractor.html"><b>Contractor app</b><span>The 3D model, framing, electrical, plumbing and HVAC sheets, packets and crew chat.</span></a></li>
+    <li><a href="contractor.html#3d"><b>3D model</b><span>Walk around the house as drawn, with the roof and each trade's layer.</span></a></li>
+    <li><a href="energy.html"><b>Heating &amp; cooling</b><span>Hour-by-hour loads and bills on a year of Powell weather, with your insulation and fuel choices.</span></a></li>
+    <li><a href="rooms.html"><b>Rooms &amp; open questions</b><span>Every room as printed and as measured, and what the plans leave open.</span></a></li>
+  </ul>
+  <p class="note" id="hint" hidden>On iPhone, tap Share, then <b>Add to Home Screen</b>, to keep this as an app.</p>
+</div>
+<script>
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone) document.getElementById('hint').hidden = false;
+  fetch('data/house-data.json').then(r => r.json()).then(h => {
+    const t = h.totals, m = h.trades.m1;
+    document.getElementById('facts').textContent =
+      `One story, about ${t.heated_gross_sf.toLocaleString()} sq ft heated, ${t.garage_gross_sf.toLocaleString()} sq ft garage. ` +
+      `${h.rooms.filter(r => r.kind === 'bed').length} bedrooms. Plans: ${h.meta.plan_name}, ${h.meta.plan_date}. Sized for a ${m.tons}-ton heat pump.`;
+  }).catch(() => {});
+</script>
+</body>
+</html>

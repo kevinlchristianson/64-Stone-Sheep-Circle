@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="app-version" content="{{VERSION}}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Stone Sheep">
+<meta name="theme-color" content="#ebe7df">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>Stone Sheep Contractor App</title>
+<meta name="description" content="Drawings, schedules, the 3D model and crew chat for building 64 Stone Sheep Circle.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* A drawing set: a sheet bar on top (3D, A-1, S-1, E-1, P-1, M-1, the owner's plans, chat); each sheet is a drawing with its notes and schedules below. Barlow Condensed labels, Plex body, Plex Mono numbers. */
+:root {
+  --bg: #ebe7df; --panel: #f7f5f0; --panel-2: #eeeae2; --ink: #221f1a; --muted: #6f685d; --line: #d6cfc3;
+  --accent: #b4462f; --accent-ink: #ffffff; --focus: #2c6aa0; --sky: #dfe5e9; --paper: #ffffff;
+  --shadow: 0 1px 2px rgba(30, 24, 16, .12), 0 6px 20px rgba(30, 24, 16, .10);
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1816; --panel: #232120; --panel-2: #2b2826; --ink: #ebe6dc; --muted: #a59e92; --line: #3b3733;
+    --accent: #e4694f; --accent-ink: #1a1816; --focus: #7fb2e0; --sky: #272c31; --paper: #ffffff;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .35); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1a1816; --panel: #232120; --panel-2: #2b2826; --ink: #ebe6dc; --muted: #a59e92; --line: #3b3733;
+  --accent: #e4694f; --accent-ink: #1a1816; --focus: #7fb2e0; --sky: #272c31; --paper: #ffffff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .35); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+#app { height: 100%; display: flex; flex-direction: column; }
+header.bar { flex: none; display: flex; align-items: center; gap: 14px; padding: 8px 16px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.brand { display: flex; flex-direction: column; min-width: 0; margin-right: 6px; }
+.brand .eyebrow { font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.brand h1 { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1; margin: 0; }
+.brand .ver { font-family: var(--mono); font-weight: 500; font-size: 11px; vertical-align: middle; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tabs button { font: inherit; font-family: var(--display); font-weight: 600; font-size: 16px; padding: 6px 12px; border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px; position: relative; }
+.tabs button .no { font-family: var(--mono); font-size: 12px; font-weight: 500; padding: 1px 6px; border-radius: 4px; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); }
+.tabs button:hover { background: var(--panel-2); }
+.tabs button[aria-selected="true"] { background: var(--panel-2); border-color: var(--line); }
+.tabs button[aria-selected="true"] .no { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.tabs button .badge { font-family: var(--mono); font-size: 11px; font-weight: 500; min-width: 18px; padding: 1px 5px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); text-align: center; }
+main { flex: 1; min-height: 0; }
+.sheet { height: 100%; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* ---------- 3D */
+#sheet-3d { display: grid; grid-template-columns: 300px minmax(0, 1fr); height: 100%; }
+#side { min-height: 0; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--line); padding: 16px 18px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.lede { margin: 0; color: var(--muted); font-size: 13px; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; }
+.row button, .tools button { font: inherit; font-weight: 500; font-size: 13px; padding: 5px 11px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; }
+.row button[aria-pressed="true"], .tools button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.toggle { display: flex; align-items: center; gap: 10px; padding: 4px 0; cursor: pointer; font-size: 13px; }
+.toggle input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; flex: none; }
+.sw { width: 14px; height: 14px; border-radius: 3px; flex: none; border: 1px solid rgba(0,0,0,.15); }
+.cut { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; font-size: 13px; color: var(--muted); }
+.cut label { grid-column: 1 / -1; }
+.cut input { width: 100%; accent-color: var(--accent); margin: 0; }
+.cut output { font-family: var(--mono); font-size: 12px; color: var(--ink); min-width: 5ch; text-align: right; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; margin: 0; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-family: var(--mono); font-size: 12.5px; }
+#stage { position: relative; min-width: 0; min-height: 0; background: var(--sky); overflow: hidden; }
+#stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.hud { position: absolute; z-index: 2; }
+.chip { background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: 6px; }
+.hud-top { top: 12px; right: 14px; display: flex; gap: 8px; }
+.dragmode { display: flex; padding: 3px; gap: 2px; }
+.dragmode button { font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 4px; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+.dragmode button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+.hud-sel { left: 14px; bottom: 12px; padding: 8px 12px; font-size: 13px; max-width: min(80%, 560px); }
+.hud-sel b { font-family: var(--display); font-size: 16px; }
+.hud-hint { right: 14px; bottom: 12px; margin: 0; padding: 4px 9px; font-size: 12px; color: var(--muted); }
+.hud-status { left: 14px; top: 12px; margin: 0; padding: 6px 10px; font-size: 13px; }
+/* ---------- 2D sheets */
+.sheet2d { height: 100%; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tools { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.tools .zoom { display: flex; gap: 4px; }
+.tools .sel { min-width: 0; flex: 1 1 300px; margin: 0; font-size: 13px; color: var(--muted); }
+.tools .sel.on { color: var(--ink); }
+a.packet { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; padding: 5px 12px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); text-decoration: none; white-space: nowrap; }
+.drawing { padding: 16px; background: var(--bg); }
+.scroller { position: relative; overflow: auto; touch-action: pan-x pan-y; overscroll-behavior-x: contain; }
+.paper { position: relative; width: 100%; max-width: 1400px; margin: 0 auto; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.paper svg { display: block; width: 100%; height: auto; }
+.paper svg .sym, .paper svg .tag { cursor: pointer; }
+.paper svg .sym:hover, .paper svg .tag:hover { filter: drop-shadow(0 0 2px #e08a00); }
+.paper svg .sym.on, .paper svg .tag.on { filter: drop-shadow(0 0 3px #e08a00) drop-shadow(0 0 6px #e08a00); }
+.paper svg .room.on polygon { fill: #e08a00; fill-opacity: .18; }
+.paper svg .sym.on .hit, .paper svg .tag.on .hit { fill: #e08a00; fill-opacity: .35; }
+.paper svg .sym.lit .hit { fill: #2c6aa0; fill-opacity: .35; }
+.paper svg .sym.lit { filter: drop-shadow(0 0 2px #2c6aa0) drop-shadow(0 0 5px #2c6aa0); }
+.picked { position: sticky; bottom: 0; z-index: 4; padding: 0 16px calc(10px + env(safe-area-inset-bottom, 0px)); margin-top: -6px; pointer-events: none; }
+.pk-card { pointer-events: auto; max-width: 960px; margin: 0 auto; max-height: 42vh; overflow-y: auto; background: var(--panel); border: 1px solid var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); border-radius: 10px; padding: 8px 12px 10px; }
+.pk-head { display: flex; align-items: baseline; gap: 10px; padding-bottom: 6px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.pk-tag { font-family: var(--mono); font-weight: 600; font-size: 17px; color: var(--accent); }
+.pk-sub { font-weight: 600; font-size: 14.5px; min-width: 0; }
+.pk-x { margin-left: auto; flex: none; font: inherit; font-size: 13px; min-height: 32px; padding: 4px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; }
+.pk-dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 3px 12px; margin: 0; font-size: 14px; }
+.pk-dl dt { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.pk-dl dd { margin: 0; overflow-wrap: anywhere; }
+.below { max-width: 1400px; margin: 0 auto; padding: 8px 16px 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px 28px; }
+.below > section { min-width: 0; }
+.below .wide { grid-column: 1 / -1; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1.1; margin: 10px 0 6px; }
+h3 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 18px 0 6px; }
+.below p, .below li { font-size: 13.5px; }
+.below ol, .below ul { padding-left: 20px; margin: 0; }
+.below li { margin: 0 0 6px; }
+.open li::marker { color: var(--accent); }
+.summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; padding: 0; list-style: none; }
+.summary li { margin: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); font-size: 13px; }
+.summary b { font-family: var(--mono); font-weight: 500; }
+.tsearch { display: flex; align-items: center; gap: 10px; margin: 6px 0 8px; }
+.tsearch input { flex: 1 1 auto; min-width: 0; max-width: 420px; font: inherit; font-size: 15px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.tsearch .cnt { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width: 700px; }
+th, td { text-align: left; vertical-align: top; padding: 5px 9px; border-bottom: 1px solid var(--line); }
+thead th { position: sticky; top: 0; font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .03em; color: var(--muted); background: var(--panel-2); }
+td:first-child { font-family: var(--mono); font-weight: 500; white-space: nowrap; }
+tbody tr[data-id] { cursor: pointer; }
+tbody tr[data-id]:hover { background: var(--panel-2); }
+tbody tr.on { background: color-mix(in srgb, var(--accent) 14%, var(--panel)); }
+tbody tr:last-child td { border-bottom: 0; }
+/* ---------- the owner's plans */
+.plans { max-width: 1400px; margin: 0 auto; padding: 16px; display: grid; gap: 18px; }
+.plans figure { margin: 0; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.plans img { display: block; width: 100%; height: auto; }
+.plans figcaption { padding: 8px 12px; font-size: 13px; color: #4d4842; border-top: 1px solid #d6cfc3; background: #f7f5f0; }
+.plans figcaption b { font-family: var(--mono); color: #b4462f; margin-right: 8px; }
+/* ---------- crew chat */
+#sheet-chat { display: flex; flex-direction: column; min-height: 0; }
+.chat-wrap { flex: 1; min-height: 0; width: 100%; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; }
+.chat-note { margin: 16px; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; font-size: 14px; }
+.chat-note h2 { margin-top: 0; }
+.chat-note p { margin: 6px 0 0; color: var(--muted); }
+.chat-who { display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.chat-who b { color: var(--ink); font-weight: 600; }
+.chat-who .st { margin-left: auto; font-family: var(--mono); font-size: 12px; }
+.chat-btn { font: inherit; font-size: 13px; font-weight: 500; padding: 5px 11px; min-height: 32px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; }
+.chat-btn.go { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-family: var(--display); font-weight: 600; font-size: 16px; padding: 8px 16px; }
+.chat-btn:disabled { opacity: .5; cursor: default; }
+.chat-log { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.chat-day { align-self: center; font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 8px 0 2px; }
+.msg { max-width: min(80%, 620px); align-self: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 12px 12px 12px 4px; padding: 7px 11px 8px; }
+.msg.mine { align-self: flex-end; background: color-mix(in srgb, var(--accent) 12%, var(--panel)); border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 12px 12px 4px 12px; }
+.msg .meta { display: flex; gap: 8px; align-items: baseline; font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+.msg .meta b { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--ink); }
+.msg .meta time { font-family: var(--mono); font-size: 11px; margin-left: auto; }
+.msg .re { display: inline-block; font-size: 12px; color: var(--muted); border-left: 3px solid var(--accent); padding: 0 0 0 7px; margin: 2px 0 4px; }
+.msg .txt { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; }
+.msg.pending { opacity: .6; }
+.msg .del { font: inherit; font-size: 11px; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.chat-empty { margin: auto; color: var(--muted); text-align: center; max-width: 36ch; }
+.chat-form { flex: none; display: flex; flex-direction: column; gap: 6px; padding: 8px 16px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--panel); }
+.chat-form .line { display: flex; gap: 8px; align-items: flex-end; }
+.chat-form textarea, .chat-form input { flex: 1 1 auto; min-width: 0; font: inherit; font-size: 16px; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.chat-form textarea { resize: none; max-height: 140px; line-height: 1.35; }
+.chat-form label { font-size: 13px; color: var(--muted); }
+.chat-re { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.chat-re span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-left: 3px solid var(--accent); padding-left: 7px; }
+.chat-re input { flex: none; accent-color: var(--accent); width: 18px; height: 18px; margin: 0; }
+@media (max-width: 760px) {
+  header.bar { gap: 2px 10px; padding: 6px 10px 0; padding-top: calc(6px + env(safe-area-inset-top, 0px)); }
+  .brand { flex: 1 1 100%; flex-direction: row; align-items: baseline; gap: 2px 10px; }
+  .brand h1 { font-size: 18px; order: -1; }
+  .tabs { flex: 1 1 100%; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; }
+  .tabs button { flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 48px; padding: 5px 2px 6px; font-size: 11px; line-height: 1; border-radius: 6px 6px 0 0; border-bottom: 2px solid transparent; }
+  .tabs button[aria-selected="true"] { border-bottom-color: var(--accent); }
+  .tabs button .no { font-size: 11px; padding: 2px 5px; }
+  .tabs button .badge { position: absolute; transform: translate(14px, -16px); }
+  #sheet-3d { display: flex; flex-direction: column; }
+  #stage { flex: 1 1 0; order: 1; }
+  #side { flex: 0 0 42%; order: 2; border-right: 0; border-top: 1px solid var(--line); padding-top: 12px; gap: 14px; }
+  .hud-hint { display: none; }
+  .tools { padding: 6px 10px; }
+  .tools .zoom button { min-width: 44px; min-height: 40px; }
+  .drawing { padding: 8px; }
+  .below { padding: 0 12px 96px; }
+  .tbl { border: 0; background: none; overflow: visible; }
+  .tbl table { display: block; min-width: 0; }
+  .tbl thead { display: none; }
+  .tbl tbody { display: block; }
+  .tbl tbody tr { display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin: 0 0 10px; padding: 10px 12px; }
+  .tbl tbody tr.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .tbl td { display: flex; gap: 10px; align-items: baseline; border: 0; padding: 3px 0; font-size: 14px; white-space: normal; }
+  .tbl td::before { content: attr(data-label); flex: 0 0 84px; font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .tbl td:first-child { display: block; font-size: 17px; font-weight: 600; color: var(--accent); padding: 0 0 6px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .tbl td:first-child::before { display: none; }
+  .msg { max-width: 88%; }
+  .chat-log { padding: 10px; }
+  .chat-form, .chat-who { padding-left: 10px; padding-right: 10px; }
+}
+@media (max-width: 760px), (pointer: coarse) {
+  .scroller.zoomed { height: calc(100dvh - var(--chrome-h, 140px) - 16px); }
+  .row button, .tools button { min-height: 40px; }
+  .toggle { min-height: 40px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <div class="brand"><span class="eyebrow">64 Stone Sheep Circle · build set</span><h1>Contractor App <span class="ver" id="appver" title="App version">{{VERSION}}</span></h1></div>
+    <nav class="tabs" role="tablist" aria-label="Sheets">
+      <button type="button" role="tab" id="tab-3d" aria-selected="true" aria-controls="sheet-3d" data-sheet="3d"><span class="no">3D</span>Model</button>
+{{TABS}}
+      <button type="button" role="tab" id="tab-plans" aria-selected="false" aria-controls="sheet-plans" data-sheet="plans"><span class="no">A</span>Plans</button>
+      <button type="button" role="tab" id="tab-chat" aria-selected="false" aria-controls="sheet-chat" data-sheet="chat"><span class="no">✉</span>Chat</button>
+    </nav>
+  </header>
+  <main>
+    <section class="sheet" id="sheet-3d" role="tabpanel" aria-labelledby="tab-3d">
+      <aside id="side">
+        <div>
+          <p class="eyebrow">64 Stone Sheep Circle</p>
+          <p class="lede">The house as drawn on the owner's plans (Larson House, 6/11/26): one story, 9' walls, the kitchen and living vault, porch and patio. Drag to orbit, pinch or scroll to zoom, tap anything to read it.</p>
+        </div>
+        <div>
+          <p class="eyebrow">Show</p>
+          <label class="toggle"><input type="checkbox" data-layer="walls" checked><span class="sw" style="background:#f1ede5"></span>Walls, doors and windows</label>
+          <label class="toggle"><input type="checkbox" data-layer="fix" checked><span class="sw" style="background:#efe9de"></span>Fixtures and cabinets (A-5)</label>
+          <label class="toggle"><input type="checkbox" data-layer="roof"><span class="sw" style="background:#3b3d40"></span>Roof (massing, from A-2)</label>
+          <label class="toggle"><input type="checkbox" data-layer="elec"><span class="sw" style="background:#c8650a"></span>Electrical devices (E-1)</label>
+          <label class="toggle"><input type="checkbox" data-layer="plumb"><span class="sw" style="background:#3c3a36"></span>Plumbing (P-1)</label>
+          <label class="toggle"><input type="checkbox" data-layer="hvac"><span class="sw" style="background:#2c6aa0"></span>HVAC registers and trunks (M-1)</label>
+        </div>
+        <div class="cut">
+          <label for="cut">Wall height (cut the walls down to see in)</label>
+          <input type="range" id="cut" min="1" max="9" step="0.25" value="9"><output id="cutv">9'-0"</output>
+        </div>
+        <div>
+          <p class="eyebrow">Views</p>
+          <div class="row" id="views">
+            <button type="button" data-view="iso" aria-pressed="true">Front corner</button>
+            <button type="button" data-view="rear">Rear corner</button>
+            <button type="button" data-view="top">Plan</button>
+            <button type="button" data-view="front">Front</button>
+          </div>
+        </div>
+        <div>
+          <p class="eyebrow">The house</p>
+          <dl class="facts">{{FACTS}}</dl>
+        </div>
+      </aside>
+      <div id="stage">
+        <div class="hud hud-top"><div class="dragmode chip" id="dragmode" role="group" aria-label="What dragging does"><button type="button" data-mode="orbit" aria-pressed="true">Orbit</button><button type="button" data-mode="pan" aria-pressed="false">Pan</button></div></div>
+        <p class="hud hud-status chip" id="status">Loading the 3D model…</p>
+        <div class="hud hud-sel chip" id="sel" hidden><b id="selname"></b> <span id="seltext"></span></div>
+        <p class="hud hud-hint chip">Drag: orbit · right-drag: pan · scroll: zoom</p>
+      </div>
+    </section>
+{{SHEETS}}
+    <section class="sheet sheet2d" id="sheet-plans" role="tabpanel" aria-labelledby="tab-plans" hidden>
+      <div class="tools"><p class="sel">The owner's plan set as received (Larson House, 6/11/26). <a href="plans/larson-house-plans-2026-06-11.pdf" target="_blank" rel="noopener">Open the PDF</a></p></div>
+      <div class="plans">
+{{PLANS}}
+      </div>
+    </section>
+    <section class="sheet" id="sheet-chat" role="tabpanel" aria-labelledby="tab-chat" hidden><div class="chat-wrap" id="chat"></div></section>
+  </main>
+</div>
+
+<script type="application/json" id="house-data">{{DATA}}</script>
+<script type="text/plain" id="floor-svg">{{FLOORSVG}}</script>
+
+<script>
+// ---------------------------------------------------------------- tabs and 2D sheets
+(function () {
+  const ver = document.querySelector('meta[name="app-version"]').content;
+  for (const t of document.querySelectorAll('svg text.rev')) t.textContent = 'rev ' + ver;
+  const $ = id => document.getElementById(id);
+  const DATA = JSON.parse($('house-data').textContent);
+  const tabs = [...document.querySelectorAll('.tabs [role="tab"]')];
+  function show(key, setHash = true) {
+    for (const t of tabs) { const on = t.dataset.sheet === key; t.setAttribute('aria-selected', String(on)); $('sheet-' + t.dataset.sheet).hidden = !on; }
+    if (setHash) history.replaceState(null, '', '#' + key);
+    try { localStorage.setItem('ssc-sheet', key); } catch (e) { /* per-viewer convenience */ }
+    dispatchEvent(new Event('resize'));
+  }
+  for (const t of tabs) t.addEventListener('click', () => show(t.dataset.sheet));
+  addEventListener('hashchange', () => { const k = location.hash.slice(1); if (tabs.some(t => t.dataset.sheet === k)) show(k, false); });
+  let start = location.hash.slice(1);
+  if (!tabs.some(t => t.dataset.sheet === start)) { try { start = localStorage.getItem('ssc-sheet') || '3d'; } catch (e) { start = '3d'; } }
+  if (!tabs.some(t => t.dataset.sheet === start)) start = '3d';
+  show(start, location.hash.slice(1) === start);
+
+  for (const sheet of document.querySelectorAll('.sheet2d[data-key]')) {
+    const key = sheet.dataset.key, picks = DATA.picks[key] || {};
+    const paper = sheet.querySelector('.paper'), svg = paper.querySelector('svg'), scroller = sheet.querySelector('.scroller'), sel = sheet.querySelector('.sel'), tools = sheet.querySelector('.tools');
+    sel.dataset.hint = sel.textContent;
+    // zoom: Fit / 2x / 4x, ctrl+wheel (trackpad pinch), two-finger pinch, double-tap
+    let zoom = 1;
+    const fitW = () => Math.min(scroller.clientWidth, 1400);
+    function layout() {
+      if (!scroller.clientWidth) return;
+      sheet.style.setProperty('--chrome-h', (tools.offsetHeight + document.querySelector('header.bar').offsetHeight) + 'px');
+      paper.style.maxWidth = 'none'; paper.style.width = Math.round(fitW() * zoom) + 'px';
+      scroller.classList.toggle('zoomed', zoom > 1.02);
+      for (const b of tools.querySelectorAll('[data-zoom]')) b.setAttribute('aria-pressed', String(Math.abs(zoom - +b.dataset.zoom) < 0.02));
+    }
+    function zoomAt(z, cx, cy) {
+      z = Math.min(8, Math.max(1, z));
+      const pr = paper.getBoundingClientRect(), px = cx - pr.left, py = cy - pr.top, k = z / zoom;
+      zoom = z; layout();
+      const nr = paper.getBoundingClientRect();
+      scroller.scrollLeft += nr.left + px * k - cx; scroller.scrollTop += nr.top + py * k - cy;
+    }
+    const centre = () => { const r = scroller.getBoundingClientRect(); return [r.left + r.width / 2, r.top + Math.min(r.height, innerHeight - r.top) / 2]; };
+    for (const b of tools.querySelectorAll('[data-zoom]')) b.addEventListener('click', () => zoomAt(+b.dataset.zoom, ...centre()));
+    addEventListener('resize', () => { if (!sheet.hidden) layout(); });
+    scroller.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); zoomAt(zoom * Math.exp(-Math.max(-40, Math.min(40, e.deltaY)) * 0.01), e.clientX, e.clientY); }, { passive: false });
+    let pinch = null, lastTap = 0;
+    const mid = t => [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2];
+    const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    scroller.addEventListener('touchstart', e => { if (e.touches.length === 2) pinch = { d: dist(e.touches), z: zoom }; }, { passive: true });
+    scroller.addEventListener('touchmove', e => { if (!pinch || e.touches.length < 2) return; e.preventDefault(); const [mx, my] = mid(e.touches); zoomAt(pinch.z * dist(e.touches) / pinch.d, mx, my); }, { passive: false });
+    scroller.addEventListener('touchend', e => {
+      if (pinch) { if (e.touches.length < 2) pinch = null; return; }
+      if (e.changedTouches.length !== 1) return;
+      const t = e.changedTouches[0];
+      if (e.timeStamp - lastTap < 320) { e.preventDefault(); zoomAt(zoom < 1.9 ? 3 : 1, t.clientX, t.clientY); lastTap = 0; } else lastTap = e.timeStamp;
+    }, { passive: false });
+    layout();
+
+    // picking: the drawing, the schedules and the card stay in step
+    const card = sheet.querySelector('.picked');
+    let on = null;
+    function clear() {
+      if (on) on.classList.remove('on'); on = null;
+      for (const el of svg.querySelectorAll('.lit')) el.classList.remove('lit');
+      for (const r of sheet.querySelectorAll('tr.on')) r.classList.remove('on');
+      sel.textContent = sel.dataset.hint; sel.classList.remove('on'); card.hidden = true;
+    }
+    function showCard(tag, sub, fields) {
+      card.querySelector('.pk-tag').textContent = tag; card.querySelector('.pk-sub').textContent = sub || '';
+      const dl = card.querySelector('.pk-dl'); dl.textContent = '';
+      for (const [k, v] of fields) { const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v; dl.append(dt, dd); }
+      card.hidden = false; sel.textContent = 'Selected: ' + tag + (sub ? ' · ' + sub : ''); sel.classList.add('on');
+    }
+    function reveal(el) {
+      if (zoom < 1.9 && scroller.clientWidth < 700) { const c = el.getBoundingClientRect(); zoomAt(3, c.left + c.width / 2, c.top + c.height / 2); }
+      const r = el.getBoundingClientRect(), p = scroller.getBoundingClientRect();
+      scroller.scrollLeft += r.left + r.width / 2 - (p.left + p.width / 2);
+      sheet.scrollTo({ top: sheet.scrollTop + scroller.getBoundingClientRect().top - tools.getBoundingClientRect().bottom - 8, behavior: 'smooth' });
+    }
+    function pick(id, fromTable) {
+      clear();
+      const el = svg.querySelector(`[data-id="${CSS.escape(id)}"]`), p = picks[id];
+      if (el) { on = el; el.classList.add('on'); if (fromTable) reveal(el); }
+      for (const r of sheet.querySelectorAll(`tr[data-id="${CSS.escape(id)}"]`)) r.classList.add('on');
+      if (p) {
+        showCard(p.tag, p.sub, p.fields);
+        if (p.ckt) for (const g of svg.querySelectorAll(`.sym[data-ckt="${p.ckt}"]`)) if (g !== el) g.classList.add('lit');
+      } else if (el) { const t = el.querySelector('title'); showCard(id, t ? t.textContent : '', []); }
+      document.dispatchEvent(new CustomEvent('ssc-pick', { detail: key.toUpperCase().replace(/(\D)(\d)/, '$1-$2') + ' · ' + (p ? p.tag + (p.sub ? ' ' + p.sub : '') : id) }));
+    }
+    function pickCircuit(n, row) {
+      clear(); row.classList.add('on');
+      const lit = svg.querySelectorAll(`.sym[data-ckt="${n}"]`);
+      for (const g of lit) g.classList.add('lit');
+      showCard('Circuit ' + n, row.children[1].textContent, [['Breaker', row.children[2].textContent + ', ' + row.children[3].textContent], ['Protection', row.children[4].textContent], ['Wire', row.children[5].textContent], ['On the sheet', lit.length + ' devices lit in blue']]);
+      if (lit[0]) reveal(lit[0]);
+    }
+    card.querySelector('.pk-x').addEventListener('click', clear);
+    svg.addEventListener('click', e => { const g = e.target.closest('.sym, .tag'); if (g && g.dataset.id) pick(g.dataset.id, false); else clear(); });
+    for (const row of sheet.querySelectorAll('tbody tr[data-id]')) {
+      row.tabIndex = 0;
+      const go = () => row.dataset.id.startsWith('ckt-') ? pickCircuit(row.dataset.id.slice(4), row) : pick(row.dataset.id, true);
+      row.addEventListener('click', go);
+      row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    }
+    // table search
+    for (const box of sheet.querySelectorAll('.tsearch')) {
+      const input = box.querySelector('input'), cnt = box.querySelector('.cnt'), rows = [...box.nextElementSibling.querySelectorAll('tbody tr')];
+      const run = () => { const q = input.value.trim().toLowerCase(); let n = 0; for (const r of rows) { const hit = !q || r.textContent.toLowerCase().includes(q); r.hidden = !hit; n += hit; } cnt.textContent = q ? `${n} of ${rows.length}` : `${rows.length}`; };
+      input.addEventListener('input', run); run();
+    }
+  }
+})();
+</script>
+
+<script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }</script>
+<script type="module">
+// ---------------------------------------------------------------- the 3D model, built from the same house data as the sheets
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const $ = id => document.getElementById(id);
+const DATA = JSON.parse($('house-data').textContent);
+const H = DATA.house, T3 = DATA.trade3d;
+const CEIL = H.meta.ceiling_ft;
+const ftIn = v => { let f = Math.floor(v + 1e-9), i = Math.round((v - f) * 12); if (i === 12) { f += 1; i = 0; } return `${f}'-${i}"`; };
+const status = t => { $('status').textContent = t; $('status').hidden = !t; };
+// plan feet (x right, y down the sheet) -> model (x right, z toward the viewer at the front, y up), centred
+const CX = 41.7, CY = 35.0;
+const M = (x, y) => ({ x: x - CX, z: y - CY });
+
+const stage = $('stage');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch (e) { status('3D needs WebGL, which this browser has turned off. The sheets work without it.'); throw e; }
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.localClippingEnabled = true;
+stage.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, 0.5, 2000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = !matchMedia('(prefers-reduced-motion: reduce)').matches; controls.dampingFactor = 0.08;
+controls.maxPolarAngle = Math.PI / 2 - 0.02; controls.minDistance = 6; controls.maxDistance = 400;
+function setDragMode(mode) {
+  const pan = mode === 'pan';
+  controls.mouseButtons = { LEFT: pan ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: pan ? THREE.MOUSE.ROTATE : THREE.MOUSE.PAN };
+  controls.touches = { ONE: pan ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+  for (const b of $('dragmode').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
+}
+$('dragmode').addEventListener('click', e => { const b = e.target.closest('button[data-mode]'); if (b) setDragMode(b.dataset.mode); });
+setDragMode('orbit');
+scene.add(new THREE.HemisphereLight(0xf3f6ff, 0x8a7c62, 1.1));
+const sun = new THREE.DirectionalLight(0xfff1da, 2.0); sun.position.set(-60, 110, 80); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 10, far: 400 }); sun.shadow.bias = -0.0004; scene.add(sun);
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function applySky() { scene.background = new THREE.Color(cssVar('--sky') || '#dfe5e9'); }
+applySky(); matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applySky);
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+
+const cutPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 30);
+const cutMats = [];
+const mat = (c, o = {}) => { const m = new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, metalness: 0, clipShadows: true, ...o }); cutMats.push(m); return m; };
+const MAT = {
+  ext: mat(0xd8cfb9), int: mat(0xf3efe7), trim: mat(0x5a4632), glass: mat(0x9fc4d6, { transparent: true, opacity: 0.35, roughness: 0.1, depthWrite: false }),
+  door: mat(0xb07a45), garageDoor: mat(0xe6e1d8), post: mat(0x9a6a3c), stone: mat(0x8f8576), slab: mat(0xcfcac2), porch: mat(0xb9b2a6),
+  fix: mat(0xf7f5f1, { roughness: 0.5 }), cab: mat(0x8f6f4f), counter: mat(0xe8e2d6), roof: new THREE.MeshStandardMaterial({ color: 0x34373b, roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }),
+  elec: mat(0xc8650a), plumb: mat(0x3c3a36), cold: mat(0x2c6aa0), hvac: mat(0x2c6aa0, { transparent: true, opacity: 0.6 }), hi: mat(0xe08a00, { emissive: 0x4a2a00 }),
+};
+function setCut(h) { const on = h < CEIL - 0.01; cutPlane.constant = h; for (const m of cutMats) { m.clippingPlanes = on ? [cutPlane] : null; m.needsUpdate = true; } }
+const G = {}; for (const k of ['ground', 'floor', 'walls', 'fix', 'roof', 'elec', 'plumb', 'hvac']) { G[k] = new THREE.Group(); scene.add(G[k]); }
+const pickables = [];
+function box(x0, y0, x1, y1, bottom, top, material, data, group) {
+  const a = M(Math.min(x0, x1), Math.min(y0, y1)), b = M(Math.max(x0, x1), Math.max(y0, y1));
+  const w = b.x - a.x, d = b.z - a.z, h = top - bottom;
+  if (w < 1e-3 || d < 1e-3 || h < 1e-3) return null;
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.position.set((a.x + b.x) / 2, bottom + h / 2, (a.z + b.z) / 2); m.castShadow = true; m.receiveShadow = true;
+  if (data) { m.userData = data; pickables.push(m); }
+  group.add(m); return m;
+}
+
+// ground and the floor plate, textured with the A-1 drawing
+box(-40, -30, 125, 105, -0.6, -0.5, mat(0x9fae8a), null, G.ground);
+(function floor() {
+  const W = 84, D = 71, S = 11, MX = 60, MY = 60;
+  const plateMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const img = new Image();
+  img.onload = () => {
+    const K = 3, cv = document.createElement('canvas'); cv.width = W * S * K; cv.height = D * S * K;
+    const ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(img, MX, MY, W * S, D * S, 0, 0, cv.width, cv.height);
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    plateMat.map = tex; plateMat.needsUpdate = true;
+  };
+  img.src = 'data:image/svg+xml;base64,' + $('floor-svg').textContent.trim();
+  // the plate is the rooms themselves (walls cover the rest), so nothing white shows outside the house
+  const pos = [], uv = [];
+  for (const r of H.rooms) {
+    if (r.kind === 'outdoor') continue;
+    const pts = r.poly.map(([x, y]) => new THREE.Vector2(x, y));
+    for (const [a, b, c] of THREE.ShapeUtils.triangulateShape(pts, [])) for (const i of [a, c, b]) {
+      const [x, y] = r.poly[i], m = M(x, y); pos.push(m.x, 0.01, m.z); uv.push(x / W, 1 - y / D);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.computeVertexNormals();
+  const plate = new THREE.Mesh(g, plateMat); plate.receiveShadow = true;
+  G.floor.add(plate);
+})();
+// slabs (house, garage, porch, patio) as thin solids so the outline reads from outside
+for (const r of H.rooms) {
+  const xs = r.poly.map(p => p[0]), ys = r.poly.map(p => p[1]);
+  const pick = { kind: 'room', name: r.name, text: `${r.label || ''}${r.label ? ' · ' : ''}${Math.round(r.area_sf)} sq ft measured` };
+  if (r.kind === 'outdoor') box(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), -0.5, 0.0, MAT.porch, pick, G.floor);
+}
+// walls: the drawing's rectangles are already broken at every opening, so each one extrudes to the ceiling
+for (const w of H.walls) box(w.x0, w.y0, w.x1, w.y1, 0, CEIL, w.kind === 'E' ? MAT.ext : MAT.int, { kind: 'wall', name: w.kind === 'E' ? 'Exterior wall, 2x6' : 'Interior wall, 2x4', text: `${ftIn(Math.max(w.x1 - w.x0, w.y1 - w.y0))} segment` }, G.walls);
+// openings: header above, sill below, glass or a leaf in between
+const opBox = (o, t, bottom, top, material, data) => {
+  const [s0, s1] = o.span;
+  return o.axis === 'y' ? box(s0, o.at, s1, o.at + t, bottom, top, material, data, G.walls) : box(o.at, s0, o.at + t, s1, bottom, top, material, data, G.walls);
+};
+for (const w of H.windows) {
+  const d = { kind: 'window', name: `${w.id} · window`, text: `${ftIn(w.w)} x ${ftIn(w.h)}, sill ${ftIn(w.sill)} · ${(H.rooms.find(r => r.id === w.room) || {}).name}` };
+  opBox(w, 0.46, w.head, CEIL, MAT.ext, null); opBox(w, 0.46, 0, w.sill, MAT.ext, null);
+  const g = opBox(w, 0.46, w.sill, w.head, MAT.glass, d); if (g) g.castShadow = false;
+}
+for (const o of H.doors) {
+  if (o.kind === 'glass') continue;
+  const t = o.ext ? 0.46 : 0.293, mt = o.ext ? MAT.ext : MAT.int;
+  const d = { kind: 'door', name: `${o.id} · ${o.name}`, text: `${ftIn(o.w)} x ${ftIn(o.h)} (${o.kind})` };
+  if (o.h < CEIL) opBox(o, t, o.h, CEIL, mt, null);
+  if (o.kind === 'opening') continue;
+  const leaf = o.kind === 'overhead' ? MAT.garageDoor : o.kind === 'french' ? MAT.glass : MAT.door;
+  const [s0, s1] = o.span, th = 0.15, mid = o.at + t / 2;
+  if (o.axis === 'y') box(s0, mid - th / 2, s1, mid + th / 2, 0, o.h, leaf, d, G.walls); else box(mid - th / 2, s0, mid + th / 2, s1, 0, o.h, leaf, d, G.walls);
+}
+for (const [x, y] of H.posts) box(x - 0.33, y - 0.33, x + 0.33, y + 0.33, 0, CEIL, MAT.post, { kind: 'post', name: 'Porch / patio post', text: '' }, G.walls);
+// fixtures and cabinets
+const FH = { wc: 1.4, tub: 1.8, lav: 2.8, sink: 3.0, shower: 0.1, drain: 0.05, cabinet: 3.0, island: 3.0, range: 3.0, ref: 6.0, dw: 2.9, washer: 3.2, dryer: 3.2, fireplace: 3.5 };
+for (const f of H.fixtures) {
+  const [x, y] = f.at, [w, d] = f.size, h = FH[f.kind] ?? 3;
+  const material = f.kind === 'cabinet' || f.kind === 'island' ? MAT.counter : f.kind === 'fireplace' ? MAT.stone : MAT.fix;
+  if (f.kind === 'lav' || f.kind === 'sink') { box(x - w / 2, y - d / 2, x + w / 2, y + d / 2, h - 0.25, h + 0.02, MAT.fix, { kind: 'fixture', name: f.name, text: f.id }, G.fix); continue; }
+  box(x - w / 2, y - d / 2, x + w / 2, y + d / 2, 0, h, material, { kind: 'fixture', name: f.name, text: f.id }, G.fix);
+}
+// roof massing from A-2: hip roofs over the three wings at 6:12, eaves 1'-6" past the walls, a 2:12 porch shed
+(function roof() {
+  const OH = 1.5, top = CEIL + 1.0;
+  function hip(x0, y0, x1, y1, pitch) {
+    x0 -= OH; y0 -= OH; x1 += OH; y1 += OH;
+    const w = x1 - x0, d = y1 - y0, run = Math.min(w, d) / 2, rise = run * pitch;
+    const along = w >= d; const r0 = along ? [x0 + run, (y0 + y1) / 2] : [(x0 + x1) / 2, y0 + run], r1 = along ? [x1 - run, (y0 + y1) / 2] : [(x0 + x1) / 2, y1 - run];
+    const P = (x, y, h) => { const m = M(x, y); return [m.x, h, m.z]; };
+    const c = [P(x0, y0, top), P(x1, y0, top), P(x1, y1, top), P(x0, y1, top)], a = P(...r0, top + rise), b = P(...r1, top + rise);
+    const tris = along ? [c[0], c[1], b, c[0], b, a, c[1], c[2], b, c[2], c[3], a, c[2], a, b, c[3], c[0], a]
+                       : [c[0], c[1], a, c[1], c[2], b, c[1], b, a, c[2], c[3], b, c[3], c[0], a, c[3], a, b];
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(tris.flat(), 3)); g.computeVertexNormals();
+    const m = new THREE.Mesh(g, MAT.roof); m.castShadow = true; m.userData = { kind: 'roof', name: 'Roof (massing)', text: 'Standing-seam metal; hips and gables per A-2. Massing only: the truss designer sets the real geometry.' }; pickables.push(m); G.roof.add(m);
+  }
+  hip(0, 34.1, 31.0, 70.1, 0.5);        // garage
+  hip(5.4, 0, 31.0, 34.1, 0.5);         // master wing
+  hip(31.0, 5.1, 64.0, 53.7, 0.5);      // great room
+  hip(64.0, 5.1, 83.4, 53.7, 0.5);      // bedroom wing
+  hip(44.2, 0, 64.0, 16.4, 0.5);        // patio
+  const a = M(31.0 - OH, 53.7), b = M(77.9 + OH, 62.24 + OH), rise = (b.z - a.z) * 2 / 12;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute([a.x, top, a.z, b.x, top, a.z, b.x, top - rise, b.z, a.x, top, a.z, b.x, top - rise, b.z, a.x, top - rise, b.z], 3)); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, MAT.roof); m.userData = { kind: 'roof', name: 'Front porch roof', text: '2:12 shed (A-2)' }; pickables.push(m); G.roof.add(m);
+  G.roof.visible = false;
+})();
+// trade overlays: devices, fixtures and registers from E-1, P-1 and M-1
+for (const t of T3) {
+  const g = G[t.layer], s = t.size || 0.5, h = t.h ?? 1;
+  box(t.x - s / 2, t.y - s / 2, t.x + s / 2, t.y + s / 2, h - s / 2, h + s / 2, MAT[t.layer === 'plumb' ? (t.cold ? 'cold' : 'plumb') : t.layer], { kind: t.layer, name: t.name, text: t.text }, g);
+}
+for (const line of DATA.lines3d) {
+  const g = G[line.layer], material = line.layer === 'plumb' ? MAT.plumb : MAT.hvac, r = line.r || 0.2;
+  for (let i = 1; i < line.pts.length; i++) {
+    const [x0, y0] = line.pts[i - 1], [x1, y1] = line.pts[i];
+    box(Math.min(x0, x1) - r, Math.min(y0, y1) - r, Math.max(x0, x1) + r, Math.max(y0, y1) + r, line.h - r, line.h + r, material, { kind: line.layer, name: line.name, text: '' }, g);
+  }
+}
+for (const k of ['elec', 'plumb', 'hvac']) G[k].visible = false;
+for (const cb of document.querySelectorAll('#side input[data-layer]')) {
+  cb.addEventListener('change', () => { G[cb.dataset.layer].visible = cb.checked; if (cb.dataset.layer === 'walls' && !cb.checked) G.roof.visible = false; });
+}
+$('cut').addEventListener('input', e => { const h = +e.target.value; $('cutv').textContent = ftIn(h); setCut(h); });
+
+// views
+const VIEWS = { iso: [[-58, 62, 92], [0, 0, 4]], rear: [[78, 58, -70], [0, 0, -4]], top: [[0, 125, 0.01], [0, 0, 0]], front: [[0, 14, 110], [0, 4, 0]] };
+function view(k) {
+  const [p, t] = VIEWS[k]; camera.position.set(...p); controls.target.set(...t); controls.update();
+  for (const b of $('views').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.view === k));
+}
+$('views').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (b) view(b.dataset.view); });
+view('iso');
+
+// picking
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+let picked = null, pickedMat = null, down = null;
+renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const hits = ray.intersectObjects(pickables.filter(m => { for (let o = m; o; o = o.parent) if (!o.visible) return false; return true; }), false)
+    .filter(h => !cutPlane.constant || cutMats.every(m => !m.clippingPlanes) || h.point.y <= cutPlane.constant + 1e-3);
+  if (picked) { picked.material = pickedMat; picked = null; }
+  if (!hits.length) { $('sel').hidden = true; return; }
+  picked = hits[0].object; pickedMat = picked.material; picked.material = MAT.hi;
+  $('selname').textContent = picked.userData.name; $('seltext').textContent = picked.userData.text || ''; $('sel').hidden = false;
+  document.dispatchEvent(new CustomEvent('ssc-pick', { detail: '3D · ' + picked.userData.name }));
+});
+function loop() { controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop); }
+status(''); loop();
+</script>
+
+<script src="chat-config.js"></script>
+<script>
+// ---------------------------------------------------------------- crew chat: one room for everyone on the job, kept in Firebase (see CHAT-SETUP.md)
+(function () {
+  const cfg = window.SSC_CHAT || {};
+  const root = document.getElementById('chat'), panel = document.getElementById('sheet-chat'), tab = document.getElementById('tab-chat');
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* per-viewer convenience */ } } };
+  if (!cfg.firebase || !cfg.firebase.projectId) {
+    const n = el('div', 'chat-note');
+    n.append(el('h2', null, 'Crew chat'), el('p', null, 'Chat isn’t switched on yet. Once the owner connects it (CHAT-SETUP.md in the repository), questions posted here go to everyone on the job.'));
+    root.append(n); return;
+  }
+  let lastPick = null;
+  document.addEventListener('ssc-pick', e => { lastPick = String(e.detail).slice(0, 120); if (form.refreshRe) form.refreshRe(); });
+  let me = { name: store.get('ssc-chat-name') || '', trade: store.get('ssc-chat-trade') || '' };
+  const who = el('div', 'chat-who'), log = el('div', 'chat-log'), form = el('form', 'chat-form');
+  log.setAttribute('aria-live', 'polite'); log.setAttribute('aria-label', 'Messages');
+  const status = el('span', 'st', 'connecting…');
+  root.append(who, log, form);
+  function drawWho() {
+    who.replaceChildren();
+    if (!me.name) { who.append(el('span', null, 'Everyone on the job sees this room.'), status); return; }
+    const ch = el('button', 'chat-btn', 'Change'); ch.type = 'button'; ch.addEventListener('click', () => { me.name = ''; drawWho(); drawForm(); });
+    who.append(el('span', null, 'You’re '), el('b', null, me.name + (me.trade ? ' · ' + me.trade : '')), ch, status);
+  }
+  let send = null;
+  function drawForm() {
+    form.replaceChildren(); form.refreshRe = null;
+    if (!me.name) {
+      const n = el('input'); n.placeholder = 'Your name'; n.required = true; n.maxLength = 40; n.autocomplete = 'name'; n.setAttribute('aria-label', 'Your name');
+      const t = el('input'); t.placeholder = 'Trade (optional)'; t.maxLength = 40; t.setAttribute('aria-label', 'Trade or company');
+      const go = el('button', 'chat-btn go', 'Join'); go.type = 'submit';
+      const line = el('div', 'line'); line.append(n, t);
+      form.append(el('label', null, 'Tell the crew who you are'), line, go);
+      form.onsubmit = e => { e.preventDefault(); me = { name: n.value.trim().slice(0, 40), trade: t.value.trim().slice(0, 40) }; if (!me.name) return; store.set('ssc-chat-name', me.name); store.set('ssc-chat-trade', me.trade); drawWho(); drawForm(); };
+      return;
+    }
+    const re = el('label', 'chat-re'), reBox = el('input'), reTxt = el('span'); reBox.type = 'checkbox'; reBox.checked = true; re.append(reBox, reTxt);
+    form.refreshRe = () => { re.hidden = !lastPick; reTxt.textContent = lastPick ? 'About ' + lastPick : ''; reBox.checked = true; };
+    form.refreshRe();
+    const ta = el('textarea'); ta.rows = 1; ta.maxLength = 2000; ta.placeholder = 'Ask the crew a question…'; ta.setAttribute('aria-label', 'Message'); ta.setAttribute('enterkeyhint', 'send');
+    const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 140) + 'px'; };
+    ta.addEventListener('input', fit);
+    ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(pointer: fine)').matches) { e.preventDefault(); form.requestSubmit(); } });
+    const go = el('button', 'chat-btn go', 'Send'); go.type = 'submit'; go.disabled = !send; form.goBtn = go;
+    const line = el('div', 'line'); line.append(ta, go); form.append(re, line);
+    form.onsubmit = async e => {
+      e.preventDefault();
+      const text = ta.value.trim(); if (!text || !send) return;
+      const msg = { name: me.name, text: text.slice(0, 2000) };
+      if (me.trade) msg.trade = me.trade;
+      if (!re.hidden && reBox.checked && lastPick) msg.sheet = lastPick;
+      ta.value = ''; fit(); lastPick = null; form.refreshRe();
+      try { await send(msg); } catch (err) { ta.value = text; fit(); status.textContent = 'not sent: ' + (err.code || err.message || 'error'); }
+    };
+  }
+  drawWho(); drawForm();
+  const badge = el('span', 'badge'); badge.hidden = true; tab.appendChild(badge);
+  let msgs = [], myUid = null, remove = null;
+  const visible = () => !panel.hidden && document.visibilityState === 'visible';
+  const lastAt = () => msgs.length ? msgs[msgs.length - 1].at : 0;
+  function seen() { if (visible() && msgs.length) { store.set('ssc-chat-seen-' + cfg.room, String(lastAt())); badge.hidden = true; } }
+  function countUnread() {
+    const since = +(store.get('ssc-chat-seen-' + cfg.room) || 0);
+    const n = msgs.filter(m => m.at > since && m.uid !== myUid && !m.pending).length;
+    badge.textContent = n > 99 ? '99+' : String(n); badge.hidden = !n || visible();
+  }
+  new MutationObserver(() => { if (!panel.hidden) { seen(); countUnread(); log.scrollTop = log.scrollHeight; } }).observe(panel, { attributes: true, attributeFilter: ['hidden'] });
+  document.addEventListener('visibilitychange', () => { seen(); countUnread(); });
+  const dayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }), timeFmt = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+  function draw() {
+    const stick = log.scrollHeight - log.scrollTop - log.clientHeight < 80 || !log.childElementCount;
+    log.replaceChildren();
+    if (!msgs.length) log.append(el('p', 'chat-empty', 'No messages yet. Ask the first question: everyone on the job will see it here.'));
+    let day = '';
+    for (const m of msgs) {
+      const d = new Date(m.at || Date.now()), ds = dayFmt.format(d);
+      if (ds !== day) { day = ds; log.append(el('div', 'chat-day', ds)); }
+      const box = el('div', 'msg' + (m.uid === myUid ? ' mine' : '') + (m.pending ? ' pending' : ''));
+      const meta = el('div', 'meta'); meta.append(el('b', null, m.name || '?')); if (m.trade) meta.append(el('span', null, m.trade));
+      const t = el('time', null, m.pending ? 'sending…' : timeFmt.format(d)); t.dateTime = d.toISOString(); meta.append(t);
+      box.append(meta); if (m.sheet) box.append(el('div', 're', m.sheet)); box.append(el('div', 'txt', m.text));
+      if (m.uid === myUid && remove && !m.pending) { const x = el('button', 'del', 'Delete'); x.type = 'button'; x.addEventListener('click', () => { if (confirm('Delete this message for everyone?')) remove(m.id).catch(() => {}); }); box.append(x); }
+      log.append(box);
+    }
+    if (stick) log.scrollTop = log.scrollHeight;
+    seen(); countUnread();
+  }
+  const V = cfg.sdk || '12.18.0', base = `https://www.gstatic.com/firebasejs/${V}/`;
+  Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')])
+    .then(async ([A, U, F]) => {
+      const app = A.initializeApp(cfg.firebase, 'ssc-chat'), auth = U.getAuth(app), db = F.getFirestore(app);
+      myUid = (await U.signInAnonymously(auth)).user.uid;
+      const col = F.collection(db, 'rooms', cfg.room, 'messages');
+      send = msg => F.addDoc(col, { ...msg, uid: myUid, at: F.serverTimestamp() });
+      remove = id => F.deleteDoc(F.doc(col, id));
+      if (form.goBtn) form.goBtn.disabled = false;
+      status.textContent = '';
+      F.onSnapshot(F.query(col, F.orderBy('at', 'desc'), F.limit(300)), { includeMetadataChanges: true }, snap => {
+        msgs = snap.docs.map(d => { const x = d.data({ serverTimestamps: 'estimate' }); return { id: d.id, name: x.name, trade: x.trade, text: x.text, sheet: x.sheet, uid: x.uid, at: x.at ? x.at.toMillis() : Date.now(), pending: d.metadata.hasPendingWrites }; }).reverse();
+        status.textContent = snap.metadata.fromCache ? 'offline' : '';
+        draw();
+      }, err => { status.textContent = 'can’t load: ' + (err.code || 'error'); });
+    })
+    .catch(err => { status.textContent = navigator.onLine ? 'can’t connect: ' + (err.code || err.message || 'error') : 'offline'; });
+})();
+</script>
+<script>
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+</script>
+</body>
+</html>

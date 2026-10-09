@@ -1,0 +1,57 @@
+/* Shared look for the 64 Stone Sheep Circle property pages. */
+:root {
+  --paper: #f1eee8; --sheet: #fbfaf7; --ink: #23201d; --ink-2: #4a4540; --muted: #6d675f;
+  --rule: #d9d3c9; --accent: #5f6e4a; --warm: #8a4f35; --cool: #2f6f8f; --bad: #a3392b; --focus: #2f6f8f;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #141210; --sheet: #1d1a17; --ink: #ece6dd; --ink-2: #cfc7bb; --muted: #a39b90;
+    --rule: #3a342e; --accent: #a9b98c; --warm: #d39473; --cool: #7fb7d1; --bad: #e08a7c; --focus: #7fb7d1;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #141210; --sheet: #1d1a17; --ink: #ece6dd; --ink-2: #cfc7bb; --muted: #a39b90;
+  --rule: #3a342e; --accent: #a9b98c; --warm: #d39473; --cool: #7fb7d1; --bad: #e08a7c; --focus: #7fb7d1;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--sheet); color: var(--ink); font: 15px/1.5 var(--body); }
+.page { max-width: 960px; margin: 0 auto; padding: 28px 16px 72px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.eyebrow { font: 600 12px/1 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+h1 { font: 700 40px/.95 var(--display); margin: 0 0 8px; }
+.lede { color: var(--ink-2); margin: 0 0 20px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
+h2 { font: 700 24px/1.1 var(--display); margin: 32px 0 10px; }
+h3 { font: 600 17px/1.2 var(--display); letter-spacing: .04em; text-transform: uppercase; margin: 18px 0 6px; color: var(--ink-2); }
+a { color: var(--cool); }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+.kpi { border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; background: var(--sheet); }
+.kpi b { display: block; font: 700 26px/1.05 var(--display); }
+.kpi span { color: var(--muted); font-size: 12.5px; }
+.card { border: 1px solid var(--rule); border-radius: 6px; padding: 14px; background: var(--sheet); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+th { font: 600 12px/1.2 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+tfoot td { font-weight: 600; border-top: 2px solid var(--ink); border-bottom: 0; }
+label.f { display: grid; gap: 3px; font-size: 12.5px; color: var(--muted); }
+input, select, textarea, button { font: inherit; color: inherit; }
+input, select, textarea { width: 100%; padding: 7px 8px; border: 1px solid var(--rule); border-radius: 5px; background: var(--paper); min-width: 0; }
+input[type="number"] { font-variant-numeric: tabular-nums; }
+.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+button, .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid var(--ink); border-radius: 5px; background: var(--ink); color: var(--sheet); font: 600 14px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
+button.ghost, .btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+button.x { padding: 3px 7px; background: transparent; color: var(--muted); border-color: transparent; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.note { margin: 14px 0; padding: 10px 12px; background: var(--paper); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; color: var(--ink-2); font-size: 13.5px; }
+.bar { height: 8px; border-radius: 4px; background: var(--paper); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); }
+.bar i.over { background: var(--bad); }
+svg text { fill: var(--muted); font: 11px var(--body); }

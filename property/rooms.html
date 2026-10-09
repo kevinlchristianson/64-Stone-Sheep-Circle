@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stone Sheep">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1a17" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="pwa.js" defer></script>
+<title>Rooms &amp; Open Questions</title>
+<meta name="description" content="Every room of 64 Stone Sheep Circle as printed and as measured, its heating and cooling, and what the plans leave open.">
+<style>
+  .plan { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 6px; background: #fff; }
+  .open li { margin: 4px 0; }
+  .diff { color: var(--warm); }
+</style>
+<body>
+<div class="page">
+  <p class="eyebrow">64 Stone Sheep Circle</p>
+  <h1>Rooms &amp; open questions</h1>
+  <p class="lede" id="lede">Every room on the Larson House plans, with the size printed on A-1 next to what the walls measure, and the heating and cooling each room needs.</p>
+
+  <a href="contractor.html#a1"><img class="plan" src="../contractor/sheets/A-1-plan.svg" alt="Floor plan of 64 Stone Sheep Circle, redrawn from the owner's A-1"></a>
+  <p class="muted small">Tap the plan to open it in the contractor app, where each room can be picked.</p>
+
+  <h2>Rooms</h2>
+  <div class="scroll"><table id="rooms"></table></div>
+
+  <h2>Questions the plans leave open</h2>
+  <p class="muted small">Every sheet in the contractor app lists what it had to assume. Answers here change the drawings.</p>
+  <div id="open" class="grid2"></div>
+
+  <h2>Packets for the trades</h2>
+  <ul id="packets"></ul>
+</div>
+<script>
+(async () => {
+  const h = await fetch('data/house-data.json').then(r => r.json());
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const load = Object.fromEntries(h.loads.map(l => [l.name, l]));
+  const KIND = { bed: 'Bedroom', bath: 'Bath', closet: 'Closet', hall: 'Hall', living: 'Living', kitchen: 'Kitchen', laundry: 'Laundry', mech: 'Mechanical', garage: 'Garage', outdoor: 'Outdoor' };
+  const order = ['living', 'kitchen', 'bed', 'bath', 'laundry', 'mech', 'hall', 'closet', 'garage', 'outdoor'];
+  const rank = k => { const i = order.indexOf(k); return i < 0 ? 50 : i; };
+  const rooms = [...h.rooms].sort((a, b) => rank(a.kind) - rank(b.kind) || b.area_sf - a.area_sf);
+  let tot = { sf: 0, heat: 0, cool: 0, cfm: 0 };
+  document.getElementById('rooms').innerHTML = `<thead><tr><th>Room</th><th>A-1 size</th><th class="num">A-1 sq ft</th><th class="num">Measured</th><th class="num">Heat BTU/h</th><th class="num">Cool BTU/h</th><th class="num">Air CFM</th></tr></thead><tbody>` +
+    rooms.map(r => {
+      const l = load[r.name], off = r.label_sf && Math.abs(r.area_sf - r.label_sf) / r.label_sf > 0.12;
+      if (l) { tot.sf += r.area_sf; tot.heat += l.heat; tot.cool += l.cool; tot.cfm += l.cfm; }
+      return `<tr><td>${esc(r.name)}${(KIND[r.kind] || r.kind) !== r.name ? ` <span class="muted small">${esc(KIND[r.kind] || r.kind)}</span>` : ""}</td><td>${esc(r.label || '—')}</td><td class="num">${r.label_sf || '—'}</td>
+        <td class="num ${off ? 'diff' : ''}" ${off ? 'title="More than 12% off the printed area"' : ''}>${Math.round(r.area_sf)}</td>
+        <td class="num">${l ? l.heat.toLocaleString() : '—'}</td><td class="num">${l ? l.cool.toLocaleString() : '—'}</td><td class="num">${l ? l.cfm : '—'}</td></tr>`;
+    }).join('') +
+    `</tbody><tfoot><tr><td>Heated rooms</td><td></td><td></td><td class="num">${Math.round(tot.sf).toLocaleString()}</td><td class="num">${tot.heat.toLocaleString()}</td><td class="num">${tot.cool.toLocaleString()}</td><td class="num">${tot.cfm.toLocaleString()}</td></tr></tfoot>`;
+  document.getElementById('open').innerHTML = Object.entries(h.open_items).map(([sheet, items]) =>
+    `<div class="card"><h3>${esc(sheet)}</h3><ul class="open small">${items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>`).join('');
+  const P = { 'A-1': 'A-1-plan', 'S-1': 'S-1-framing', 'E-1': 'E-1-electrical', 'P-1': 'P-1-plumbing', 'M-1': 'M-1-hvac' };
+  document.getElementById('packets').innerHTML = Object.entries(P).map(([k, f]) =>
+    `<li><a href="../contractor/packets/${f}-packet.pdf">${k} packet (PDF)</a> · <a href="../contractor/packets/${f}-packet.html">print view</a></li>`).join('');
+})();
+</script>
+</body>
+</html>

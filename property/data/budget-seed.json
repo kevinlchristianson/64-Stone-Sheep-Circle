@@ -1,0 +1,340 @@
+{
+ "version": 1,
+ "note": "Starting numbers only: quantities come from the plans, prices are placeholders. Replace each line as bids arrive.",
+ "contingency_pct": 10,
+ "lines": [
+  {
+   "id": "b1",
+   "group": "Soft costs",
+   "name": "Permits, plan review and impact fees",
+   "qty": 1,
+   "unit": "lot",
+   "price": 9000,
+   "basis": "county fees, placeholder"
+  },
+  {
+   "id": "b2",
+   "group": "Soft costs",
+   "name": "Engineering (truss, foundation, energy check)",
+   "qty": 1,
+   "unit": "lot",
+   "price": 6500,
+   "basis": "the plans have no structural or MEP sheets"
+  },
+  {
+   "id": "b3",
+   "group": "Soft costs",
+   "name": "Builder's risk insurance and temporary utilities",
+   "qty": 1,
+   "unit": "lot",
+   "price": 5500,
+   "basis": ""
+  },
+  {
+   "id": "b4",
+   "group": "Site",
+   "name": "Excavation, grading and backfill",
+   "qty": 1,
+   "unit": "lot",
+   "price": 28000,
+   "basis": "lot not dimensioned on the plans"
+  },
+  {
+   "id": "b5",
+   "group": "Site",
+   "name": "Well or water tap, septic or sewer tap",
+   "qty": 1,
+   "unit": "lot",
+   "price": 32000,
+   "basis": "depends on the site"
+  },
+  {
+   "id": "b6",
+   "group": "Site",
+   "name": "Driveway and flatwork",
+   "qty": 1,
+   "unit": "lot",
+   "price": 14000,
+   "basis": ""
+  },
+  {
+   "id": "b7",
+   "group": "Foundation",
+   "name": "Footings, stem walls and slab",
+   "qty": 4891,
+   "unit": "sq ft",
+   "price": 14,
+   "basis": "4,891 sq ft under roof (house, garage, porch, patio)"
+  },
+  {
+   "id": "b8",
+   "group": "Foundation",
+   "name": "Slab-edge and under-slab insulation",
+   "qty": 230.2,
+   "unit": "ft",
+   "price": 18,
+   "basis": "230 ft of heated slab edge"
+  },
+  {
+   "id": "b9",
+   "group": "Framing",
+   "name": "Wall framing, sheathing and labor",
+   "qty": 703,
+   "unit": "ft of wall",
+   "price": 95,
+   "basis": "328 ft exterior + 375 ft interior (S-1)"
+  },
+  {
+   "id": "b10",
+   "group": "Framing",
+   "name": "Roof trusses, sheathing and labor",
+   "qty": 4891,
+   "unit": "sq ft",
+   "price": 16,
+   "basis": "4,891 sq ft under roof"
+  },
+  {
+   "id": "b11",
+   "group": "Roof",
+   "name": "Standing-seam metal roof",
+   "qty": 5478,
+   "unit": "sq ft",
+   "price": 12,
+   "basis": "about 5,478 sq ft of roof surface (A-2 pitches)"
+  },
+  {
+   "id": "b12",
+   "group": "Roof",
+   "name": "Gutters, downspouts, soffit and fascia",
+   "qty": 388,
+   "unit": "ft",
+   "price": 22,
+   "basis": "perimeter plus porch and patio"
+  },
+  {
+   "id": "b13",
+   "group": "Exterior",
+   "name": "Windows",
+   "qty": 20,
+   "unit": "each",
+   "price": 1100,
+   "basis": "17 house + 3 garage windows (A-1)"
+  },
+  {
+   "id": "b14",
+   "group": "Exterior",
+   "name": "Exterior doors (entry, patio French, service)",
+   "qty": 3,
+   "unit": "each",
+   "price": 2800,
+   "basis": "D1, D2, D3"
+  },
+  {
+   "id": "b15",
+   "group": "Exterior",
+   "name": "Garage doors and openers",
+   "qty": 2,
+   "unit": "each",
+   "price": 3800,
+   "basis": "two 9' x 8' (D4, D5)"
+  },
+  {
+   "id": "b16",
+   "group": "Exterior",
+   "name": "Board-and-batten siding and trim",
+   "qty": 3124,
+   "unit": "sq ft",
+   "price": 9,
+   "basis": "about 3,124 sq ft of wall"
+  },
+  {
+   "id": "b17",
+   "group": "Exterior",
+   "name": "Stone veneer on the garage gable",
+   "qty": 260,
+   "unit": "sq ft",
+   "price": 32,
+   "basis": "A-3 front elevation"
+  },
+  {
+   "id": "b18",
+   "group": "Exterior",
+   "name": "Porch and patio posts, beams and ceilings",
+   "qty": 724,
+   "unit": "sq ft",
+   "price": 28,
+   "basis": ""
+  },
+  {
+   "id": "b19",
+   "group": "Mechanical",
+   "name": "Heat pump, air handler, ducts and ERV",
+   "qty": 1,
+   "unit": "lot",
+   "price": 30000,
+   "basis": "3.5-ton cold-climate heat pump, 18 registers (M-1)"
+  },
+  {
+   "id": "b20",
+   "group": "Mechanical",
+   "name": "Fireplace and venting",
+   "qty": 1,
+   "unit": "lot",
+   "price": 7500,
+   "basis": "living room fireplace, chimney route open"
+  },
+  {
+   "id": "b21",
+   "group": "Plumbing",
+   "name": "Rough and finish plumbing",
+   "qty": 21,
+   "unit": "fixture",
+   "price": 1900,
+   "basis": "21 fixtures, 5 stacks (P-1)"
+  },
+  {
+   "id": "b22",
+   "group": "Plumbing",
+   "name": "Water heater",
+   "qty": 1,
+   "unit": "each",
+   "price": 3200,
+   "basis": "heat-pump water heater in the mechanical room"
+  },
+  {
+   "id": "b23",
+   "group": "Electrical",
+   "name": "Rough and finish wiring",
+   "qty": 209,
+   "unit": "device",
+   "price": 115,
+   "basis": "209 devices on 31 circuits (E-1)"
+  },
+  {
+   "id": "b24",
+   "group": "Electrical",
+   "name": "200 A service, panel and meter",
+   "qty": 1,
+   "unit": "lot",
+   "price": 6500,
+   "basis": "load calc about 134 A"
+  },
+  {
+   "id": "b25",
+   "group": "Electrical",
+   "name": "Light fixtures",
+   "qty": 59,
+   "unit": "each",
+   "price": 85,
+   "basis": ""
+  },
+  {
+   "id": "b26",
+   "group": "Insulation",
+   "name": "Walls, ceilings and air sealing",
+   "qty": 4799,
+   "unit": "sq ft",
+   "price": 3.2,
+   "basis": "to the energy page's R-values"
+  },
+  {
+   "id": "b27",
+   "group": "Interior",
+   "name": "Drywall, hang and finish",
+   "qty": 10604,
+   "unit": "sq ft",
+   "price": 3.6,
+   "basis": "wall and ceiling board (S-1)"
+  },
+  {
+   "id": "b28",
+   "group": "Interior",
+   "name": "Interior doors and trim",
+   "qty": 22,
+   "unit": "each",
+   "price": 650,
+   "basis": "A-1 door schedule"
+  },
+  {
+   "id": "b29",
+   "group": "Interior",
+   "name": "Paint",
+   "qty": 2975,
+   "unit": "sq ft floor",
+   "price": 4.5,
+   "basis": ""
+  },
+  {
+   "id": "b30",
+   "group": "Interior",
+   "name": "Flooring",
+   "qty": 2975,
+   "unit": "sq ft",
+   "price": 9,
+   "basis": "2,975 sq ft of rooms"
+  },
+  {
+   "id": "b31",
+   "group": "Interior",
+   "name": "Tile (baths, laundry, mud room)",
+   "qty": 650,
+   "unit": "sq ft",
+   "price": 22,
+   "basis": "4 baths"
+  },
+  {
+   "id": "b32",
+   "group": "Kitchen & baths",
+   "name": "Cabinets",
+   "qty": 1,
+   "unit": "lot",
+   "price": 38000,
+   "basis": "kitchen, pantry, baths, laundry (A-5)"
+  },
+  {
+   "id": "b33",
+   "group": "Kitchen & baths",
+   "name": "Countertops",
+   "qty": 1,
+   "unit": "lot",
+   "price": 14000,
+   "basis": ""
+  },
+  {
+   "id": "b34",
+   "group": "Kitchen & baths",
+   "name": "Appliances",
+   "qty": 1,
+   "unit": "lot",
+   "price": 15000,
+   "basis": ""
+  },
+  {
+   "id": "b35",
+   "group": "Kitchen & baths",
+   "name": "Shower glass, mirrors and accessories",
+   "qty": 1,
+   "unit": "lot",
+   "price": 6000,
+   "basis": ""
+  },
+  {
+   "id": "b36",
+   "group": "General",
+   "name": "Builder supervision and overhead",
+   "qty": 1,
+   "unit": "lot",
+   "price": 0,
+   "basis": "set this from the builder's contract"
+  },
+  {
+   "id": "b37",
+   "group": "General",
+   "name": "Cleanup, dumpsters and final clean",
+   "qty": 1,
+   "unit": "lot",
+   "price": 6000,
+   "basis": ""
+  }
+ ]
+}

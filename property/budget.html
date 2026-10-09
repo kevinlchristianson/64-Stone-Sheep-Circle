@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stone Sheep">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1a17" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="pwa.js" defer></script>
+<title>Construction Budget</title>
+<meta name="description" content="Construction budget for 64 Stone Sheep Circle by trade, with quantities from the plans, every payment, and what's left.">
+<style>
+  .grp td { background: var(--paper); font-weight: 600; }
+  td input { padding: 4px 6px; min-width: 70px; }
+  td.basis { color: var(--muted); font-size: 12.5px; max-width: 260px; }
+  #lines td:first-child { min-width: 180px; }
+  .pay { display: grid; grid-template-columns: 140px 1fr 1fr 120px 1fr auto; gap: 8px; align-items: end; }
+  @media (max-width: 720px) { .pay { grid-template-columns: 1fr 1fr; } .pay .wide { grid-column: 1 / -1; } }
+  .over { color: var(--bad); }
+  .status { font-size: 12.5px; color: var(--muted); }
+</style>
+<body>
+<div class="page">
+  <p class="eyebrow">64 Stone Sheep Circle</p>
+  <h1>Construction budget</h1>
+  <p class="lede">A line for each trade, with quantities taken from the plans. The prices are starting guesses, so replace them as bids come in, then log every payment against its line.</p>
+
+  <div class="kpis" id="kpis"></div>
+
+  <h2>Log a payment</h2>
+  <form class="card pay" id="payForm">
+    <label class="f">Date<input type="date" name="date" required></label>
+    <label class="f wide">Budget line<select name="line" id="lineSel" required></select></label>
+    <label class="f">Paid to<input name="vendor" required placeholder="Vendor or crew"></label>
+    <label class="f">Amount $<input type="number" name="amount" step="0.01" min="0" required></label>
+    <label class="f">Note<input name="note" placeholder="Draw #, invoice, check"></label>
+    <button type="submit">Add</button>
+  </form>
+
+  <h2>Budget by trade</h2>
+  <p class="muted small">Change a quantity or price and the totals follow. Spent comes from the payments below.</p>
+  <div class="scroll"><table id="lines"></table></div>
+  <p class="row" style="margin-top:10px">
+    <button class="ghost" type="button" id="addLine">Add a line</button>
+    <label class="f" style="width:160px">Contingency %<input type="number" id="cont" step="1" min="0"></label>
+  </p>
+
+  <h2>Payments</h2>
+  <div class="scroll"><table id="pays"></table></div>
+
+  <h2>Keep it safe</h2>
+  <p class="muted small">Everything here is saved in this browser only. Download a backup now and then, and load it on another phone or computer to carry the budget over.</p>
+  <p class="row">
+    <button class="ghost" type="button" id="exportJson">Download backup</button>
+    <label class="btn ghost" for="importJson">Load a backup</label><input type="file" id="importJson" accept="application/json,.json" hidden>
+    <button class="ghost" type="button" id="exportCsv">Payments as CSV</button>
+    <button class="ghost" type="button" id="resetAll">Start over</button>
+  </p>
+  <p class="status" id="status"></p>
+</div>
+
+<script type="module">
+import { load, save, fresh, summarize, lineBudget, newId, toCsv } from './model/budget.js';
+const $ = s => document.querySelector(s);
+const usd = n => (n < 0 ? '−$' : '$') + Math.abs(Math.round(n)).toLocaleString();
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const seed = await fetch('data/budget-seed.json').then(r => r.json());
+let state = load(seed);
+const status = t => { $('#status').textContent = t; };
+function commit(msg) { status(save(state) ? (msg || 'Saved in this browser.') : 'This browser would not save. Download a backup to keep your changes.'); render(); }
+
+function render() {
+  const s = summarize(state);
+  const kpi = (v, l, cls = '') => `<div class="kpi"><b class="${cls}">${v}</b><span>${l}</span></div>`;
+  $('#kpis').innerHTML = kpi(usd(s.total), `budget with ${state.contingency}% contingency`) + kpi(usd(s.paid), 'paid so far') +
+    kpi(usd(s.left), 'left to spend', s.left < 0 ? 'over' : '') + kpi(s.total ? Math.round(100 * s.paid / s.total) + '%' : '—', 'of the budget spent');
+
+  $('#lineSel').innerHTML = s.groups.map(g => `<optgroup label="${esc(g.name)}">` + g.lines.map(l => `<option value="${l.id}">${esc(l.name)}</option>`).join('') + '</optgroup>').join('');
+
+  let h = `<thead><tr><th>Line</th><th class="num">Qty</th><th>Unit</th><th class="num">Price</th><th class="num">Budget</th><th class="num">Spent</th><th class="num">Left</th><th style="min-width:90px"></th><th>From the plans</th><th></th></tr></thead><tbody>`;
+  for (const g of s.groups) {
+    h += `<tr class="grp"><td colspan="4">${esc(g.name)}</td><td class="num">${usd(g.budget)}</td><td class="num">${usd(g.spent)}</td><td class="num ${g.budget - g.spent < 0 ? 'over' : ''}">${usd(g.budget - g.spent)}</td><td colspan="3"></td></tr>`;
+    for (const l of g.lines) {
+      const pct = l.budget ? Math.min(100, 100 * l.spent / l.budget) : (l.spent ? 100 : 0);
+      h += `<tr data-id="${l.id}"><td><input data-f="name" value="${esc(l.name)}" aria-label="Line name"></td>
+        <td class="num"><input type="number" step="any" data-f="qty" value="${l.qty}" style="width:90px" aria-label="Quantity"></td><td class="muted">${esc(l.unit)}</td>
+        <td class="num"><input type="number" step="any" data-f="price" value="${l.price}" style="width:90px" aria-label="Unit price"></td>
+        <td class="num">${usd(l.budget)}</td><td class="num">${usd(l.spent)}</td><td class="num ${l.left < 0 ? 'over' : ''}">${usd(l.left)}</td>
+        <td><div class="bar"><i class="${l.left < 0 ? 'over' : ''}" style="width:${pct}%"></i></div></td><td class="basis">${esc(l.basis)}</td>
+        <td><button class="x" data-del="${l.id}" aria-label="Remove line" title="Remove line">✕</button></td></tr>`;
+    }
+  }
+  h += `</tbody><tfoot><tr><td colspan="4">Lines</td><td class="num">${usd(s.base)}</td><td colspan="5"></td></tr>
+    <tr><td colspan="4">Contingency ${state.contingency}%</td><td class="num">${usd(s.contingency)}</td><td colspan="5"></td></tr>
+    <tr><td colspan="4">Total</td><td class="num">${usd(s.total)}</td><td class="num">${usd(s.paid)}</td><td class="num ${s.left < 0 ? 'over' : ''}">${usd(s.left)}</td><td colspan="3"></td></tr></tfoot>`;
+  $('#lines').innerHTML = h;
+  $('#cont').value = state.contingency;
+
+  const name = Object.fromEntries(state.lines.map(l => [l.id, l.name]));
+  const pays = [...state.payments].sort((a, b) => b.date.localeCompare(a.date));
+  $('#pays').innerHTML = pays.length ? `<thead><tr><th>Date</th><th>Line</th><th>Paid to</th><th class="num">Amount</th><th>Note</th><th></th></tr></thead><tbody>` +
+    pays.map(p => `<tr><td>${esc(p.date)}</td><td>${esc(name[p.line] || '(removed line)')}</td><td>${esc(p.vendor)}</td><td class="num">${usd(p.amount)}</td><td class="muted">${esc(p.note)}</td><td><button class="x" data-delpay="${p.id}" aria-label="Remove payment" title="Remove payment">✕</button></td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td class="muted">No payments yet.</td></tr></tbody>';
+}
+
+$('#lines').addEventListener('change', e => {
+  const tr = e.target.closest('tr[data-id]'), f = e.target.dataset.f; if (!tr || !f) return;
+  const l = state.lines.find(x => x.id === tr.dataset.id);
+  l[f] = f === 'name' ? e.target.value : Number(e.target.value) || 0;
+  commit();
+});
+$('#lines').addEventListener('click', e => {
+  const id = e.target.dataset.del; if (!id) return;
+  const l = state.lines.find(x => x.id === id), n = state.payments.filter(p => p.line === id).length;
+  if (!confirm(`Remove "${l.name}"?` + (n ? ` Its ${n} payment(s) stay in the ledger as "(removed line)".` : ''))) return;
+  state.lines = state.lines.filter(x => x.id !== id); commit('Line removed.');
+});
+$('#pays').addEventListener('click', e => {
+  const id = e.target.dataset.delpay; if (!id || !confirm('Remove this payment?')) return;
+  state.payments = state.payments.filter(p => p.id !== id); commit('Payment removed.');
+});
+$('#addLine').onclick = () => {
+  const group = prompt('Which group? (for example Exterior, Interior, Site)', 'Other'); if (group === null) return;
+  const name = prompt('What is the line for?'); if (!name) return;
+  state.lines.push({ id: newId('u', state.lines), group: group || 'Other', name, qty: 1, unit: 'lot', price: 0, basis: 'added by you' });
+  commit('Line added. Set its price in the table.');
+};
+$('#cont').onchange = e => { state.contingency = Math.max(0, Number(e.target.value) || 0); commit(); };
+$('#payForm').date.value = new Date().toISOString().slice(0, 10);
+$('#payForm').onsubmit = e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  state.payments.push({ id: newId('p', state.payments), date: f.get('date'), line: f.get('line'), vendor: f.get('vendor').trim(), amount: Number(f.get('amount')), note: f.get('note').trim() });
+  e.target.vendor.value = ''; e.target.amount.value = ''; e.target.note.value = '';
+  commit('Payment added.');
+};
+const download = (name, text, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); };
+const stamp = () => new Date().toISOString().slice(0, 10);
+$('#exportJson').onclick = () => download(`stone-sheep-budget-${stamp()}.json`, JSON.stringify(state, null, 1), 'application/json');
+$('#exportCsv').onclick = () => download(`stone-sheep-payments-${stamp()}.csv`, toCsv(state), 'text/csv');
+$('#importJson').onchange = async e => {
+  const file = e.target.files[0]; if (!file) return;
+  try {
+    const s = JSON.parse(await file.text());
+    if (!Array.isArray(s.lines) || !Array.isArray(s.payments)) throw new Error('not a budget backup');
+    if (!confirm(`Replace what's here with this backup (${s.lines.length} lines, ${s.payments.length} payments)?`)) return;
+    state = s; commit('Backup loaded.');
+  } catch (err) { status('That file is not a budget backup: ' + err.message); }
+  e.target.value = '';
+};
+$('#resetAll').onclick = () => { if (confirm('Clear every payment and change, back to the starting budget? Download a backup first if you want to keep them.')) { state = fresh(seed); commit('Back to the starting budget.'); } };
+render();
+let had = false; try { had = !!localStorage.getItem('ssp-budget-v1'); } catch {}
+status(had ? 'Saved in this browser.' : seed.note);
+</script>
+</body>
+</html>

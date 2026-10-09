@@ -1,0 +1,650 @@
+{
+ "version": "v1",
+ "meta": {
+  "address": "64 Stone Sheep Circle",
+  "plan_name": "Larson House",
+  "plan_date": "2026-06-11",
+  "sheets": {
+   "A-1": "First floor plan, room sizes and dimensions",
+   "A-2": "Roof plan over the floor plan, pitches and ceiling notes",
+   "A-3 (site)": "Site plan (lot outline, house position, north arrow)",
+   "A-3 (elev)": "Front and rear elevations",
+   "A-4": "Left and right elevations",
+   "A-5": "Floor plan with fixtures, cabinets and appliances"
+  },
+  "scale": "1/4\" = 1'-0\"",
+  "stories": 1,
+  "ceiling_ft": 9.0,
+  "vault": {
+   "rooms": [
+    "kitchen",
+    "living"
+   ],
+   "pitch": "4:12",
+   "note": "A-2: vaulted ceiling 4:12 over kitchen and living; all other interior ceilings 9'"
+  },
+  "patio_vault": {
+   "pitch": "6:12",
+   "note": "A-2: 6:12 vaulted patio ceiling"
+  },
+  "roof": {
+   "main_pitch": "6:12",
+   "gable_pitch": "8:12",
+   "porch_pitch": "2:12",
+   "material": "standing-seam metal (dark), per elevations",
+   "note": "Hips and gables per A-2; 8:12 on the front entry gable and the gable over the office/entry, 2:12 shed over the front porch."
+  },
+  "siding": "vertical board-and-batten (tan), stone veneer on the front garage gable, cedar-tone posts and gable bracket at the entry",
+  "ext_wall_ft": 0.46,
+  "int_wall_ft": 0.293,
+  "overall": {
+   "width_ft": 83.44,
+   "depth_ft": 70.09,
+   "note": "83'-5 1/4\" across the front, 78'-0 3/4\" across the rear, 70'-1 1/16\" deep at the garage, 62'-2 15/16\" at the bedroom wing to the porch edge"
+  }
+ },
+ "totals": {
+  "heated_gross_sf": 3185,
+  "garage_gross_sf": 982,
+  "conditioned_room_sf": 2975,
+  "garage_sf": 942,
+  "patio_sf": 325,
+  "porch_sf": 399
+ },
+ "climate": {
+  "name": "Casper, WY (assumed)",
+  "source": "ASHRAE 2009, Casper Natrona Co Intl AP, 99.6 % heating / 1 % cooling",
+  "heat_design_f": -10.3,
+  "cool_design_f": 89.6,
+  "indoor_heat_f": 70,
+  "indoor_cool_f": 75,
+  "elevation_ft": 5338,
+  "altitude_factor": 0.82,
+  "solar_btu_sf": 70,
+  "hp_capacity_at_design": 0.85,
+  "iecc_zone": "6B"
+ },
+ "envelope_defaults": {
+  "wall_u": 0.045,
+  "ceiling_u": 0.026,
+  "vault_u": 0.03,
+  "window_u": 0.3,
+  "window_shgc": 0.4,
+  "door_u": 0.2,
+  "slab_f": 0.54,
+  "ach50": 3.0,
+  "ach_nat": 0.25
+ },
+ "envelope": {
+  "walls": 1775.9,
+  "windows": 224.0,
+  "doors": 96.0,
+  "ceiling": 2080.1,
+  "vault": 943.3,
+  "slab_ft": 230.2,
+  "garage_wall": 268.5,
+  "volume": 29013.4
+ },
+ "rooms": [
+  {
+   "id": "master_bed",
+   "name": "Master Bed",
+   "kind": "bed",
+   "label": "14' x 17'",
+   "label_sf": 258,
+   "area_sf": 240.5
+  },
+  {
+   "id": "master_bath",
+   "name": "Master Bath",
+   "kind": "bath",
+   "label": "10'-3\" x 18'-7\"",
+   "label_sf": 189,
+   "area_sf": 192.5
+  },
+  {
+   "id": "master_closet",
+   "name": "Master Closet",
+   "kind": "closet",
+   "label": "10'-2\" x 9'-4\"",
+   "label_sf": 107,
+   "area_sf": 96.1
+  },
+  {
+   "id": "master_hall",
+   "name": "Master Hall",
+   "kind": "hall",
+   "label": null,
+   "label_sf": null,
+   "area_sf": 22.0
+  },
+  {
+   "id": "laundry",
+   "name": "Laundry",
+   "kind": "laundry",
+   "label": "8'-4\" x 12'-1\"",
+   "label_sf": 100,
+   "area_sf": 100.6
+  },
+  {
+   "id": "powder",
+   "name": "Powder",
+   "kind": "bath",
+   "label": "5'-5\" x 5'-5\"",
+   "label_sf": 34,
+   "area_sf": 30.4
+  },
+  {
+   "id": "mud",
+   "name": "Mud Room",
+   "kind": "hall",
+   "label": "14'-1\" x 6'-6\"",
+   "label_sf": 145,
+   "area_sf": 133.4
+  },
+  {
+   "id": "dining",
+   "name": "Dining",
+   "kind": "living",
+   "label": "12'-10\" x 10'-7\"",
+   "label_sf": 147,
+   "area_sf": 136.2
+  },
+  {
+   "id": "kitchen",
+   "name": "Kitchen",
+   "kind": "kitchen",
+   "label": "13' x 28'-9\"",
+   "label_sf": 376,
+   "area_sf": 370.5
+  },
+  {
+   "id": "pantry",
+   "name": "Pantry",
+   "kind": "closet",
+   "label": "9'-5\" x 8'",
+   "label_sf": 81,
+   "area_sf": 76.8
+  },
+  {
+   "id": "mechanical",
+   "name": "Mechanical",
+   "kind": "mech",
+   "label": "3' x 8'",
+   "label_sf": 30,
+   "area_sf": 24.9
+  },
+  {
+   "id": "living",
+   "name": "Living",
+   "kind": "living",
+   "label": "17'-4\" x 25'-7\"",
+   "label_sf": 512,
+   "area_sf": 524.5
+  },
+  {
+   "id": "entry",
+   "name": "Entry",
+   "kind": "hall",
+   "label": "7' x 10'-7\"",
+   "label_sf": 80,
+   "area_sf": 76.4
+  },
+  {
+   "id": "coat",
+   "name": "Coat Closet",
+   "kind": "closet",
+   "label": null,
+   "label_sf": null,
+   "area_sf": 6.0
+  },
+  {
+   "id": "office",
+   "name": "Office",
+   "kind": "bed",
+   "label": "12'-9\" x 10'-5\"",
+   "label_sf": 143,
+   "area_sf": 134.3
+  },
+  {
+   "id": "hall",
+   "name": "Bedroom Hall",
+   "kind": "hall",
+   "label": null,
+   "label_sf": null,
+   "area_sf": 85.8
+  },
+  {
+   "id": "bed1",
+   "name": "Bedroom 1",
+   "kind": "bed",
+   "label": "13'-1\" x 13'-4\"",
+   "label_sf": 189,
+   "area_sf": 175.8
+  },
+  {
+   "id": "bed1_closet",
+   "name": "Bedroom 1 Closet",
+   "kind": "closet",
+   "label": null,
+   "label_sf": null,
+   "area_sf": 17.5
+  },
+  {
+   "id": "bath1",
+   "name": "Bath 1",
+   "kind": "bath",
+   "label": "5' x 6'-11\"",
+   "label_sf": 42,
+   "area_sf": 52.6
+  },
+  {
+   "id": "bed2_closet",
+   "name": "Closet (Bedroom 2)",
+   "kind": "closet",
+   "label": "5' x 5'",
+   "label_sf": 31,
+   "area_sf": 26.1
+  },
+  {
+   "id": "bed2",
+   "name": "Bedroom 2",
+   "kind": "bed",
+   "label": "14'-1\" x 12'-6\"",
+   "label_sf": 190,
+   "area_sf": 178.1
+  },
+  {
+   "id": "bath2",
+   "name": "Bath 2",
+   "kind": "bath",
+   "label": "14'-1\" x 5'-6\"",
+   "label_sf": 87,
+   "area_sf": 78.9
+  },
+  {
+   "id": "bed3",
+   "name": "Bedroom 3",
+   "kind": "bed",
+   "label": "12'-11\" x 12'-11\"",
+   "label_sf": 181,
+   "area_sf": 169.0
+  },
+  {
+   "id": "bed3_closet",
+   "name": "Closet (Bedroom 3)",
+   "kind": "closet",
+   "label": "5'-2\" x 4'-11\"",
+   "label_sf": 33,
+   "area_sf": 26.2
+  },
+  {
+   "id": "garage",
+   "name": "Garage",
+   "kind": "garage",
+   "label": "30' x 32'-11\"",
+   "label_sf": 978,
+   "area_sf": 942.0
+  },
+  {
+   "id": "patio",
+   "name": "Covered Patio",
+   "kind": "outdoor",
+   "label": null,
+   "label_sf": null,
+   "area_sf": 325.0
+  },
+  {
+   "id": "porch",
+   "name": "Front Porch",
+   "kind": "outdoor",
+   "label": null,
+   "label_sf": null,
+   "area_sf": 399.1
+  }
+ ],
+ "windows": 20,
+ "doors": 28,
+ "glazing": [
+  {
+   "id": "W1",
+   "room": "master_bed",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W2",
+   "room": "master_bed",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W3",
+   "room": "master_bath",
+   "side": "rear",
+   "sf": 13.5,
+   "shaded": false
+  },
+  {
+   "id": "W4",
+   "room": "dining",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W5",
+   "room": "dining",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W6",
+   "room": "dining",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W7",
+   "room": "dining",
+   "side": "right",
+   "sf": 12.5,
+   "shaded": true
+  },
+  {
+   "id": "W8",
+   "room": "dining",
+   "side": "right",
+   "sf": 12.5,
+   "shaded": true
+  },
+  {
+   "id": "W9",
+   "room": "living",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": true
+  },
+  {
+   "id": "W10",
+   "room": "living",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": true
+  },
+  {
+   "id": "W11",
+   "room": "bed1",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W12",
+   "room": "bed1",
+   "side": "rear",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W13",
+   "room": "bed2",
+   "side": "right",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W14",
+   "room": "bed2",
+   "side": "right",
+   "sf": 12.5,
+   "shaded": false
+  },
+  {
+   "id": "W15",
+   "room": "pantry",
+   "side": "front",
+   "sf": 16.0,
+   "shaded": false
+  },
+  {
+   "id": "W16",
+   "room": "office",
+   "side": "front",
+   "sf": 16.0,
+   "shaded": false
+  },
+  {
+   "id": "W17",
+   "room": "bed3",
+   "side": "front",
+   "sf": 16.0,
+   "shaded": false
+  }
+ ],
+ "loads": [
+  {
+   "name": "Master Bed",
+   "heat": 2724,
+   "cool": 1768,
+   "cfm": 99
+  },
+  {
+   "name": "Master Bath",
+   "heat": 3389,
+   "cool": 1005,
+   "cfm": 103
+  },
+  {
+   "name": "Master Closet",
+   "heat": 1335,
+   "cool": 291,
+   "cfm": 40
+  },
+  {
+   "name": "Master Hall",
+   "heat": 105,
+   "cool": 36,
+   "cfm": 3
+  },
+  {
+   "name": "Laundry",
+   "heat": 478,
+   "cool": 565,
+   "cfm": 32
+  },
+  {
+   "name": "Powder",
+   "heat": 145,
+   "cool": 50,
+   "cfm": 4
+  },
+  {
+   "name": "Mud Room",
+   "heat": 1207,
+   "cool": 380,
+   "cfm": 37
+  },
+  {
+   "name": "Dining",
+   "heat": 3707,
+   "cool": 3089,
+   "cfm": 172
+  },
+  {
+   "name": "Kitchen",
+   "heat": 2203,
+   "cool": 2412,
+   "cfm": 135
+  },
+  {
+   "name": "Pantry",
+   "heat": 1414,
+   "cool": 715,
+   "cfm": 43
+  },
+  {
+   "name": "Mechanical",
+   "heat": 484,
+   "cool": 106,
+   "cfm": 15
+  },
+  {
+   "name": "Living",
+   "heat": 5781,
+   "cool": 3194,
+   "cfm": 178
+  },
+  {
+   "name": "Entry",
+   "heat": 1199,
+   "cool": 275,
+   "cfm": 36
+  },
+  {
+   "name": "Coat Closet",
+   "heat": 29,
+   "cool": 10,
+   "cfm": 1
+  },
+  {
+   "name": "Office",
+   "heat": 1937,
+   "cool": 1600,
+   "cfm": 89
+  },
+  {
+   "name": "Bedroom Hall",
+   "heat": 408,
+   "cool": 141,
+   "cfm": 12
+  },
+  {
+   "name": "Bedroom 1",
+   "heat": 3360,
+   "cool": 1776,
+   "cfm": 102
+  },
+  {
+   "name": "Bedroom 1 Closet",
+   "heat": 83,
+   "cool": 29,
+   "cfm": 3
+  },
+  {
+   "name": "Bath 1",
+   "heat": 1419,
+   "cool": 227,
+   "cfm": 43
+  },
+  {
+   "name": "Closet (Bedroom 2)",
+   "heat": 512,
+   "cool": 90,
+   "cfm": 16
+  },
+  {
+   "name": "Bedroom 2",
+   "heat": 2314,
+   "cool": 1652,
+   "cfm": 92
+  },
+  {
+   "name": "Bath 2",
+   "heat": 799,
+   "cool": 181,
+   "cfm": 24
+  },
+  {
+   "name": "Bedroom 3",
+   "heat": 3104,
+   "cool": 1478,
+   "cfm": 94
+  },
+  {
+   "name": "Closet (Bedroom 3)",
+   "heat": 901,
+   "cool": 137,
+   "cfm": 27
+  }
+ ],
+ "trades": {
+  "s1": {
+   "ext_lf": 328,
+   "int_lf": 375,
+   "studs": 973,
+   "wall_board": 7580,
+   "ceiling_board": 3024,
+   "runs": 54
+  },
+  "e1": {
+   "devices": 209,
+   "circuits": 31,
+   "spaces": 36,
+   "amps": 134,
+   "receptacles": 76,
+   "lights": 59,
+   "switches": 43
+  },
+  "p1": {
+   "fixtures": 21,
+   "dfu": 41,
+   "wsfu": 35.7,
+   "stacks": 5,
+   "peak_gpm": 11.3
+  },
+  "m1": {
+   "heat": 39035,
+   "cool": 21207,
+   "tons": 3.5,
+   "cfm": 1400.0,
+   "registers": 18,
+   "backup_kw": 5
+  }
+ },
+ "open_items": {
+  "A-1": [
+   "Where the house is (address, lot, orientation): the site plan has a north arrow but no dimensions, setbacks or street.",
+   "Sheet numbering: the site plan and the front/rear elevations are both A-3 on the owner's set.",
+   "Living room width (17'-4\" printed vs. ~20'-5\" measured).",
+   "Powder room sink, fireplace chimney route, bedroom 3 egress window."
+  ],
+  "S-1": [
+   "Window sizes and heights are scaled from the elevations; confirm the window schedule with the supplier before framing.",
+   "Bedroom 3's only window (W17, 4'x4') scales with a 4'-0\" sill: above the 44\" egress limit. Lower it or use a casement sized for egress.",
+   "Interior door heights are not on the plans (8'-0\" assumed to match the exterior doors on the elevations).",
+   "Roof: truss layout, vault framing over kitchen/living and the patio's 6:12 vaulted ceiling.",
+   "Fireplace insert: chimney chase framing through the vaulted living ceiling and roof; clearances per the insert's manual.",
+   "Living room label on A-1 says 17'-4\" wide; the walls measure about 20'-5\". Framing follows the walls.",
+   "Foundation type (slab assumed: the garage and mechanical floor drains) and anchor schedule."
+  ],
+  "E-1": [
+   "Range fuel: the 48\" range (BS655Z-48) could be gas, dual-fuel or electric. Electric is assumed (50 A 240 V); a gas or dual-fuel range drops that circuit and adds a gas line.",
+   "Heating and water heating fuel (heat pump / gas furnace / electric) set the mechanical circuits and the service load.",
+   "Meter and service entrance location (overhead or underground, which side of the house) is not on the site plan.",
+   "EV charger in the garage: yes or no.",
+   "Lighting choices (cans vs. surface fixtures, pendants, fan locations) for the owner's walk-through.",
+   "Low-voltage: network drops, TV at the fireplace wall, doorbell, security."
+  ],
+  "P-1": [
+   "Where the house connects: city sewer or septic, and which side of the lot. The drain is drawn leaving under the front porch.",
+   "Water source (city or well) and where it enters; the manifold is drawn in the mechanical closet.",
+   "Water heater fuel and type. A heat-pump water heater needs about 700 cu ft of air or a ducted kit; the 3' x 8' mechanical closet is too small without one. A gas unit needs venting and combustion air.",
+   "Powder room sink is not drawn on A-5 (one is shown here, assumed).",
+   "Garage floor drain: sanitary with an interceptor, or to daylight (lot grading).",
+   "Kitchen island vent method (loop vent vs. AAV) depends on the local code.",
+   "Fixture models: A-5 tags the drains K-9135 and K-9136; tub, toilet, faucet and valve models still to pick."
+  ],
+  "M-1": [
+   "Location: the design temperatures, and with them every number on this sheet, use Casper, WY until the site is confirmed.",
+   "Fuel: heat pump with electric backup is assumed. A gas furnace with AC is the other common choice; it needs a gas line, a flue and combustion air in the closet.",
+   "Mechanical closet opens from the garage: confirm the AHJ allows the air handler there, and air-seal it (gasketed door, sealed plenum, no return openings).",
+   "Insulation values and air-tightness target for the house.",
+   "Outdoor unit location (drawn by the master closet's outside wall, out of sight from the front)."
+  ]
+ }
+}

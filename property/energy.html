@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stone Sheep">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1a17" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="pwa.js" defer></script>
+<title>Heating &amp; Cooling</title>
+<meta name="description" content="Hour-by-hour heating and cooling for 64 Stone Sheep Circle on a typical Casper year, with editable insulation, windows, air sealing and fuel.">
+<style>
+  .chart { width: 100%; height: auto; display: block; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  details.card summary { cursor: pointer; font: 600 17px/1.2 var(--display); letter-spacing: .04em; text-transform: uppercase; }
+  .best td { font-weight: 600; }
+</style>
+<body>
+<div class="page">
+  <p class="eyebrow">64 Stone Sheep Circle</p>
+  <h1>Heating &amp; cooling</h1>
+  <p class="lede">Every hour of a typical year of Casper weather, run through the house as drawn: wall, ceiling and window areas measured from the plans, your insulation and air-sealing targets, sun through each window, and the mass of the slab. Change anything below and the year re-runs.</p>
+
+  <div class="kpis" id="kpis"></div>
+  <p class="note" id="verdict"></p>
+
+  <h2>Month by month</h2>
+  <div class="legend"><span><i style="background:var(--warm)"></i>Heating cost</span><span><i style="background:var(--cool)"></i>Cooling cost</span></div>
+  <svg class="chart" id="months" viewBox="0 0 720 230" role="img" aria-label="Monthly heating and cooling cost"></svg>
+
+  <h2>The coldest week</h2>
+  <p class="muted small">Casper's TMY coldest week (Jan 29 to Feb 4). The line is outdoor temperature; the shading is the heat the house needs each hour, with any part the heat pump can't cover in red.</p>
+  <div class="legend"><span><i style="background:var(--muted)"></i>Outdoor °F</span><span><i style="background:var(--warm)"></i>Heat needed</span><span><i style="background:var(--bad)"></i>Backup heat</span></div>
+  <svg class="chart" id="week" viewBox="0 0 720 240" role="img" aria-label="Coldest week, hourly"></svg>
+
+  <h2>Which heating system</h2>
+  <div class="scroll"><table id="systems"></table></div>
+
+  <h2>Where the heat goes</h2>
+  <p class="muted small">Conductance of each part of the envelope, BTU per hour per °F of inside-to-outside difference.</p>
+  <div class="scroll"><table id="ua"></table></div>
+
+  <h2>Settings</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Site</h3>
+      <div class="fields">
+        <label class="f">Front porch faces
+          <select data-k="front"><option value="180">South</option><option value="135">Southeast</option><option value="225">Southwest</option><option value="90">East</option><option value="270">West</option><option value="0">North</option><option value="45">Northeast</option><option value="315">Northwest</option></select></label>
+      </div>
+      <p class="muted small">The plans have a north arrow but no lot or street, so south is a placeholder. Weather is Casper (Natrona Co. airport) until the site is confirmed.</p>
+      <h3>Envelope</h3>
+      <div class="fields">
+        <label class="f">Wall R (whole wall)<input type="number" step="1" data-k="wallR"></label>
+        <label class="f">Flat ceiling R<input type="number" step="1" data-k="ceilingR"></label>
+        <label class="f">Vault R<input type="number" step="1" data-k="vaultR"></label>
+        <label class="f">Window U<input type="number" step="0.01" data-k="windowU"></label>
+        <label class="f">Window SHGC<input type="number" step="0.01" data-k="shgc"></label>
+        <label class="f">Door U<input type="number" step="0.01" data-k="doorU"></label>
+        <label class="f">Slab edge F<input type="number" step="0.01" data-k="slabF"></label>
+        <label class="f">Blower door ACH50<input type="number" step="0.1" data-k="ach50"></label>
+        <label class="f">ERV recovery (0–0.9)<input type="number" step="0.05" data-k="ervEff"></label>
+        <label class="f">Ventilation CFM (0 = code)<input type="number" step="5" data-k="ventCfm"></label>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Equipment</h3>
+      <div class="fields">
+        <label class="f">Heating
+          <select data-k="system"><option value="hp">Cold-climate heat pump</option><option value="propane">Propane furnace + AC</option><option value="gas">Natural gas furnace + AC</option></select></label>
+        <label class="f">Heat pump tons<input type="number" step="0.5" data-k="tons"></label>
+        <label class="f">Backup strips kW<input type="number" step="1" data-k="backupKw"></label>
+        <label class="f">Cooling SEER2<input type="number" step="0.5" data-k="seer2"></label>
+        <label class="f">Furnace AFUE<input type="number" step="0.01" data-k="afue"></label>
+        <label class="f">Heat to °F<input type="number" step="1" data-k="heatSet"></label>
+        <label class="f">Cool to °F<input type="number" step="1" data-k="coolSet"></label>
+      </div>
+      <h3>Prices</h3>
+      <div class="fields">
+        <label class="f">Electricity $/kWh<input type="number" step="0.005" data-k="elec"></label>
+        <label class="f">Propane $/gal<input type="number" step="0.05" data-k="propane"></label>
+        <label class="f">Natural gas $/therm<input type="number" step="0.05" data-k="gas"></label>
+      </div>
+      <p class="row" style="margin-top:12px"><button class="ghost" id="reset" type="button">Back to the defaults</button></p>
+    </div>
+  </div>
+
+  <details class="card" style="margin-top:16px">
+    <summary>How this is worked out</summary>
+    <ul class="small" id="method"></ul>
+  </details>
+</div>
+
+<script type="module">
+import { DEFAULTS, simulate, compareSystems } from './model/energy.js';
+const KEY = 'ssp-energy-v1';
+const $ = s => document.querySelector(s);
+const fmt = (n, d = 0) => n.toLocaleString(undefined, { maximumFractionDigits: d, minimumFractionDigits: d });
+const usd = n => '$' + fmt(Math.round(n));
+let saved = {}; try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch {}
+const params = { ...DEFAULTS, ...saved };
+const [house, wx] = await Promise.all(['data/house-data.json', 'data/casper-tmy3.json'].map(u => fetch(u).then(r => r.json())));
+
+document.querySelectorAll('[data-k]').forEach(el => {
+  el.value = params[el.dataset.k];
+  el.addEventListener('input', () => {
+    const k = el.dataset.k, v = el.tagName === 'SELECT' && k === 'system' ? el.value : Number(el.value);
+    if (typeof v === 'number' && !Number.isFinite(v)) return;
+    params[k] = v; save(); schedule();
+  });
+});
+$('#reset').onclick = () => { Object.assign(params, DEFAULTS); try { localStorage.removeItem(KEY); } catch {} document.querySelectorAll('[data-k]').forEach(el => el.value = params[el.dataset.k]); run(); };
+function save() { try { const diff = {}; for (const k in params) if (params[k] !== DEFAULTS[k]) diff[k] = params[k]; localStorage.setItem(KEY, JSON.stringify(diff)); } catch {} }
+let timer; function schedule() { clearTimeout(timer); timer = setTimeout(run, 150); }
+
+const NAMES = { hp: 'Cold-climate heat pump', propane: 'Propane furnace + AC', gas: 'Natural gas furnace + AC' };
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function run() {
+  const all = compareSystems(house, wx, params), r = all.find(a => a.system === params.system).r;
+  const kpi = (v, l) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`;
+  $('#kpis').innerHTML = [
+    kpi(usd(r.total), 'a year to heat and cool'),
+    kpi(fmt(r.heatMMBtu, 1) + ' MMBtu', 'heat the house needs in a year'),
+    kpi(fmt(r.peakHeat / 1000, 1) + 'k', 'BTU/h, the worst hour of the year'),
+    kpi(fmt(r.designLoss / 1000, 1) + 'k', `BTU/h at the ${fmt(r.designF, 0)} °F design day`),
+    kpi(fmt(r.elecKwh) + ' kWh', 'electricity for heating and cooling'),
+    kpi(usd(r.coolCost), 'of that is cooling'),
+  ].join('');
+  const m1 = house.trades.m1;
+  let v = `The M-1 sheet sizes the system at ${m1.tons} tons for a ${fmt(m1.heat / 1000, 1)}k BTU/h room-by-room heating load. Here the whole house loses ${fmt(r.designLoss / 1000, 1)}k BTU/h at design. `;
+  if (params.system === 'hp') {
+    v += r.unmet ? `With ${params.tons} tons and ${params.backupKw} kW of strips, ${r.unmet} hours a year fall short; add backup or capacity.` :
+      r.backupHours ? `The heat pump covers all but ${r.backupHours} hours a year; the strips add ${fmt(r.backupKwh)} kWh (${usd(r.backupKwh * params.elec)}).` :
+      `The heat pump carries every hour of the year without the backup strips.`;
+  } else v += `The furnace burns ${fmt(r.fuelUnits)} ${params.system === 'propane' ? 'gallons of propane' : 'therms of gas'} a year.`;
+  $('#verdict').textContent = v;
+
+  // monthly cost bars
+  const W = 720, H = 230, L = 46, B = 24, T = 10, bw = (W - L - 10) / 12;
+  const split = r.month.map(m => ({ heat: m.heatCost, cool: m.coolCost }));
+  const max = Math.max(1, ...split.map(s => s.heat + s.cool));
+  const step = max > 300 ? 100 : max > 120 ? 50 : 20, top = Math.ceil(max / step) * step;
+  const y = v => T + (H - T - B) * (1 - v / top);
+  let s = '';
+  for (let g = 0; g <= top; g += step) s += `<line x1="${L}" x2="${W - 6}" y1="${y(g)}" y2="${y(g)}" stroke="var(--rule)"/><text x="${L - 6}" y="${y(g) + 4}" text-anchor="end">$${g}</text>`;
+  split.forEach((m, i) => {
+    const x = L + i * bw + 4, w = bw - 8;
+    s += `<rect x="${x}" y="${y(m.heat)}" width="${w}" height="${y(0) - y(m.heat)}" fill="var(--warm)"><title>${MON[i]} heating ${usd(m.heat)}</title></rect>`;
+    s += `<rect x="${x}" y="${y(m.heat + m.cool)}" width="${w}" height="${y(m.heat) - y(m.heat + m.cool)}" fill="var(--cool)"><title>${MON[i]} cooling ${usd(m.cool)}</title></rect>`;
+    s += `<text x="${x + w / 2}" y="${H - 6}" text-anchor="middle">${MON[i]}</text>`;
+  });
+  $('#months').innerHTML = s;
+
+  // coldest week, hours 672..839 (Jan 29 to Feb 4)
+  const a = 28 * 24, n = 7 * 24, hh = r.hourly, Hw = 240;
+  const tmin = Math.floor(Math.min(...hh.tout.slice(a, a + n)) / 10) * 10, tmax = Math.ceil(Math.max(...hh.tout.slice(a, a + n), 40) / 10) * 10;
+  const qmax = Math.max(1, ...hh.heat.slice(a, a + n));
+  const xs = i => L + (W - L - 46) * i / (n - 1), yt = t => T + (Hw - T - B) * (1 - (t - tmin) / (tmax - tmin)), yq = q => T + (Hw - T - B) * (1 - q / qmax / 1.1);
+  let w = '';
+  for (let t = tmin; t <= tmax; t += 10) w += `<line x1="${L}" x2="${W - 46}" y1="${yt(t)}" y2="${yt(t)}" stroke="var(--rule)"/><text x="${L - 6}" y="${yt(t) + 4}" text-anchor="end">${t}°</text>`;
+  const qTicks = [0, 0.25, 0.5, 0.75, 1].map(f => f * qmax * 1.1);
+  qTicks.forEach(q => w += `<text x="${W - 40}" y="${yq(q) + 4}">${fmt(q / 1000, 0)}k</text>`);
+  let area = `M${xs(0)},${yq(0)}`, back = `M${xs(0)},${yq(0)}`;
+  for (let i = 0; i < n; i++) { area += `L${xs(i)},${yq(hh.heat[a + i])}`; back += `L${xs(i)},${yq(hh.backup[a + i])}`; }
+  area += `L${xs(n - 1)},${yq(0)}Z`; back += `L${xs(n - 1)},${yq(0)}Z`;
+  w += `<path d="${area}" fill="var(--warm)" opacity=".35"/>`;
+  if (params.system === 'hp') w += `<path d="${back}" fill="var(--bad)" opacity=".7"/>`;
+  let line = ''; for (let i = 0; i < n; i++) line += (i ? 'L' : 'M') + xs(i) + ',' + yt(hh.tout[a + i]);
+  w += `<path d="${line}" fill="none" stroke="var(--ink-2)" stroke-width="1.5"/>`;
+  ['Jan 29', 'Jan 30', 'Jan 31', 'Feb 1', 'Feb 2', 'Feb 3', 'Feb 4'].forEach((d, k) => w += `<text x="${xs(k * 24 + 12)}" y="${Hw - 6}" text-anchor="middle">${d}</text>`);
+  $('#week').innerHTML = w;
+
+  // system comparison
+  const best = Math.min(...all.map(a => a.r.total));
+  $('#systems').innerHTML = `<thead><tr><th>System</th><th class="num">Electricity</th><th class="num">Fuel</th><th class="num">Heating</th><th class="num">Cooling</th><th class="num">Year</th></tr></thead><tbody>` +
+    all.map(({ system, r }) => `<tr class="${r.total === best ? 'best' : ''}"><td>${NAMES[system]}${system === params.system ? ' <span class="muted">(selected)</span>' : ''}</td><td class="num">${fmt(r.elecKwh)} kWh</td><td class="num">${system === 'hp' ? '—' : fmt(r.fuelUnits) + (system === 'propane' ? ' gal' : ' therms')}</td><td class="num">${usd(r.heatCost)}</td><td class="num">${usd(r.coolCost)}</td><td class="num">${usd(r.total)}</td></tr>`).join('') + '</tbody>';
+
+  const LAB = { walls: 'Above-grade walls', windows: 'Windows', doors: 'Doors', ceiling: 'Flat ceilings (attic)', vault: 'Vaulted ceilings', slab: 'Slab edge', garage: 'Wall to the garage', leakage: 'Air leakage', ventilation: 'Fresh air (after the ERV)' };
+  const AREA = { walls: house.envelope.walls + ' sq ft', windows: house.envelope.windows + ' sq ft', doors: house.envelope.doors + ' sq ft', ceiling: house.envelope.ceiling + ' sq ft', vault: house.envelope.vault + ' sq ft', slab: house.envelope.slab_ft + ' ft of edge', garage: house.envelope.garage_wall + ' sq ft', leakage: fmt(r.achNat, 2) + ' ACH natural', ventilation: fmt(r.ventCfm) + ' CFM' };
+  $('#ua').innerHTML = `<thead><tr><th>Part</th><th>Size</th><th class="num">UA</th><th class="num">Share</th><th style="width:30%"></th></tr></thead><tbody>` +
+    Object.entries(r.ua).sort((a, b) => b[1] - a[1]).map(([k, u]) => `<tr><td>${LAB[k]}</td><td class="muted">${AREA[k]}</td><td class="num">${fmt(u, 1)}</td><td class="num">${fmt(100 * u / r.UA)}%</td><td><div class="bar"><i style="width:${100 * u / r.UA}%"></i></div></td></tr>`).join('') +
+    `</tbody><tfoot><tr><td>Whole house</td><td></td><td class="num">${fmt(r.UA, 0)}</td><td class="num">100%</td><td></td></tr></tfoot>`;
+
+  $('#method').innerHTML = [
+    `Weather: ${wx.station}, ${wx.dataset} (8,760 hours of temperature and sun). Swap this file when the site is confirmed.`,
+    `Areas come from the plans: ${house.envelope.walls} sq ft of net wall, ${house.envelope.windows} sq ft of windows, ${house.envelope.ceiling} sq ft of flat ceiling and ${house.envelope.vault} sq ft of vault, ${fmt(house.envelope.volume)} cu ft inside.`,
+    `Air leakage is the blower-door target divided by ${params.nFactor}; fresh air is ASHRAE 62.2 (${fmt(r.ventCfm)} CFM) through the ERV. Both are corrected for Casper's altitude.`,
+    `Sun: each window's side of the house is turned to the porch direction you pick; windows under the rear patio roof get only sky light.`,
+    `Internal gains: ${fmt(r.internal)} BTU/h around the clock (RESNET, ${house.rooms.filter(r => r.kind === 'bed').length} bedrooms). Mass: ${fmt(r.C)} BTU/°F, so the house coasts through sunny afternoons and mild nights.`,
+    `Heat pump capacity falls to 85% of nominal at −10 °F and its efficiency from COP 3.8 at 47 °F to 1.7 at −10 °F (a cold-climate unit); what it can't cover goes to the strips.`,
+  ].map(t => `<li>${t}</li>`).join('');
+}
+run();
+</script>
+</body>
+</html>

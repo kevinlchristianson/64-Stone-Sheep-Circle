@@ -4,7 +4,7 @@
 //   Public:  /  and  /contractor/*   (the crews' app, chat included)
 //   Private: /property/*  and  /api/*  (only through Cloudflare Access)
 {
-  "name": "stone-sheep-circle",
+  "name": "64-stone-sheep-circle",
   "main": "worker/index.js",
   "compatibility_date": "2025-09-01",
   "assets": {

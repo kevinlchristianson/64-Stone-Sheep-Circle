@@ -56,7 +56,7 @@
   <div class="scroll"><table id="pays"></table></div>
 
   <h2>Keep it safe</h2>
-  <p class="muted small">Everything here is saved in this browser only. Download a backup now and then, and load it on another phone or computer to carry the budget over.</p>
+  <p class="muted small" id="keepNote">Everything here is saved in this browser only. Download a backup now and then, and load it on another phone or computer to carry the budget over.</p>
   <p class="row">
     <button class="ghost" type="button" id="exportJson">Download backup</button>
     <label class="btn ghost" for="importJson">Load a backup</label><input type="file" id="importJson" accept="application/json,.json" hidden>
@@ -67,14 +67,31 @@
 </div>
 
 <script type="module">
-import { load, save, fresh, summarize, lineBudget, newId, toCsv } from './model/budget.js';
+import { load, save, fresh, summarize, lineBudget, newId, toCsv, cloudStore } from './model/budget.js';
 const $ = s => document.querySelector(s);
 const usd = n => (n < 0 ? '−$' : '$') + Math.abs(Math.round(n)).toLocaleString();
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const seed = await fetch('data/budget-seed.json').then(r => r.json());
 let state = load(seed);
 const status = t => { $('#status').textContent = t; };
-function commit(msg) { status(save(state) ? (msg || 'Saved in this browser.') : 'This browser would not save. Download a backup to keep your changes.'); render(); }
+let cloud = null;
+function commit(msg) {
+  state.updatedAt = Date.now();
+  const kept = save(state);
+  render();
+  if (cloud) cloud.put(state).then(() => status((msg ? msg + ' ' : '') + 'Synced to your other devices.'))
+    .catch(() => status((msg ? msg + ' ' : '') + 'Saved here; it will sync when the connection is back.'));
+  else status(kept ? (msg || 'Saved in this browser.') : 'This browser would not save. Download a backup to keep your changes.');
+}
+// Bring in the shared copy when it is newer, and push ours when it is newer.
+async function pull() {
+  if (!cloud) return;
+  try {
+    const remote = await cloud.get();
+    if (remote && Array.isArray(remote.lines) && (remote.updatedAt || 0) > (state.updatedAt || 0)) { state = remote; save(state); render(); status('Up to date with your other devices.'); }
+    else if (!remote || (state.updatedAt || 0) > (remote.updatedAt || 0)) { await cloud.put(state); status('Synced to your other devices.'); }
+  } catch { status('Could not reach the sync store; changes stay in this browser for now.'); }
+}
 
 function render() {
   const s = summarize(state);
@@ -159,6 +176,13 @@ $('#resetAll').onclick = () => { if (confirm('Clear every payment and change, ba
 render();
 let had = false; try { had = !!localStorage.getItem('ssp-budget-v1'); } catch {}
 status(had ? 'Saved in this browser.' : seed.note);
+cloud = await cloudStore();
+if (cloud) {
+  document.getElementById('keepNote').textContent = 'Changes sync to every phone and computer you sign in on. A downloaded backup is still a good idea now and then.';
+  await pull();
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pull(); });
+  setInterval(() => { if (document.visibilityState === 'visible') pull(); }, 30000);
+}
 </script>
 </body>
 </html>

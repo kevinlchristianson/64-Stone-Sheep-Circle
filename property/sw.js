@@ -1,5 +1,5 @@
 // Bump VERSION whenever a page or data file changes so phones pick up the new copy.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = 'ssp-' + VERSION;
 const SHELL = [
   './home.html', './budget.html', './energy.html', './rooms.html', './contractor.html',

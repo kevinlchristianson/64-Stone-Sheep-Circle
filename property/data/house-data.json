@@ -431,145 +431,145 @@
    "name": "Master Bed",
    "heat": 2785,
    "cool": 1725,
-   "cfm": 113
+   "cfm": 80
   },
   {
    "name": "Master Bath",
    "heat": 3455,
    "cool": 960,
-   "cfm": 116
+   "cfm": 44
   },
   {
    "name": "Master Closet",
    "heat": 1363,
    "cool": 271,
-   "cfm": 46
+   "cfm": 13
   },
   {
    "name": "Master Hall",
    "heat": 108,
    "cool": 34,
-   "cfm": 4
+   "cfm": 2
   },
   {
    "name": "Laundry",
    "heat": 904,
    "cool": 587,
-   "cfm": 39
+   "cfm": 27
   },
   {
    "name": "Powder",
    "heat": 150,
    "cool": 47,
-   "cfm": 5
+   "cfm": 2
   },
   {
    "name": "Mud Room",
    "heat": 1236,
    "cool": 356,
-   "cfm": 42
+   "cfm": 16
   },
   {
    "name": "Dining",
    "heat": 3771,
    "cool": 3031,
-   "cfm": 199
+   "cfm": 140
   },
   {
    "name": "Kitchen",
    "heat": 2280,
    "cool": 2370,
-   "cfm": 156
+   "cfm": 110
   },
   {
    "name": "Pantry",
    "heat": 1441,
    "cool": 694,
-   "cfm": 48
+   "cfm": 32
   },
   {
    "name": "Mechanical",
    "heat": 493,
    "cool": 99,
-   "cfm": 17
+   "cfm": 5
   },
   {
    "name": "Living",
    "heat": 5927,
    "cool": 3095,
-   "cfm": 203
+   "cfm": 143
   },
   {
    "name": "Entry",
    "heat": 1223,
    "cool": 256,
-   "cfm": 41
+   "cfm": 12
   },
   {
    "name": "Coat Closet",
    "heat": 30,
    "cool": 9,
-   "cfm": 1
+   "cfm": 0
   },
   {
    "name": "Office",
    "heat": 1977,
    "cool": 1571,
-   "cfm": 103
+   "cfm": 73
   },
   {
    "name": "Bedroom Hall",
    "heat": 422,
    "cool": 133,
-   "cfm": 14
+   "cfm": 6
   },
   {
    "name": "Bedroom 1",
    "heat": 3424,
    "cool": 1729,
-   "cfm": 115
+   "cfm": 80
   },
   {
    "name": "Bedroom 1 Closet",
    "heat": 86,
    "cool": 27,
-   "cfm": 3
+   "cfm": 1
   },
   {
    "name": "Bath 1",
    "heat": 1443,
    "cool": 211,
-   "cfm": 48
+   "cfm": 10
   },
   {
    "name": "Closet (Bedroom 2)",
    "heat": 521,
    "cool": 84,
-   "cfm": 18
+   "cfm": 4
   },
   {
    "name": "Bedroom 2",
    "heat": 2363,
    "cool": 1615,
-   "cfm": 106
+   "cfm": 75
   },
   {
    "name": "Bath 2",
    "heat": 817,
    "cool": 170,
-   "cfm": 27
+   "cfm": 8
   },
   {
    "name": "Bedroom 3",
    "heat": 3163,
    "cool": 1436,
-   "cfm": 106
+   "cfm": 66
   },
   {
    "name": "Closet (Bedroom 3)",
    "heat": 916,
    "cool": 127,
-   "cfm": 31
+   "cfm": 6
   }
  ],
  "trades": {
@@ -601,10 +601,10 @@
   "m1": {
    "heat": 40299,
    "cool": 20637,
-   "tons": 4.0,
-   "cfm": 1600.0,
-   "registers": 18,
-   "backup_kw": 5
+   "tons": 4.5,
+   "units": 2,
+   "heads": 6,
+   "backup_kw": 0
   }
  },
  "open_items": {
@@ -643,11 +643,12 @@
    "Fixture models: A-5 tags the drains K-9135 and K-9136; tub, toilet, faucet and valve models still to pick."
   ],
   "M-1": [
-   "Location: Powell, WY, using design temperatures from Cody (the nearest ASHRAE station, ~700 ft higher, so slightly conservative). Confirm the lot's orientation.",
-   "Fuel: heat pump with electric backup is assumed. A gas furnace with AC is the other common choice; it needs a gas line, a flue and combustion air in the closet.",
-   "Mechanical closet opens from the garage: confirm the AHJ allows the air handler there, and air-seal it (gasketed door, sealed plenum, no return openings).",
-   "Insulation values and air-tightness target for the house.",
-   "Outdoor unit location (drawn by the master closet's outside wall, out of sight from the front)."
+   "Living room head: which outdoor unit feeds it. Drawn on CU-2 (the bedroom unit) because the patio and the vault split the attic: from CU-1 the line set runs about 106 ft around through the front attics, past the 82 ft per-head limit most multi-zone units have.",
+   "Office: no head as drawn (the ask was the right-side bedrooms). A 6k head on the office's right wall would make CU-2 a 5-port.",
+   "Exact models: pick the brand, then confirm the heads are an allowed combination for the outdoor unit and the line lengths are inside its limits.",
+   "Bed walls: the master and Bedroom 1 heads sit on the rear wall between the windows, where a headboard may go. A head over a headboard works with its vanes set level; otherwise it moves to a side wall. Confirm furniture walls before rough-in.",
+   "Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about 133 CFM continuous under the IRC).",
+   "Mechanical closet: no air handler now, so it is free for the radiant boiler or heat pump and manifold (R-1)."
   ]
  }
 }

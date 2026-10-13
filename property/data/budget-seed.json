@@ -168,11 +168,11 @@
   {
    "id": "b19",
    "group": "Mechanical",
-   "name": "Heat pump, air handler, ducts and ERV",
+   "name": "Mini-split heat pumps, heads and line sets",
    "qty": 1,
    "unit": "lot",
-   "price": 30000,
-   "basis": "4.0-ton cold-climate heat pump, 18 registers (M-1)"
+   "price": 22000,
+   "basis": "2 cold-climate multi-zone units, 6 wall heads, 4.5 tons (M-1)"
   },
   {
    "id": "b20",

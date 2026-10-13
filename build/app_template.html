@@ -355,7 +355,7 @@ tbody tr:last-child td { border-bottom: 0; }
           <label class="toggle"><input type="checkbox" id="ly-framing"><span class="sw" style="background:#c9a46a"></span> Framing: studs, plates, headers (S-1); green staggered, magenta blocking</label>
           <label class="toggle"><input type="checkbox" id="ly-elec" checked><span class="sw" style="background:#d08a00"></span> Electrical devices and lights (E-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-plumb" checked><span class="sw" style="background:#2c6aa0"></span> Plumbing: drains, stacks, supply (P-1)</label>
-          <label class="toggle"><input type="checkbox" id="ly-hvac" checked><span class="sw" style="background:#e3a05a"></span> HVAC (M-1)</label>
+          <label class="toggle"><input type="checkbox" id="ly-hvac" checked><span class="sw" style="background:#e3a05a"></span> HVAC: mini-split heads, outdoor units and line sets (M-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-trusses"><span class="sw" style="background:#a98a5c"></span> Roof trusses: 6:12 at 24" o.c., scissors over the kitchen and living vault, girder G1 (S-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-roof"><span class="sw" style="background:#3b3d40"></span> Roof: massing from A-2</label>
           <label class="toggle"><input type="checkbox" id="ly-furn" checked><span class="sw" style="background:#dfe8df"></span> Fixtures, cabinets and appliances (A-5)</label>
@@ -1038,6 +1038,37 @@ for (const line of DATA.lines3d) {
   const d0 = M(0, 0); tgt.position.set(d0.x, 0.08, d0.z); tgt.userData = { kind: 'grid', name: '0,0 datum', text: g.note }; pickables.push(tgt); G.grid.add(tgt);
 })();
 
+// ---------------------------------------------------------------- HVAC (M-1): ductless mini-splits
+// Outdoor units on stands, wall heads 6" below the ceiling, line sets from each unit up inside the wall to the attic,
+// across the attic and down to the heads; condensate out the wall or by pump. Not clipped by the wall-height cut.
+const HI_FREE = new THREE.MeshStandardMaterial({ color: 0xe08a00, emissive: 0x4a2a00, roughness: 0.9 });   // highlight for unclipped things
+(function buildHVAC() {
+  const hv = DATA.hvac3d; if (!hv) return;
+  const m3 = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, metalness: 0, ...o });
+  const M3 = {
+    unit: m3(0xd6d4cf, { roughness: 0.55, metalness: 0.2 }), stand: m3(0x55524c), head: m3(0xf7f6f2, { roughness: 0.35 }),
+    ls: m3(0xb06a2c, { roughness: 0.5, metalness: 0.3 }), cd: m3(0x2c6aa0), part: m3(0x333333),
+  };
+  const ref = n => String(n).split(' · ')[0];
+  const pipe = (a, b, r, material, data) => {
+    const p = M(a[0], a[1]), q = M(b[0], b[1]);
+    const va = new THREE.Vector3(p.x, a[2], p.z), vb = new THREE.Vector3(q.x, b[2], q.z), len = va.distanceTo(vb);
+    if (len < 1e-3) return;
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 10), material);
+    m.position.copy(va).add(vb).multiplyScalar(0.5);
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), vb.clone().sub(va).normalize());
+    m.castShadow = true; m.userData = data; pickables.push(m); G.hvac.add(m);
+  };
+  for (const u of hv.units) {
+    const d = { kind: 'hvac', name: u.name, ref: ref(u.name), text: u.text }, i = 0.12;
+    for (const [x, y] of [[u.x0 + i, u.y0 + i], [u.x1 - i, u.y0 + i], [u.x0 + i, u.y1 - i], [u.x1 - i, u.y1 - i]]) box(x - 0.08, y - 0.08, x + 0.08, y + 0.08, 0, u.stand, M3.stand, d, G.hvac);
+    box(u.x0, u.y0, u.x1, u.y1, u.stand, u.top, M3.unit, d, G.hvac);
+  }
+  for (const h of hv.heads) box(h.x0, h.y0, h.x1, h.y1, h.b, h.t, M3.head, { kind: 'hvac', name: h.name, ref: ref(h.name), text: h.text }, G.hvac);
+  for (const p of hv.parts) box(p.x0, p.y0, p.x1, p.y1, p.b, p.t, M3.part, { kind: 'hvac', name: p.name, ref: ref(p.name), text: p.text }, G.hvac);
+  for (const l of hv.lines) for (let i = 1; i < l.pts.length; i++) pipe(l.pts[i - 1], l.pts[i], l.kind === 'ls' ? 0.1 : 0.035, M3[l.kind], { kind: 'hvac', name: l.name, ref: ref(l.name), text: l.text });
+})();
+
 // ---------------------------------------------------------------- picking
 const raycaster = new THREE.Raycaster(); let picked = null, downAt = null;
 function clearPick() { if (!picked) return; picked.mesh.material = picked.mat; picked = null; $('sel').hidden = true; $('selpop').hidden = true; $('selcomment').setAttribute('aria-expanded', 'false'); }
@@ -1048,7 +1079,7 @@ function refOf3d({ kind, name, ref, text }) {
   return { sheet, ref: String(ref || String(name).split(' · ')[0]).slice(0, 60) };
 }
 function pick(mesh) {
-  clearPick(); picked = { mesh, mat: mesh.material }; mesh.material = MAT.hi;
+  clearPick(); picked = { mesh, mat: mesh.material }; mesh.material = cutMats.includes(mesh.material) ? MAT.hi : HI_FREE;
   const u = mesh.userData; $('seltext').textContent = u.text ? `${u.name}: ${u.text}` : u.name; $('sel').hidden = false;
   const { sheet, ref } = refOf3d(u); $('sel').dataset.sheet = sheet; $('selref').textContent = ref;
 }

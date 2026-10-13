@@ -38,34 +38,30 @@ CIRCUITS = [
     ('5-6', '240V 25A 2P', '#10 Cu', 'Mini-split CU-1, 24k (master, dining, living heads)', 'rear alcove between the master bedroom and the covered patio; heads fed from the unit (MCA ~20A)', '240', 4800),
     ('7-8', '240V 25A 2P', '#10 Cu', 'Mini-split CU-2, 24k (bedrooms 1-3 heads)', 'right side yard, Bath 2 wall; heads fed from the unit (MCA ~20A)', '240', 4800),
     ('9-10', '240V 50A 2P', '#6 Cu', 'EV-ready receptacle (NEMA 14-50)', 'garage, front wall', '240', 9600),
-    ('11', '20A GFCI/AFCI', '#12', 'Kitchen small appliance 1', 'left counter run', 'rec', 1500),
-    ('12', '20A GFCI/AFCI', '#12', 'Kitchen small appliance 2', 'island, front counter', 'rec', 1500),
-    ('13', '20A GFCI/AFCI', '#12', 'Small appliance 3: dining + pantry', 'dining walls, pantry counter', 'rec', 1500),
-    ('14', '20A AFCI', '#12', 'Refrigerator', 'kitchen, front wall', 'rec', 800),
-    ('15', '20A GFCI/AFCI', '#12', 'Dishwasher', 'island', 'rec', 1200),
-    ('16', '20A GFCI/AFCI', '#12', 'Disposal', 'island sink base', 'rec', 900),
-    ('17', '15A AFCI', '#14', 'Range hood', 'over the range', 'rec', 400),
-    ('18', '20A GFCI/AFCI', '#12', 'Laundry: washer + counter', 'laundry', 'rec', 1500),
-    ('19', '20A GFCI', '#12', 'Bath receptacles west', 'master bath, powder', 'rec', 360),
-    ('20', '20A GFCI', '#12', 'Bath receptacles east', 'bath 1, bath 2', 'rec', 360),
-    ('21', '15A AFCI', '#14', 'Master suite receptacles', 'master bedroom, master closet', 'rec', 0),
-    ('22', '15A AFCI', '#14', 'Living receptacles', 'living, TV wall, floor box, fireplace blower', 'rec', 200),
-    ('23', '15A AFCI', '#14', 'Entry + office receptacles', 'entry, office', 'rec', 0),
-    ('24', '15A AFCI', '#14', 'Bedroom 1 + hall receptacles', 'bedroom 1, bedroom hall', 'rec', 0),
-    ('25', '15A AFCI', '#14', 'Bedroom 2 receptacles', 'bedroom 2', 'rec', 0),
-    ('26', '15A AFCI', '#14', 'Bedroom 3 receptacles', 'bedroom 3', 'rec', 0),
-    ('27', '20A GFCI/AFCI', '#12', 'Mud room receptacles', 'mud room', 'rec', 0),
-    ('28', '20A GFCI', '#12', 'Garage receptacles', 'garage walls, one per bay', 'rec', 0),
-    ('29', '20A GFCI', '#12', 'Garage door openers', 'two ceiling receptacles', 'rec', 1200),
-    ('30', '20A GFCI', '#12', 'Exterior receptacles', 'porch, patio, both mini-split units', 'rec', 0),
-    ('31', '15A AFCI', '#14', 'Boiler, circulators, zone controls', 'mechanical room, the three manifold stations (MF-1 laundry, MF-2/MF-G garage, MF-3 hall)', 'rec', 700),
-    ('32', '15A AFCI', '#14', 'Water heater (power vent)', 'mechanical room', 'rec', 400),
-    ('33', '15A AFCI', '#14', 'Lighting A', 'master suite, master hall, laundry, powder, mud room', 'light', 0),
-    ('34', '15A AFCI', '#14', 'Lighting B', 'kitchen, dining, pantry, mech, living, entry, coat closet, porch, patio', 'light', 0),
-    ('35', '15A AFCI', '#14', 'Lighting C + alarms', 'office, bedroom wing, baths, closets, every smoke and CO alarm', 'light', 0),
-    ('36', '15A', '#14', 'Garage + garage exterior lights', 'garage, garage door and service door lights', 'light', 0),
-    ('37', '15A AFCI', '#14', 'Media panel + low voltage', 'media panel in the pantry, doorbell transformer', 'rec', 300),
-    ('38-40', '', '', 'Spare', 'three spaces', '', 0),
+    ('11', '20A AFCI', '#12', 'Kitchen small appliance 1 + dining', 'left counter run, dining walls', 'rec', 1500),
+    ('12', '20A AFCI', '#12', 'Kitchen small appliance 2 + pantry', 'island, front counter, pantry counter', 'rec', 1500),
+    ('13', '20A AFCI', '#12', 'Refrigerator', 'kitchen, front wall', 'rec', 800),
+    ('14', '20A GFCI/AFCI', '#12', 'Dishwasher', 'island', 'rec', 1200),
+    ('15', '20A GFCI/AFCI', '#12', 'Disposal', 'island sink base', 'rec', 900),
+    ('16', '15A AFCI', '#14', 'Range hood', 'over the range', 'rec', 400),
+    ('17', '20A AFCI', '#12', 'Laundry: washer + counter', 'laundry; the counter GFCI protects the washer receptacle', 'rec', 1500),
+    ('18', '20A', '#12', 'Bath receptacles west', 'master bath, powder', 'rec', 360),
+    ('19', '20A', '#12', 'Bath receptacles east', 'bath 1, bath 2', 'rec', 360),
+    ('20', '15A AFCI', '#14', 'Master suite + mud room receptacles', 'master bedroom, master closet, mud room', 'rec', 0),
+    ('21', '15A AFCI', '#14', 'Living receptacles', 'living, TV wall, floor box, fireplace blower', 'rec', 200),
+    ('22', '15A AFCI', '#14', 'Entry + office receptacles', 'entry, office', 'rec', 0),
+    ('23', '15A AFCI', '#14', 'Bedroom 1 + hall receptacles', 'bedroom 1, bedroom hall', 'rec', 0),
+    ('24', '15A AFCI', '#14', 'Bedroom 2 receptacles', 'bedroom 2', 'rec', 0),
+    ('25', '15A AFCI', '#14', 'Bedroom 3 receptacles', 'bedroom 3', 'rec', 0),
+    ('26', '20A', '#12', 'Garage + exterior receptacles, door openers', 'garage walls, both door openers, porch, patio, both mini-split units (210.11(C)(4) exception)', 'rec', 1200),
+    ('27', '15A AFCI', '#14', 'Boiler, circulators, zone controls', 'mechanical room, the three manifold stations (MF-1 laundry, MF-2/MF-G garage, MF-3 hall)', 'rec', 700),
+    ('28', '15A AFCI', '#14', 'Water heater (power vent)', 'mechanical room', 'rec', 400),
+    ('29', '15A AFCI', '#14', 'Lighting A', 'master suite, master hall, laundry, powder, mud room', 'light', 0),
+    ('30', '15A AFCI', '#14', 'Lighting B', 'kitchen, dining, pantry, mech, living, entry, coat closet, porch, patio', 'light', 0),
+    ('31', '15A AFCI', '#14', 'Lighting C + alarms', 'office, bedroom wing, baths, closets, every smoke and CO alarm', 'light', 0),
+    ('32', '15A', '#14', 'Garage + garage exterior lights', 'garage, garage door and service door lights', 'light', 0),
+    ('33', '15A AFCI', '#14', 'Media panel + low voltage', 'media panel in the pantry, doorbell transformer', 'rec', 300),
+    ('34-40', '', '', 'Spare', 'seven spaces', '', 0),
 ]
 CKT = {c[0]: dict(key=c[0], breaker=c[1], wire=c[2], name=c[3], serves=c[4], kind=c[5], va=c[6]) for c in CIRCUITS}
 
@@ -159,61 +155,61 @@ LEGEND = {
 H_REC, H_SW, H_CTR, H_VAN, H_CEIL = 16, 48, 44, 40, 108
 
 # master bedroom: bed on the right (dining) wall, nightstand USB-C receptacles either side of it, TV opposite
-wall(REC, 'master_bed', 'rear', 23.25, H_REC, '', '21')
-wall(USB, 'master_bed', 'right', 4.3, H_REC, '', '21', note='nightstand')
-wall(USB, 'master_bed', 'right', 12.7, H_REC, '', '21', note='nightstand')
-wall(REC, 'master_bed', 'front', 21.0, H_REC, '', '21')
-wall(REC, 'master_bed', 'left', 3.6, H_REC, '', '21')
-wall(TV, 'master_bed', 'left', 8.5, 60, '', '21', note='TV facing the bed')
-wall(DIM, 'master_bed', 'front', 25.7, H_SW, '', '33', ['mbed-cans', 'mbed-fan', 'mhall'], note='3-gang at the bedroom door, latch side of D8: cans (dimmer), fan box, master hall 3-way')
+wall(REC, 'master_bed', 'rear', 23.25, H_REC, '', '20')
+wall(USB, 'master_bed', 'right', 4.3, H_REC, '', '20', note='nightstand')
+wall(USB, 'master_bed', 'right', 12.7, H_REC, '', '20', note='nightstand')
+wall(REC, 'master_bed', 'front', 21.0, H_REC, '', '20')
+wall(REC, 'master_bed', 'left', 3.6, H_REC, '', '20')
+wall(TV, 'master_bed', 'left', 8.5, 60, '', '20', note='TV facing the bed')
+wall(DIM, 'master_bed', 'front', 25.7, H_SW, '', '29', ['mbed-cans', 'mbed-fan', 'mhall'], note='3-gang at the bedroom door, latch side of D8: cans (dimmer), fan box, master hall 3-way')
 for x, y in ((19.5, 4.4), (27.5, 4.4), (19.5, 13.4), (27.5, 13.4)):
-    ceil(CAN, 'master_bed', x, y, '', '33', ['mbed-cans'])
-ceil(FANBOX, 'master_bed', 23.5, 9.6, '', '33', ['mbed-fan'], note='room centre, below the label')
-ceil(SMOKE, 'master_bed', 20.6, 15.6, '', '35', note='over 3 ft from the fan blades')
+    ceil(CAN, 'master_bed', x, y, '', '29', ['mbed-cans'])
+ceil(FANBOX, 'master_bed', 23.5, 9.6, '', '29', ['mbed-fan'], note='room centre, below the label')
+ceil(SMOKE, 'master_bed', 20.6, 15.6, '', '31', note='over 3 ft from the fan blades')
 # master hall
-wall(SW3, 'master_hall', 'rear', 25.65, H_SW, '', '33', ['mhall'], note='hall side of the bedroom door')
-wall(SW3, 'master_hall', 'front', 29.95, H_SW, '', '33', ['mhall'], note='at the kitchen opening')
-ceil(CAN, 'master_hall', 28.6, 19.8, '', '33', ['mhall'])
-ceil(COMBO, 'master_hall', 26.3, 19.8, '', '35', note='outside the master suite')
+wall(SW3, 'master_hall', 'rear', 25.65, H_SW, '', '29', ['mhall'], note='hall side of the bedroom door')
+wall(SW3, 'master_hall', 'front', 29.95, H_SW, '', '29', ['mhall'], note='at the kitchen opening')
+ceil(CAN, 'master_hall', 28.6, 19.8, '', '29', ['mhall'])
+ceil(COMBO, 'master_hall', 26.3, 19.8, '', '31', note='outside the master suite')
 # master bath: vanity on the bedroom wall, WC top left, tub, shower bottom left
-wall(GFCI, 'master_bath', 'right', 9.6, H_VAN, '', '19', note='between the two vanity sinks')
-wall(SCONCE, 'master_bath', 'right', 7.6, 84, '', '33', ['mbath-light'], note='over the mirror at sink 1')
-wall(SCONCE, 'master_bath', 'right', 11.6, 84, '', '33', ['mbath-light'], note='over the mirror at sink 2')
-wall(DIM, 'master_bath', 'right', 17.85, H_SW, '', '33', ['mbath-light', 'mbath-fan', 'mbath-shower'], note='3-gang just inside the opening from the bedroom: lights (dimmer), fans, shower and tub cans')
-ceil(CAN, 'master_bath', 12.0, 8.2, '', '33', ['mbath-light'])
-ceil(CAN, 'master_bath', 12.0, 15.2, '', '33', ['mbath-light'])
-ceil(CAN, 'master_bath', 13.0, 21.0, '', '33', ['mbath-light'])
-ceil(WET, 'master_bath', 7.5, 13.8, '', '33', ['mbath-shower'], note='over the tub')
-ceil(WET, 'master_bath', 7.8, 21.6, '', '33', ['mbath-shower'], note='in the shower')
-ceil(EFL, 'master_bath', 8.4, 9.6, '', '33', ['mbath-light', 'mbath-fan'], note='toilet; the light dims with the room, the fan on rocker 2')
-ceil(EFL, 'master_bath', 10.6, 18.6, '', '33', ['mbath-light', 'mbath-fan'], note='between the tub and the shower')
+wall(GFCI, 'master_bath', 'right', 9.6, H_VAN, '', '18', note='between the two vanity sinks')
+wall(SCONCE, 'master_bath', 'right', 7.6, 84, '', '29', ['mbath-light'], note='over the mirror at sink 1')
+wall(SCONCE, 'master_bath', 'right', 11.6, 84, '', '29', ['mbath-light'], note='over the mirror at sink 2')
+wall(DIM, 'master_bath', 'right', 17.85, H_SW, '', '29', ['mbath-light', 'mbath-fan', 'mbath-shower'], note='3-gang just inside the opening from the bedroom: lights (dimmer), fans, shower and tub cans')
+ceil(CAN, 'master_bath', 12.0, 8.2, '', '29', ['mbath-light'])
+ceil(CAN, 'master_bath', 12.0, 15.2, '', '29', ['mbath-light'])
+ceil(CAN, 'master_bath', 13.0, 21.0, '', '29', ['mbath-light'])
+ceil(WET, 'master_bath', 7.5, 13.8, '', '29', ['mbath-shower'], note='over the tub')
+ceil(WET, 'master_bath', 7.8, 21.6, '', '29', ['mbath-shower'], note='in the shower')
+ceil(EFL, 'master_bath', 8.4, 9.6, '', '29', ['mbath-light', 'mbath-fan'], note='toilet; the light dims with the room, the fan on rocker 2')
+ceil(EFL, 'master_bath', 10.6, 18.6, '', '29', ['mbath-light', 'mbath-fan'], note='between the tub and the shower')
 # master closet
-wall(OCC, 'master_closet', 'rear', 15.0, H_SW, '', '33', ['mcloset'], note='inside the opening from the bath')
-ceil(CLOSET, 'master_closet', 8.6, 29.4, '', '33', ['mcloset'])
-ceil(CLOSET, 'master_closet', 13.3, 29.4, '', '33', ['mcloset'])
-wall(REC, 'master_closet', 'front', 11.0, H_REC, '', '21', note='steamer, vacuum')
+wall(OCC, 'master_closet', 'rear', 15.0, H_SW, '', '29', ['mcloset'], note='inside the opening from the bath')
+ceil(CLOSET, 'master_closet', 8.6, 29.4, '', '29', ['mcloset'])
+ceil(CLOSET, 'master_closet', 13.3, 29.4, '', '29', ['mcloset'])
+wall(REC, 'master_closet', 'front', 11.0, H_REC, '', '20', note='steamer, vacuum')
 # laundry
-wall(R20, 'laundry', 'right', 23.3, 42, '', '18', note='washer, behind the machine')
+wall(R20, 'laundry', 'right', 23.3, 42, '', '17', note='washer, behind the machine; GFCI-protected from the laundry counter GFCI')
 wall(R240, 'laundry', 'right', 20.6, 30, '', '3-4', note='dryer, NEMA 14-30R')
-wall(GFCI, 'laundry', 'left', 24.4, H_CTR, '', '18', note='laundry counter')
-wall(GFCI, 'laundry', 'left', 28.0, H_CTR, '', '18', note='laundry counter')
-wall(SW, 'laundry', 'front', 22.6, H_SW, '', '33', ['laundry'], note='latch side of D12')
-ceil(SURF, 'laundry', 20.6, 21.0, '', '33', ['laundry'])
-ceil(SURF, 'laundry', 20.6, 27.0, '', '33', ['laundry'])
+wall(GFCI, 'laundry', 'left', 24.4, H_CTR, '', '17', note='laundry counter')
+wall(GFCI, 'laundry', 'left', 28.0, H_CTR, '', '17', note='laundry counter')
+wall(SW, 'laundry', 'front', 22.6, H_SW, '', '29', ['laundry'], note='latch side of D12')
+ceil(SURF, 'laundry', 20.6, 21.0, '', '29', ['laundry'])
+ceil(SURF, 'laundry', 20.6, 27.0, '', '29', ['laundry'])
 # powder
-wall(GFCI, 'powder', 'left', 23.2, H_VAN, '', '19', note='beside the lav')
-wall(SCONCE, 'powder', 'left', 25.0, 84, '', '33', ['powder-light'], note='over the mirror')
-wall(SW, 'powder', 'front', 29.1, H_SW, '', '33', ['powder-light', 'powder-fan'], note='2-gang, latch side of D13: light, fan')
-ceil(EFL, 'powder', 28.3, 25.1, '', '33', ['powder-light', 'powder-fan'])
+wall(GFCI, 'powder', 'left', 23.2, H_VAN, '', '18', note='beside the lav')
+wall(SCONCE, 'powder', 'left', 25.0, 84, '', '29', ['powder-light'], note='over the mirror')
+wall(SW, 'powder', 'front', 29.1, H_SW, '', '29', ['powder-light', 'powder-fan'], note='2-gang, latch side of D13: light, fan')
+ceil(EFL, 'powder', 28.3, 25.1, '', '29', ['powder-light', 'powder-fan'])
 # mud room (L-shaped)
-at(REC, 'mud', 16.373, 33.5, 'left', H_REC, '', '27', note='bench')
-at(REC, 'mud', 20.9, 36.84, 'front', H_REC, '', '27')
-at(REC, 'mud', 25.44, 39.6, 'left', H_REC, '', '27')
-at(REC, 'mud', 30.54, 32.0, 'right', H_REC, '', '27')
-at(SW3, 'mud', 30.06, 42.213, 'front', H_SW, '', '33', ['mud'], note='at the garage door, latch side of D6')
-at(SW3, 'mud', 30.54, 37.55, 'right', H_SW, '', '33', ['mud'], note='at the kitchen opening')
+at(REC, 'mud', 16.373, 33.5, 'left', H_REC, '', '20', note='bench')
+at(REC, 'mud', 20.9, 36.84, 'front', H_REC, '', '20')
+at(REC, 'mud', 25.44, 39.6, 'left', H_REC, '', '20')
+at(REC, 'mud', 30.54, 32.0, 'right', H_REC, '', '20')
+at(SW3, 'mud', 30.06, 42.213, 'front', H_SW, '', '29', ['mud'], note='at the garage door, latch side of D6')
+at(SW3, 'mud', 30.54, 37.55, 'right', H_SW, '', '29', ['mud'], note='at the kitchen opening')
 for x, y in ((19.6, 33.6), (27.8, 31.4), (27.8, 38.6)):
-    ceil(CAN, 'mud', x, y, '', '33', ['mud'])
+    ceil(CAN, 'mud', x, y, '', '29', ['mud'])
 # kitchen: counter run on the left wall with the range, island with sink and dishwasher, fridge and counter on the front wall
 for y in (24.2, 26.6, 32.8, 36.4):
     wall(GFCI, 'kitchen', 'left', y, H_CTR, '', '11', note='counter, 4 ft spacing')
@@ -221,163 +217,163 @@ wall(GFCI, 'kitchen', 'front', 34.6, H_CTR, '', '12', note='front counter')
 at(GFCI, 'kitchen', 40.87, 28.2, 'left', 27, '', '12', note='island end panel, living side, below the counter edge', island=True)
 at(GFCI, 'kitchen', 40.87, 33.4, 'left', 27, '', '12', note='island, living side, below the counter edge', island=True)
 wall(R240, 'kitchen', 'left', 29.6, 6, '', '1-2', note='range receptacle behind the range, NEMA 14-50R')
-wall(HOOD, 'kitchen', 'left', 29.6, 72, '', '17', note='hood over the range, ducted outside')
-wall(R20, 'kitchen', 'front', 37.9, 48, '', '14', note='refrigerator, above the floor in the fridge recess')
-ceil(R20, 'kitchen', 38.68, 25.6, '', '15', note='dishwasher, junction in the island sink base', h=12, island=True)
-ceil(R20, 'kitchen', 38.68, 27.6, '', '16', note='disposal, switched receptacle in the sink base; air switch on the sink deck', h=12, island=True)
-at(DIM, 'kitchen', 30.833, 42.4, 'left', H_SW, '', '34', ['kit-cans', 'kit-pend', 'kit-ucl'], note='3-gang beside the mud room opening: cans (3-way dimmer), pendants, under-cabinet')
-at(DIM, 'kitchen', 30.833, 22.25, 'left', H_SW, '', '34', ['kit-cans'], note='3-way dimmer at the master hall opening')
+wall(HOOD, 'kitchen', 'left', 29.6, 72, '', '16', note='hood over the range, ducted outside')
+wall(R20, 'kitchen', 'front', 37.9, 48, '', '13', note='refrigerator, above the floor in the fridge recess')
+ceil(R20, 'kitchen', 38.68, 25.6, '', '14', note='dishwasher, junction in the island sink base', h=12, island=True)
+ceil(R20, 'kitchen', 38.68, 27.6, '', '15', note='disposal, switched receptacle in the sink base; air switch on the sink deck', h=12, island=True)
+at(DIM, 'kitchen', 30.833, 42.4, 'left', H_SW, '', '30', ['kit-cans', 'kit-pend', 'kit-ucl'], note='3-gang beside the mud room opening: cans (3-way dimmer), pendants, under-cabinet')
+at(DIM, 'kitchen', 30.833, 22.25, 'left', H_SW, '', '30', ['kit-cans'], note='3-way dimmer at the master hall opening')
 for x, y in ((34.3, 19.6), (34.3, 24.6), (34.3, 34.6), (34.3, 39.8), (41.8, 19.6), (41.8, 24.6), (41.8, 36.6), (41.8, 41.6)):
-    ceil(CAN, 'kitchen', x, y, '', '34', ['kit-cans'])
+    ceil(CAN, 'kitchen', x, y, '', '30', ['kit-cans'])
 for y in (26.6, 30.6, 34.6):
-    ceil(PEND, 'kitchen', 38.68, y, '', '34', ['kit-pend'], h=72, note='over the island')
-at(STRIP, 'kitchen', 30.833, 25.3, 'left', 54, '', '34', ['kit-ucl'], note='under the uppers, left of the range', y0=23.1, y1=27.5)
-at(STRIP, 'kitchen', 30.833, 34.85, 'left', 54, '', '34', ['kit-ucl'], note='under the uppers, right of the range', y0=31.7, y1=38.0)
+    ceil(PEND, 'kitchen', 38.68, y, '', '30', ['kit-pend'], h=72, note='over the island')
+at(STRIP, 'kitchen', 30.833, 25.3, 'left', 54, '', '30', ['kit-ucl'], note='under the uppers, left of the range', y0=23.1, y1=27.5)
+at(STRIP, 'kitchen', 30.833, 34.85, 'left', 54, '', '30', ['kit-ucl'], note='under the uppers, right of the range', y0=31.7, y1=38.0)
 # dining (receptacles on a small-appliance circuit, 210.11(C)(1))
-wall(GFCI, 'dining', 'left', 8.4, H_REC, '', '13')
-wall(GFCI, 'dining', 'left', 13.6, H_REC, '', '13')
-wall(GFCI, 'dining', 'rear', 35.27, H_REC, '', '13', note='between the windows')
-wall(GFCI, 'dining', 'rear', 39.1, H_REC, '', '13', note='between the windows')
-wall(GFCI, 'dining', 'right', 10.37, H_REC, '', '13', note='between the windows')
-wall(DIM, 'dining', 'left', 15.35, H_SW, '', '34', ['dining'], note='kitchen end of the dining wall')
-ceil(PEND, 'dining', 37.27, 11.6, '', '34', ['dining'], h=78, note='chandelier over the table; 30" over the top')
+wall(REC, 'dining', 'left', 8.4, H_REC, '', '11')
+wall(REC, 'dining', 'left', 13.6, H_REC, '', '11')
+wall(REC, 'dining', 'rear', 35.27, H_REC, '', '11', note='between the windows')
+wall(REC, 'dining', 'rear', 39.1, H_REC, '', '11', note='between the windows')
+wall(REC, 'dining', 'right', 10.37, H_REC, '', '11', note='between the windows')
+wall(DIM, 'dining', 'left', 15.35, H_SW, '', '30', ['dining'], note='kitchen end of the dining wall')
+ceil(PEND, 'dining', 37.27, 11.6, '', '30', ['dining'], h=78, note='chandelier over the table; 30" over the top')
 # pantry and mechanical
-wall(GFCI, 'pantry', 'right', 49.2, H_CTR, '', '13', note='pantry counter')
-wall(GFCI, 'pantry', 'left', 47.4, H_CTR, '', '13', note='pantry counter')
-wall(SW, 'pantry', 'rear', 41.85, H_SW, '', '34', ['pantry'], note='inside the opening')
-ceil(CLOSET, 'pantry', 37.0, 49.2, '', '34', ['pantry'], legend='surface LED, closet-rated (410.16)')
-ceil(CLOSET, 'pantry', 41.0, 49.2, '', '34', ['pantry'], legend='surface LED, closet-rated (410.16)')
-wall(MP, 'pantry', 'left', 51.2, 54, '', '37', note='media panel on the mech room wall; every Cat6 home-runs here')
-wall(R20, 'mechanical', 'right', 47.6, 54, '', '31', legend='boiler: 120V service switch + receptacle', note='heat source for the radiant slab (R-1)')
-wall(REC, 'mechanical', 'right', 51.5, 54, '', '31', legend='duplex receptacle, 15A', note='circulators and zone control panel')
-wall(R20, 'mechanical', 'right', 52.7, 54, '', '32', legend='water heater: 120V receptacle (power vent)', note='')
-wall(SW, 'mechanical', 'rear', 31.35, H_SW, '', '34', ['mech'], note='inside the double doors')
-ceil(SURF, 'mechanical', 32.37, 46.9, '', '34', ['mech'])
+wall(GFCI, 'pantry', 'right', 49.2, H_CTR, '', '12', note='pantry counter')
+wall(GFCI, 'pantry', 'left', 47.4, H_CTR, '', '12', note='pantry counter')
+wall(SW, 'pantry', 'rear', 41.85, H_SW, '', '30', ['pantry'], note='inside the opening')
+ceil(CLOSET, 'pantry', 37.0, 49.2, '', '30', ['pantry'], legend='surface LED, closet-rated (410.16)')
+ceil(CLOSET, 'pantry', 41.0, 49.2, '', '30', ['pantry'], legend='surface LED, closet-rated (410.16)')
+wall(MP, 'pantry', 'left', 51.2, 54, '', '33', note='media panel on the mech room wall; every Cat6 home-runs here')
+wall(R20, 'mechanical', 'right', 47.6, 54, '', '27', legend='boiler: 120V service switch + receptacle', note='heat source for the radiant slab (R-1)')
+wall(REC, 'mechanical', 'right', 51.5, 54, '', '27', legend='duplex receptacle, 15A', note='circulators and zone control panel')
+wall(R20, 'mechanical', 'right', 52.7, 54, '', '28', legend='water heater: 120V receptacle (power vent)', note='')
+wall(SW, 'mechanical', 'rear', 31.35, H_SW, '', '30', ['mech'], note='inside the double doors')
+ceil(SURF, 'mechanical', 32.37, 46.9, '', '30', ['mech'])
 # radiant manifold stations (R-1): a receptacle at each for the actuator wiring module and its transformer
-wall(REC, 'laundry', 'rear', 22.4, 24, '', '31', legend='duplex receptacle, 15A', note='radiant manifold MF-1 actuator module (R-1)')
-at(GFCI, 'garage', 20.4, 37.13, 'rear', 48, '', '31', legend='GFCI receptacle, 15A', note='radiant manifolds MF-2 / MF-G actuator module and the garage circulator P-RG (R-1)')
-wall(REC, 'hall', 'left', 27.4, 24, '', '31', legend='duplex receptacle, 15A', note='radiant manifold MF-3 actuator module (R-1)')
+wall(REC, 'laundry', 'rear', 22.4, 24, '', '27', legend='duplex receptacle, 15A', note='radiant manifold MF-1 actuator module (R-1)')
+at(GFCI, 'garage', 20.4, 37.13, 'rear', 48, '', '27', legend='GFCI receptacle, 15A', note='radiant manifolds MF-2 / MF-G actuator module and the garage circulator P-RG (R-1)')
+wall(REC, 'hall', 'left', 27.4, 24, '', '27', legend='duplex receptacle, 15A', note='radiant manifold MF-3 actuator module (R-1)')
 # living: open to the kitchen; patio doors on the rear wall, fireplace on the bedroom-hall wall
 for x in (44.9, 49.8, 58.2, 63.0):
-    wall(REC, 'living', 'rear', x, H_REC, '', '22')
+    wall(REC, 'living', 'rear', x, H_REC, '', '21')
 for y in (18.5, 25.6, 35.2, 40.6):
-    wall(REC, 'living', 'right', y, H_REC, '', '22')
-wall(TV, 'living', 'right', 29.6, 66, '', '22', note='over the fireplace mantel')
-wall(REC, 'living', 'right', 32.2, 8, '', '22', legend='duplex receptacle, 15A', note='fireplace insert blower, beside the insert')
-wall(REC, 'living', 'front', 56.0, H_REC, '', '22')
-wall(REC, 'living', 'front', 62.0, H_REC, '', '22')
-ceil(FLOOR, 'living', 52.4, 34.0, '', '22', note='floor box under the sofa (confirm the furniture layout)', h=0)
-wall(SW4, 'living', 'rear', 50.3, H_SW, '', '34', ['living-cans', 'living-fan', 'patio-lights', 'patio-fan'], note='4-gang beside the patio doors: living cans 4-way, living fan, patio lights, patio fan')
-wall(SW3, 'living', 'right', 24.25, H_SW, '', '34', ['living-cans'], note='at the bedroom hall opening')
+    wall(REC, 'living', 'right', y, H_REC, '', '21')
+wall(TV, 'living', 'right', 29.6, 66, '', '21', note='over the fireplace mantel')
+wall(REC, 'living', 'right', 32.2, 8, '', '21', legend='duplex receptacle, 15A', note='fireplace insert blower, beside the insert')
+wall(REC, 'living', 'front', 56.0, H_REC, '', '21')
+wall(REC, 'living', 'front', 62.0, H_REC, '', '21')
+ceil(FLOOR, 'living', 52.4, 34.0, '', '21', note='floor box under the sofa (confirm the furniture layout)', h=0)
+wall(SW4, 'living', 'rear', 50.3, H_SW, '', '30', ['living-cans', 'living-fan', 'patio-lights', 'patio-fan'], note='4-gang beside the patio doors: living cans 4-way, living fan, patio lights, patio fan')
+wall(SW3, 'living', 'right', 24.25, H_SW, '', '30', ['living-cans'], note='at the bedroom hall opening')
 for x in (47.8, 54.0, 60.2):
     for y in (22.4, 37.0):
-        ceil(CAN, 'living', x, y, '', '34', ['living-cans'])
-ceil(FANBOX, 'living', 54.0, 31.4, '', '34', ['living-fan'], note='room centre, below the label')
+        ceil(CAN, 'living', x, y, '', '30', ['living-cans'])
+ceil(FANBOX, 'living', 54.0, 31.4, '', '30', ['living-fan'], note='room centre, below the label')
 # entry, coat closet, office
-wall(REC, 'entry', 'left', 49.6, H_REC, '', '23')
-wall(DIM, 'entry', 'right', 52.1, H_SW, '', '34', ['living-cans', 'entry', 'porch'], note='3-gang at the front door: living cans 3-way dimmer, entry light, porch lights')
-ceil(SURF, 'entry', 47.55, 49.4, '', '34', ['entry'])
-ceil(COMBO, 'entry', 48.8, 44.6, '', '35', note='outside the office (a possible bedroom)')
-ceil(CLOSET, 'coat', 42.7, 44.3, '', '34', ['coat'])
+wall(REC, 'entry', 'left', 49.6, H_REC, '', '22')
+wall(DIM, 'entry', 'right', 52.1, H_SW, '', '30', ['living-cans', 'entry', 'porch'], note='3-gang at the front door: living cans 3-way dimmer, entry light, porch lights')
+ceil(SURF, 'entry', 47.55, 49.4, '', '30', ['entry'])
+ceil(COMBO, 'entry', 48.8, 44.6, '', '31', note='outside the office (a possible bedroom)')
+ceil(CLOSET, 'coat', 42.7, 44.3, '', '30', ['coat'])
 for x in (54.6, 60.4):
-    wall(REC, 'office', 'rear', x, H_REC, '', '23')
-wall(REC, 'office', 'right', 47.0, H_REC, '', '23')
-wall(DATA, 'office', 'right', 49.3, H_REC, '', '37', note='desk')
-wall(REC, 'office', 'front', 54.2, H_REC, '', '23')
-wall(REC, 'office', 'front', 62.6, H_REC, '', '23')
-wall(DIM, 'office', 'left', 51.6, H_SW, '', '35', ['office'], note='inside the French doors')
+    wall(REC, 'office', 'rear', x, H_REC, '', '22')
+wall(REC, 'office', 'right', 47.0, H_REC, '', '22')
+wall(DATA, 'office', 'right', 49.3, H_REC, '', '33', note='desk')
+wall(REC, 'office', 'front', 54.2, H_REC, '', '22')
+wall(REC, 'office', 'front', 62.6, H_REC, '', '22')
+wall(DIM, 'office', 'left', 51.6, H_SW, '', '31', ['office'], note='inside the French doors')
 for x in (54.6, 61.0):
     for y in (45.6, 50.4):
-        ceil(CAN, 'office', x, y, '', '35', ['office'])
-ceil(SMOKE, 'office', 57.8, 50.6, '', '35')
+        ceil(CAN, 'office', x, y, '', '31', ['office'])
+ceil(SMOKE, 'office', 57.8, 50.6, '', '31')
 # bedroom hall
-wall(REC, 'hall', 'left', 31.0, H_REC, '', '24', note='hall over 10 ft (210.52(H))')
-wall(SW3, 'hall', 'left', 24.95, H_SW, '', '35', ['bhall'], note='living end, just past the opening')
-wall(SW3, 'hall', 'left', 38.7, H_SW, '', '35', ['bhall'], note='bedroom 3 end')
+wall(REC, 'hall', 'left', 31.0, H_REC, '', '23', note='hall over 10 ft (210.52(H))')
+wall(SW3, 'hall', 'left', 24.95, H_SW, '', '31', ['bhall'], note='living end, just past the opening')
+wall(SW3, 'hall', 'left', 38.7, H_SW, '', '31', ['bhall'], note='bedroom 3 end')
 for y in (22.0, 30.0, 36.4):
-    ceil(CAN, 'hall', 66.5, y, '', '35', ['bhall'])
-ceil(COMBO, 'hall', 66.5, 26.4, '', '35', note='outside the bedrooms')
+    ceil(CAN, 'hall', 66.5, y, '', '31', ['bhall'])
+ceil(COMBO, 'hall', 66.5, 26.4, '', '31', note='outside the bedrooms')
 # bedroom 1, bath 1
-wall(REC, 'bed1', 'rear', 72.1, H_REC, '', '24', note='between the windows')
-wall(REC, 'bed1', 'front', 69.5, H_REC, '', '24', note='2 ft wall space between the door and the closet (210.52(A)(2))')
-wall(REC, 'bed1', 'left', 9.0, H_REC, '', '24')
-wall(REC, 'bed1', 'left', 15.4, H_REC, '', '24')
-wall(REC, 'bed1', 'right', 11.6, H_REC, '', '24')
-wall(REC, 'bed1', 'right', 16.6, H_REC, '', '24')
-wall(SW, 'bed1', 'front', 68.75, H_SW, '', '35', ['bed1-light', 'bed1-fan'], note='2-gang, latch side of D17: light, fan')
-ceil(FANBOX, 'bed1', 71.0, 11.2, '', '35', ['bed1-light', 'bed1-fan'])
-ceil(SMOKE, 'bed1', 74.8, 15.6, '', '35')
-ceil(CLOSET, 'bed1_closet', 73.2, 20.23, '', '35', ['bed1-closet'])
-wall(GFCI, 'bath1', 'right', 8.95, H_VAN, '', '20', note='between the lav and the toilet')
-wall(SCONCE, 'bath1', 'right', 7.1, 84, '', '35', ['bath1-light'], note='over the mirror')
-wall(SW, 'bath1', 'left', 9.3, H_SW, '', '35', ['bath1-light', 'bath1-fan'], note='2-gang, latch side of D19: lights, fan')
-ceil(EFL, 'bath1', 80.0, 10.2, '', '35', ['bath1-light', 'bath1-fan'])
-ceil(WET, 'bath1', 80.4, 14.2, '', '35', ['bath1-light'], note='in the shower')
+wall(REC, 'bed1', 'rear', 72.1, H_REC, '', '23', note='between the windows')
+wall(REC, 'bed1', 'front', 69.5, H_REC, '', '23', note='2 ft wall space between the door and the closet (210.52(A)(2))')
+wall(REC, 'bed1', 'left', 9.0, H_REC, '', '23')
+wall(REC, 'bed1', 'left', 15.4, H_REC, '', '23')
+wall(REC, 'bed1', 'right', 11.6, H_REC, '', '23')
+wall(REC, 'bed1', 'right', 16.6, H_REC, '', '23')
+wall(SW, 'bed1', 'front', 68.75, H_SW, '', '31', ['bed1-light', 'bed1-fan'], note='2-gang, latch side of D17: light, fan')
+ceil(FANBOX, 'bed1', 71.0, 11.2, '', '31', ['bed1-light', 'bed1-fan'])
+ceil(SMOKE, 'bed1', 74.8, 15.6, '', '31')
+ceil(CLOSET, 'bed1_closet', 73.2, 20.23, '', '31', ['bed1-closet'])
+wall(GFCI, 'bath1', 'right', 8.95, H_VAN, '', '19', note='between the lav and the toilet')
+wall(SCONCE, 'bath1', 'right', 7.1, 84, '', '31', ['bath1-light'], note='over the mirror')
+wall(SW, 'bath1', 'left', 9.3, H_SW, '', '31', ['bath1-light', 'bath1-fan'], note='2-gang, latch side of D19: lights, fan')
+ceil(EFL, 'bath1', 80.0, 10.2, '', '31', ['bath1-light', 'bath1-fan'])
+ceil(WET, 'bath1', 80.4, 14.2, '', '31', ['bath1-light'], note='in the shower')
 # bedroom 2, bath 2
-wall(REC, 'bed2', 'rear', 73.0, H_REC, '', '25')
-wall(REC, 'bed2', 'right', 26.2, H_REC, '', '25', note='between the windows')
-wall(REC, 'bed2', 'front', 74.2, H_REC, '', '25')
-wall(REC, 'bed2', 'front', 80.0, H_REC, '', '25')
-wall(REC, 'bed2', 'left', 25.6, H_REC, '', '25')
-wall(SW, 'bed2', 'front', 69.45, H_SW, '', '35', ['bed2-light', 'bed2-fan'], note='2-gang in the corner, latch side of D21: light, fan')
-ceil(FANBOX, 'bed2', 75.9, 27.2, '', '35', ['bed2-light', 'bed2-fan'])
-ceil(SMOKE, 'bed2', 80.2, 31.6, '', '35')
-ceil(CLOSET, 'bed2_closet', 80.4, 18.4, '', '35', ['bed2-closet'])
-wall(GFCI, 'bath2', 'front', 72.85, H_VAN, '', '20', note='between the two sinks')
-wall(SCONCE, 'bath2', 'front', 71.3, 84, '', '35', ['bath2-light'], note='over the mirror at sink 1')
-wall(SCONCE, 'bath2', 'front', 74.4, 84, '', '35', ['bath2-light'], note='over the mirror at sink 2')
-wall(SW, 'bath2', 'left', 37.85, H_SW, '', '35', ['bath2-light', 'bath2-fan'], note='2-gang, latch side of D22: lights, fan')
-ceil(EFL, 'bath2', 76.6, 36.4, '', '35', ['bath2-light', 'bath2-fan'])
-ceil(WET, 'bath2', 81.6, 37.2, '', '35', ['bath2-light'], note='over the tub')
+wall(REC, 'bed2', 'rear', 73.0, H_REC, '', '24')
+wall(REC, 'bed2', 'right', 26.2, H_REC, '', '24', note='between the windows')
+wall(REC, 'bed2', 'front', 74.2, H_REC, '', '24')
+wall(REC, 'bed2', 'front', 80.0, H_REC, '', '24')
+wall(REC, 'bed2', 'left', 25.6, H_REC, '', '24')
+wall(SW, 'bed2', 'front', 69.45, H_SW, '', '31', ['bed2-light', 'bed2-fan'], note='2-gang in the corner, latch side of D21: light, fan')
+ceil(FANBOX, 'bed2', 75.9, 27.2, '', '31', ['bed2-light', 'bed2-fan'])
+ceil(SMOKE, 'bed2', 80.2, 31.6, '', '31')
+ceil(CLOSET, 'bed2_closet', 80.4, 18.4, '', '31', ['bed2-closet'])
+wall(GFCI, 'bath2', 'front', 72.85, H_VAN, '', '19', note='between the two sinks')
+wall(SCONCE, 'bath2', 'front', 71.3, 84, '', '31', ['bath2-light'], note='over the mirror at sink 1')
+wall(SCONCE, 'bath2', 'front', 74.4, 84, '', '31', ['bath2-light'], note='over the mirror at sink 2')
+wall(SW, 'bath2', 'left', 37.85, H_SW, '', '31', ['bath2-light', 'bath2-fan'], note='2-gang, latch side of D22: lights, fan')
+ceil(EFL, 'bath2', 76.6, 36.4, '', '31', ['bath2-light', 'bath2-fan'])
+ceil(WET, 'bath2', 81.6, 37.2, '', '31', ['bath2-light'], note='over the tub')
 # bedroom 3
-wall(REC, 'bed3', 'rear', 72.5, H_REC, '', '26')
-wall(REC, 'bed3', 'left', 45.5, H_REC, '', '26')
-wall(REC, 'bed3', 'front', 67.0, H_REC, '', '26')
-wall(REC, 'bed3', 'front', 75.5, H_REC, '', '26')
-wall(REC, 'bed3', 'right', 49.0, H_REC, '', '26')
-wall(SW, 'bed3', 'rear', 68.5, H_SW, '', '35', ['bed3-light', 'bed3-fan'], note='2-gang, latch side of D23: light, fan')
-ceil(FANBOX, 'bed3', 70.96, 47.6, '', '35', ['bed3-light', 'bed3-fan'])
-ceil(SMOKE, 'bed3', 75.2, 51.2, '', '35')
-ceil(CLOSET, 'bed3_closet', 80.4, 42.8, '', '35', ['bed3-closet'])
+wall(REC, 'bed3', 'rear', 72.5, H_REC, '', '25')
+wall(REC, 'bed3', 'left', 45.5, H_REC, '', '25')
+wall(REC, 'bed3', 'front', 67.0, H_REC, '', '25')
+wall(REC, 'bed3', 'front', 75.5, H_REC, '', '25')
+wall(REC, 'bed3', 'right', 49.0, H_REC, '', '25')
+wall(SW, 'bed3', 'rear', 68.5, H_SW, '', '31', ['bed3-light', 'bed3-fan'], note='2-gang, latch side of D23: light, fan')
+ceil(FANBOX, 'bed3', 70.96, 47.6, '', '31', ['bed3-light', 'bed3-fan'])
+ceil(SMOKE, 'bed3', 75.2, 51.2, '', '31')
+ceil(CLOSET, 'bed3_closet', 80.4, 42.8, '', '31', ['bed3-closet'])
 # garage
 at(PANEL, 'garage', 30.54, 44.6, 'right', 60, '', 'panel', note='beside the mud room door, 36" clear in front; fed from the meter-main outside')
-at(GFCI, 'garage', 0.46, 52.1, 'left', 48, '', '28', note='between the garage doors')
-at(GFCI, 'garage', 5.0, 67.13, 'front', 48, '', '28')
-at(GFCI, 'garage', 22.8, 69.63, 'front', 48, '', '28')
-at(GFCI, 'garage', 30.54, 59.0, 'right', 48, '', '28')
-at(GFCI, 'garage', 11.0, 34.13, 'rear', 48, '', '28')
-at(GFCI, 'garage', 25.15, 39.8, 'right', 48, '', '28', note='workbench')
+at(GFCI, 'garage', 0.46, 52.1, 'left', 48, '', '26', note='between the garage doors')
+at(GFCI, 'garage', 5.0, 67.13, 'front', 48, '', '26')
+at(GFCI, 'garage', 22.8, 69.63, 'front', 48, '', '26')
+at(GFCI, 'garage', 30.54, 59.0, 'right', 48, '', '26')
+at(GFCI, 'garage', 11.0, 34.13, 'rear', 48, '', '26')
+at(GFCI, 'garage', 25.15, 39.8, 'right', 48, '', '26', note='workbench')
 at(R240, 'garage', 30.54, 66.4, 'right', 48, '', '9-10', legend='240V receptacle, NEMA 14-50R', note='EV-ready; swap for a hardwired charger if wanted')
-ceil(GFCI, 'garage', 11.5, 45.63, '', '29', note='door opener 1, ceiling', h=H_CEIL)
-ceil(GFCI, 'garage', 11.5, 58.63, '', '29', note='door opener 2, ceiling', h=H_CEIL)
-at(SW3, 'garage', 5.15, 37.13, 'rear', H_SW, '', '36', ['garage'], note='inside the service door, latch side of D3')
-at(SW3, 'garage', 29.95, 42.513, 'rear', H_SW, '', '36', ['garage', 'garage-ext'], note='2-gang at the mud room door: garage lights 3-way, garage door lights')
+ceil(REC, 'garage', 11.5, 45.63, '', '26', note='door opener 1, ceiling; GFCI-protected from the wall GFCI upstream', h=H_CEIL)
+ceil(REC, 'garage', 11.5, 58.63, '', '26', note='door opener 2, ceiling; GFCI-protected from the wall GFCI upstream', h=H_CEIL)
+at(SW3, 'garage', 5.15, 37.13, 'rear', H_SW, '', '32', ['garage'], note='inside the service door, latch side of D3')
+at(SW3, 'garage', 29.95, 42.513, 'rear', H_SW, '', '32', ['garage', 'garage-ext'], note='2-gang at the mud room door: garage lights 3-way, garage door lights')
 for x in (6.5, 18.0, 25.5):
     for y in (45.0, 60.0):
-        ceil(SURF, 'garage', x, y, '', '36', ['garage'], legend='4 ft LED shop fixture')
+        ceil(SURF, 'garage', x, y, '', '32', ['garage'], legend='4 ft LED shop fixture')
 # outside: meter-main, porch, patio, garage doors, mini-split disconnects
 at(METER, 'outside', 30.54 + 0.46, 66.4, 'left', 60, '', 'panel', note='on the garage wall outside, beside the EV receptacle; utility service route to confirm')
 for x in (36.0, 47.55, 58.0, 70.0):
-    ceil(WET, 'porch', x, 58.0, '', '34', ['porch'], h=H_CEIL)
-at(EXT, 'porch', 44.95, 53.73, 'rear', 72, '', '34', ['porch'], note='front door, left')
-at(EXT, 'porch', 50.15, 53.73, 'rear', 72, '', '34', ['porch'], note='front door, right')
-at(WP, 'porch', 39.8, 53.73, 'rear', 24, '', '30')
-at(WP, 'porch', 63.0, 53.73, 'rear', 24, '', '30')
-ceil(WET, 'patio', 48.5, 5.2, '', '34', ['patio-lights'], h=H_CEIL)
-ceil(WET, 'patio', 59.7, 5.2, '', '34', ['patio-lights'], h=H_CEIL)
-ceil(FANBOX, 'patio', 54.1, 9.0, '', '34', ['patio-fan'], legend='fan-rated ceiling box, wet location', h=H_CEIL)
-at(EXT, 'patio', 50.35, 16.39, 'front', 72, '', '34', ['patio-lights'], note='patio doors, left')
-at(EXT, 'patio', 57.65, 16.39, 'front', 72, '', '34', ['patio-lights'], note='patio doors, right')
-at(WP, 'patio', 45.2, 16.39, 'front', 24, '', '30')
-at(WP, 'patio', 63.0, 16.39, 'front', 24, '', '30')
-at(EXT, 'outside', 5.15, 36.67, 'front', 78, '', '36', ['garage-ext'], note='service door')
+    ceil(WET, 'porch', x, 58.0, '', '30', ['porch'], h=H_CEIL)
+at(EXT, 'porch', 44.95, 53.73, 'rear', 72, '', '30', ['porch'], note='front door, left')
+at(EXT, 'porch', 50.15, 53.73, 'rear', 72, '', '30', ['porch'], note='front door, right')
+at(WP, 'porch', 39.8, 53.73, 'rear', 24, '', '26')
+at(WP, 'porch', 63.0, 53.73, 'rear', 24, '', '26')
+ceil(WET, 'patio', 48.5, 5.2, '', '30', ['patio-lights'], h=H_CEIL)
+ceil(WET, 'patio', 59.7, 5.2, '', '30', ['patio-lights'], h=H_CEIL)
+ceil(FANBOX, 'patio', 54.1, 9.0, '', '30', ['patio-fan'], legend='fan-rated ceiling box, wet location', h=H_CEIL)
+at(EXT, 'patio', 50.35, 16.39, 'front', 72, '', '30', ['patio-lights'], note='patio doors, left')
+at(EXT, 'patio', 57.65, 16.39, 'front', 72, '', '30', ['patio-lights'], note='patio doors, right')
+at(WP, 'patio', 45.2, 16.39, 'front', 24, '', '26')
+at(WP, 'patio', 63.0, 16.39, 'front', 24, '', '26')
+at(EXT, 'outside', 5.15, 36.67, 'front', 78, '', '32', ['garage-ext'], note='service door')
 for y in (39.1, 52.1, 65.1):
-    at(EXT, 'outside', 0.0, y, 'right', 84, '', '36', ['garage-ext'], note='garage door coach light')
+    at(EXT, 'outside', 0.0, y, 'right', 84, '', '32', ['garage-ext'], note='garage door coach light')
 at(DISC, 'outside', 31.0, 3.5, 'left', 54, '', '5-6', legend='fused disconnect DS1, CU-1', note='rear alcove, on the master bedroom\'s east wall, in sight of the unit (M-1)')
-at(WP, 'outside', 31.0, 1.5, 'left', 24, '', '30', note='rear alcove; service receptacle within 25 ft of CU-1 (210.63)')
+at(WP, 'outside', 31.0, 1.5, 'left', 24, '', '26', note='rear alcove; service receptacle within 25 ft of CU-1 (210.63)')
 at(DISC, 'outside', 83.44, 40.6, 'left', 54, '', '7-8', legend='fused disconnect DS2, CU-2', note='right side yard, on the Bath 2 wall beside the unit (M-1)')
-at(WP, 'outside', 83.44, 42.6, 'left', 24, '', '30', note='right side yard; service receptacle within 25 ft of CU-2 (210.63)')
-at(LV, 'outside', 50.9, 53.73, 'rear', 48, '', '37', legend='low-voltage drop: Cat6 for a video doorbell', note='right of the front door')
+at(WP, 'outside', 83.44, 42.6, 'left', 24, '', '26', note='right side yard; service receptacle within 25 ft of CU-2 (210.63)')
+at(LV, 'outside', 50.9, 53.73, 'rear', 48, '', '33', legend='low-voltage drop: Cat6 for a video doorbell', note='right of the front door')
 
 PREFIX = {REC: 'R', USB: 'R', GFCI: 'R', R20: 'R', R240: 'R', WP: 'R', FLOOR: 'R', TV: 'R', DATA: 'R', LV: 'X',
           SW: 'S', SW3: 'S', SW4: 'S', DIM: 'S', OCC: 'S',
@@ -719,37 +715,37 @@ def build():
 
     # ---- service load, NEC 220.82 (dwelling, optional method)
     sq = HOUSE['totals']['heated_gross_sf']
-    fixed = ['1-2', '3-4', '9-10', '14', '15', '16', '17', '29', '31', '32', '37']
+    fixed = ['1-2', '3-4', '9-10', '13', '14', '15', '16', '26', '27', '28', '33']
     appl = sum(CKT[k]['va'] for k in fixed)
-    general = 3 * sq + 3 * 1500 + 1500
+    general = 3 * sq + 2 * 1500 + 1500
     other = general + appl
     demand = 10000 + 0.4 * (other - 10000)
     hvac = CKT['5-6']['va'] + CKT['7-8']['va']
     total = demand + hvac; amps = total / 240
     load_rows = [
         (None, ['General lighting and receptacles', f'3 VA x {sq:,} sf', f'{3 * sq:,} VA']),
-        (None, ['Small-appliance circuits', '3 x 1,500 VA (11, 12, 13)', '4,500 VA']),
+        (None, ['Small-appliance circuits', '2 x 1,500 VA (11, 12)', '3,000 VA']),
         (None, ['Laundry circuit', '1 x 1,500 VA (18)', '1,500 VA']),
         (None, ['Fixed appliances, nameplate', 'range, dryer, EV-ready, fridge, DW, disposal, hood, openers, boiler, water heater, media', f'{appl:,} VA']),
         (None, ['All other load, demand', 'first 10 kVA at 100%, rest at 40% (220.82(B))', f'{demand:,.0f} VA']),
         (None, ['Heating / cooling', 'two mini-split outdoor units at 100% (220.82(C)); radiant boiler and water heater are gas or propane (owner, 2026-10-13)', f'{hvac:,} VA']),
         (None, ['Calculated load', f'{total:,.0f} VA / 240 V', f'{amps:,.0f} A on a 200 A service']),
     ]
-    spaces = sum(2 if '-' in k and k != '38-40' else 3 if k == '38-40' else 1 for k in CKT)
+    spaces = sum(2 if '-' in k and k != '34-40' else 7 if k == '34-40' else 1 for k in CKT)
     notes = [
         'Panel P1, 200A main breaker, 40 spaces, in the garage on the mud room wall beside D6, 60" to centre, 36" clear in front (110.26). It sits next to the mechanical room (boiler, water heater) and the kitchen, the two heaviest groups of circuits. A meter-main outside on the garage\'s porch-side wall carries the service disconnect (NEC 2023 230.85 emergency disconnect) and feeds P1 with 4-wire 2/0 Al SER (or #2/0 Al in conduit), neutral isolated in P1.',
-        'Code basis: NEC 2023 (confirm the edition Powell / Park County enforces). AFCI on every 120V 15A and 20A branch circuit in the house except the bath receptacle circuits and the garage and exterior circuits (210.12); GFCI in baths, kitchen counters and island, dishwasher, disposal, laundry, garage, outdoors, and within 6 ft of any sink (210.8). Tamper-resistant receptacles throughout (406.12).',
+        'Code basis: NEC 2023 (confirm the edition Powell / Park County enforces). AFCI on every 120V 15A and 20A branch circuit in the house except the bath receptacle circuits and the garage and exterior circuit (210.12); GFCI in baths, kitchen counters and island, dishwasher, disposal, laundry, garage, outdoors, and within 6 ft of any sink (210.8). GFCI protection is by GFCI receptacles (marked G) at a readily accessible first outlet, which also protect what is downstream (the washer, the door openers); only the dishwasher and disposal, whose receptacles sit in cabinets, use dual-function breakers. Tamper-resistant receptacles throughout (406.12).',
         'Positions: every wall device is drawn on the face of the wall it goes in, with its stem to that wall; the schedule gives the wall and the distance from the nearer corner. Ceiling devices give two distances. Final boxes are set to the studs at the owner walk-through.',
         'Mounting heights (standard): receptacles 16" to centre, switches 48", counter and laundry GFCIs 44", vanity GFCIs 40", vanity lights 84", exterior lights 72" or 84".',
         'Switch plan: every light belongs to one switch leg (table below), switched in the room it lights, at the latch side of the door you walk in through. Rooms with two ways in get 3-ways: the master hall, mud room, kitchen, bedroom hall and garage; the living cans have three control points (entry dimmer, 4-way at the patio doors, 3-way at the bedroom hall). A switch tag that appears in several legs is a multi-gang bank, one rocker per leg. On the page, picking a light or switch lights every device on its legs in blue.',
         'Circuit sheets E-1.1 onward show one circuit each with its cable run drawn from P1 through every device in nearest-neighbour order (solid for receptacle and appliance circuits, dashed for lighting). The run is a proposed order, not a required one. E-1.D shows the Cat6 home runs to the media panel.',
-        'Kitchen: three 20A small-appliance circuits (11 left counter, 12 island and front counter, 13 dining and pantry, 210.11(C)(1)), counter receptacles at 4 ft spacing (210.52(C)); range, refrigerator, dishwasher, disposal and hood each on their own circuit. The island has a receptacle in each end panel on the living side, below the counter edge. Kitchen and living ceilings are vaulted 4:12: sloped-ceiling can trims and a fan downrod sized for the slope.',
-        'Lighting circuits by area, whole switch legs only: 33 master suite, master hall, laundry, powder, mud room; 34 kitchen, dining, pantry, mech room, living, entry, coat closet, porch and patio; 35 office, bedroom wing and every smoke and CO alarm (so a tripped alarm circuit shows as dark lights). Garage and garage exterior lights on 36. Each is well under the 1,440 W continuous limit of a 15A circuit at LED design wattages.',
+        'Kitchen: two 20A small-appliance circuits (11 left counter and the dining walls, 12 island, front counter and pantry, 210.11(C)(1) and 210.52(B)), counter receptacles at 4 ft spacing (210.52(C)); range, refrigerator, dishwasher, disposal and hood each on their own circuit. The island has a receptacle in each end panel on the living side, below the counter edge. Kitchen and living ceilings are vaulted 4:12: sloped-ceiling can trims and a fan downrod sized for the slope.',
+        'Lighting circuits by area, whole switch legs only: 29 master suite, master hall, laundry, powder, mud room; 30 kitchen, dining, pantry, mech room, living, entry, coat closet, porch and patio; 31 office, bedroom wing and every smoke and CO alarm (so a tripped alarm circuit shows as dark lights). Garage and garage exterior lights on 32. Each is well under the 1,440 W continuous limit of a 15A circuit at LED design wattages.',
         'Smoke alarms in every bedroom and the office; smoke + CO combination alarms outside each sleeping area (master hall, bedroom hall, entry outside the office). All 120V, interconnected, battery backup (IRC R314, R315; CO because of the attached garage, the wood fireplace and the gas boiler).',
         'Bath exhaust fans 110 CFM with humidity sensing and an integrated LED light: the light switches with the room\'s other lights, the fan on its own rocker with a timer (14/3 from the bank). Ducted outside in rigid duct.',
         'Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (24k, master, dining and living heads) sits in the rear alcove between the master bedroom and the covered patio, and CU-2 (24k, bedrooms 1-3) in the right side yard against the Bath 2 wall, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).',
-        'Radiant (R-1): the wall-hung boiler HS-1, its system circulator and the zone controller share 15A circuit 31 with a service switch at the boiler, and each remote manifold station has a receptacle on 31 for its actuator wiring module (MF-1 laundry, MF-2/MF-G on the garage side of the mud room wall with the garage circulator, MF-3 bedroom hall). The water heater\'s power vent is on 32. Thermostats are 24V back to the zone controller, not line voltage. The MF-3 cabinet sits below the hall 3-way S at 48".',
-        'Low voltage: Cat6 home runs to the media panel on the pantry\'s mech-room wall (master and living TV boxes, office desk, video doorbell at the front door), powered from circuit 37.',
+        'Radiant (R-1): the wall-hung boiler HS-1, its system circulator and the zone controller share 15A circuit 27 with a service switch at the boiler, and each remote manifold station has a receptacle on 27 for its actuator wiring module (MF-1 laundry, MF-2/MF-G on the garage side of the mud room wall with the garage circulator, MF-3 bedroom hall). The water heater\'s power vent is on 32. Thermostats are 24V back to the zone controller, not line voltage. The MF-3 cabinet sits below the hall 3-way S at 48".',
+        'Low voltage: Cat6 home runs to the media panel on the pantry\'s mech-room wall (master and living TV boxes, office desk, video doorbell at the front door), powered from circuit 33.',
     ]
     open_items = [
         'Range fuel: the 48" range is drawn electric on a 50A circuit. A gas or dual-fuel range drops that to a 120V receptacle and adds a gas line.',

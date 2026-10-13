@@ -17,7 +17,8 @@ ROOMS = {r['id']: r for r in HOUSE['rooms']}
 
 S, MX, MY = 11.0, 60, 60
 PW, PH = 84.0, 71.0                     # plan extents in feet
-TB = 230                                # title block width, px
+TB = 0                                  # no side title block: sheets are laid out like the Zero Rd set (drawing full width, legend strip below)
+LEG = 92                                # legend strip under the drawing, px
 
 
 def px(x): return MX + x * S
@@ -65,8 +66,10 @@ def room_at(x, y):
     return None
 
 
-ROOM_FILL = {'bed': '#f3efe6', 'bath': '#e3eef5', 'closet': '#efece6', 'hall': '#f6f4ef', 'laundry': '#e8f0f2',
-             'kitchen': '#f6ede0', 'living': '#f7f1e6', 'mech': '#ece6ea', 'garage': '#ececec', 'outdoor': '#eef2e8'}
+# Room tints as on every Zero Rd sheet (bed green, wet beige, service grey, circulation white, living cream, office blue)
+ROOM_FILL = {'bed': '#dcefe6', 'bath': '#efeadf', 'closet': '#e9e6e0', 'hall': '#ffffff', 'laundry': '#efeadf',
+             'kitchen': '#f7f4ec', 'living': '#f7f4ec', 'mech': '#e9e6e0', 'garage': '#e3e0d8', 'outdoor': '#f4f5f1', 'office': '#e6ecf3'}
+WALL_INT, WALL_EXT, WALL_LINE = '#5d5750', '#d8d2c8', '#8a837a'   # Zero Rd: dark partitions, light shell band
 
 LAYERS = ['page', 'rooms', 'grid', 'walls', 'openings', 'fix', 'base-lab', 'disc', 'disc-lab', 'tags', 'title']
 
@@ -78,7 +81,8 @@ class Sheet:
         self.items = []
         self.prefix = number.replace('-', '').lower() + '-'
         self.width = int(MX * 2 + PW * S + TB)
-        self.height = int(MY * 2 + PH * S)
+        self.height = int(MY * 2 + PH * S + LEG)
+        self.legend_items, self.key_notes = [], []
 
     def add(self, s, layer='disc'): self.L[layer].append(s)
 
@@ -122,9 +126,11 @@ class Sheet:
 
     # ------------------------------------------------------------ the house, in grey (or colour on A-1)
     def base(self, colour=False, fixtures=True, labels=True, grid=True):
+        """The house as the Zero Rd sheets draw it: tinted rooms, light exterior band, dark partitions, grey fixtures,
+        room names in title case. `colour` is kept for A-1, which also prints the owner's room sizes."""
         self.add('<rect width="100%" height="100%" fill="#fff"/>', 'page')
         for r in HOUSE['rooms']:
-            fill = ROOM_FILL.get(r['kind'], '#fff') if colour else ('#f4f5f1' if r['kind'] == 'outdoor' else '#fbfbfa')
+            fill = ROOM_FILL.get('office' if r['id'] == 'office' else r['kind'], '#fff')
             pts = ' '.join(f'{px(x):.1f},{py(y):.1f}' for x, y in r['poly'])
             if r['kind'] == 'outdoor':
                 self.add(f'<polygon points="{pts}" fill="{fill}" stroke="#9aa08f" stroke-width="0.8" stroke-dasharray="4,3"/>', 'rooms')
@@ -135,16 +141,15 @@ class Sheet:
                 self.line(x, -1.2, x, 71, '#d3dbe4', 0.5, '2,3', layer='grid'); self.text(x, -2.2, str(x), 6.5, '#7b93ad', layer='grid')
             for y in range(0, 71, 5):
                 self.line(-1.2, y, 84, y, '#d3dbe4', 0.5, '2,3', layer='grid'); self.text(-2.6, y, str(y), 6.5, '#7b93ad', layer='grid')
-        wc = '#3f3b35' if colour else '#77726a'
         for w in HOUSE['walls']:
-            fill = ('#8a9bb4' if w['kind'] == 'E' else '#d9c56a') if colour else ('#9b968d' if w['kind'] == 'E' else '#c3beb5')
-            self.rect(w['x0'], w['y0'], w['x1'], w['y1'], fill, wc, 0.6, layer='walls')
+            ext = w['kind'] == 'E'
+            self.rect(w['x0'], w['y0'], w['x1'], w['y1'], WALL_EXT if ext else WALL_INT, WALL_LINE if ext else WALL_INT, 0.6, layer='walls')
         for x, y in HOUSE['posts']:
-            self.rect(x - 0.33, y - 0.33, x + 0.33, y + 0.33, '#fff', wc, 0.8, layer='walls')
+            self.rect(x - 0.33, y - 0.33, x + 0.33, y + 0.33, '#fff', WALL_LINE, 0.8, layer='walls')
         self.openings(colour)
         if fixtures:
             for f in HOUSE['fixtures']:
-                self.fixture(f, '#8a5a44' if colour else '#b6afa5')
+                self.fixture(f, '#b6afa5')
         if labels:
             for r in HOUSE['rooms']:
                 if r['area_sf'] < 12: continue
@@ -152,21 +157,24 @@ class Sheet:
                 if r['id'] == 'mud': cx, cy = 21.0, 33.6
                 if r['id'] == 'garage': cx, cy = 15.5, 52.0
                 if r['id'] == 'kitchen': cx, cy = 34.8, 20.5
-                self.text(cx, cy - 0.5, r['name'].upper(), 7.5 if r['area_sf'] > 40 else 6, '#4d4842' if colour else '#8f897f', '600', layer='base-lab')
+                self.text(cx, cy - 0.5, r['name'], 8 if r['area_sf'] > 40 else 6.5, '#7a7268', layer='base-lab')
                 if colour and r.get('label'):
-                    self.text(cx, cy + 0.7, r['label'], 6.5, '#6f685d', layer='base-lab')
+                    self.text(cx, cy + 0.8, r['label'], 6.5, '#8f897f', layer='base-lab')
+        # plan directions, where the Zero Rd sheets print N / S and the street sides
+        self.text(PW / 2, -4.6, 'REAR · PATIO', 8, '#6f685d', '600', layer='base-lab')
+        self.text(PW / 2, PH + 3.6, 'FRONT · PORCH', 8, '#6f685d', '600', layer='base-lab')
 
     def openings(self, colour):
         for w in HOUSE['windows']:
             a, (s0, s1) = w['at'], w['span']; t = 0.46
             if w['axis'] == 'y':
-                self.rect(s0, a, s1, a + t, '#fff', '#3c6e9e' if colour else '#8f8a82', 0.6, layer='openings')
-                self.line(s0, a + t / 2, s1, a + t / 2, '#3c6e9e' if colour else '#8f8a82', 0.8, layer='openings')
+                self.rect(s0, a, s1, a + t, '#fff', '#8f8a82', 0.6, layer='openings')
+                self.line(s0, a + t / 2, s1, a + t / 2, '#8f8a82', 0.8, layer='openings')
             else:
-                self.rect(a, s0, a + t, s1, '#fff', '#3c6e9e' if colour else '#8f8a82', 0.6, layer='openings')
-                self.line(a + t / 2, s0, a + t / 2, s1, '#3c6e9e' if colour else '#8f8a82', 0.8, layer='openings')
+                self.rect(a, s0, a + t, s1, '#fff', '#8f8a82', 0.6, layer='openings')
+                self.line(a + t / 2, s0, a + t / 2, s1, '#8f8a82', 0.8, layer='openings')
         for d in HOUSE['doors']:
-            self.door(d, '#3f3b35' if colour else '#9a948a')
+            self.door(d, '#9a948a')
 
     def door(self, d, color):
         a, (s0, s1) = d['at'], d['span']; k = d['kind']
@@ -233,33 +241,37 @@ class Sheet:
                 self.text(x, y, {'range': 'R', 'washer': 'W', 'dryer': 'D', 'ref': 'REF', 'dw': 'DW'}[k], 5.5, color, layer='fix')
 
     # ------------------------------------------------------------ title block and output
+    # ------------------------------------------------------------ legend strip (Zero Rd layout: symbols and their meaning under the drawing)
+    def legend(self, items):
+        """items: [(svg_symbol_markup_centred_at_0_0, label)]; drawn left to right in the strip under the plan."""
+        self.legend_items.extend(items)
+
     def title_block(self, notes=()):
-        x = self.width - TB + 10; w = TB - 20; y = MY; h = self.height - 2 * MY
-        self.add(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#fff" stroke="#3f3b35" stroke-width="1"/>', 'title')
-        self.add(f'<text x="{x + 10}" y="{y + 22}" font-size="10" fill="#6f685d" font-weight="600" letter-spacing="1">64 STONE SHEEP CIRCLE</text>', 'title')
-        self.add(f'<text x="{x + 10}" y="{y + 40}" font-size="9" fill="#6f685d">From the owner\'s plans, Larson House 6/11/26</text>', 'title')
-        self.add(f'<text x="{x + 10}" y="{y + 76}" font-size="15" fill="#221f1a" font-weight="700">{esc(self.title)}</text>', 'title')
-        yy = y + 96
-        for line in wrap(self.subtitle, 40):
-            self.add(f'<text x="{x + 10}" y="{yy}" font-size="9" fill="#4d4842">{esc(line)}</text>', 'title'); yy += 13
-        yy += 10
-        for n in notes:
-            for i, line in enumerate(wrap(n, 44)):
-                self.add(f'<text x="{x + 10}" y="{yy}" font-size="8.5" fill="#4d4842">{esc(("• " if i == 0 else "  ") + line)}</text>', 'title'); yy += 12
-            yy += 3
-        # north is not given relative to the plan; show the plan's own directions
-        self.add(f'<text x="{x + 10}" y="{y + h - 92}" font-size="8.5" fill="#6f685d">Top of sheet = rear (patio). Bottom = front (porch).</text>', 'title')
-        self.add(f'<text x="{x + 10}" y="{y + h - 78}" font-size="8.5" fill="#6f685d">Grid: 5 ft, feet from the garage door wall (X)</text>', 'title')
-        self.add(f'<text x="{x + 10}" y="{y + h - 66}" font-size="8.5" fill="#6f685d">and from the master bedroom\'s rear wall (Y).</text>', 'title')
-        self.add(f'<line x1="{x}" y1="{y + h - 50}" x2="{x + w}" y2="{y + h - 50}" stroke="#3f3b35"/>', 'title')
-        self.add(f'<text x="{x + 10}" y="{y + h - 30}" font-size="9" fill="#6f685d">SHEET</text>', 'title')
-        self.add(f'<text x="{x + w - 10}" y="{y + h - 18}" font-size="26" fill="#b4462f" font-weight="700" text-anchor="end">{esc(self.number)}</text>', 'title')
-        self.add(f'<text class="rev" x="{x + 10}" y="{y + h - 14}" font-size="9" fill="#6f685d">draft</text>', 'title')
+        """Kept for the trade generators: the sheet's key notes now print as one line in the legend strip,
+        and the sheet number and title live in the page heading and the packet (as on the Zero Rd sheets)."""
+        self.key_notes = list(notes)
+
+    def _strip(self):
+        y0 = MY + PH * S + 70; x = MX; out = []
+        for sym, label in self.legend_items:
+            w = 26 + len(label) * 5.2 + 22
+            if x + w > self.width - 20: x = MX; y0 += 20
+            out.append(f'<g transform="translate({x + 9:.1f},{y0:.1f})">{sym}</g>'
+                       f'<text x="{x + 24:.1f}" y="{y0:.1f}" font-size="9" fill="#4d4842" dominant-baseline="middle">{esc(label)}</text>')
+            x += w
+        y = y0 + (20 if self.legend_items else 0)
+        for line in wrap(' · '.join(self.key_notes), int((self.width - 2 * MX) / 4.2)) if self.key_notes else []:
+            out.append(f'<text x="{MX}" y="{y:.1f}" font-size="8.5" fill="#6f685d" dominant-baseline="middle">{esc(line)}</text>'); y += 13
+        self._bottom = y
+        out.append(f'<text class="rev" x="{self.width - 20}" y="REV" font-size="9" fill="#555" text-anchor="end">draft</text>')
+        return ''.join(out)
 
     def svg(self):
-        body = ''.join(''.join(self.L[k]) for k in LAYERS)
+        strip = self._strip()
+        self.height = max(self.height, int(self._bottom + 14))
+        body = ''.join(''.join(self.L[k]) for k in LAYERS if k != 'title') + strip.replace('y="REV"', f'y="{self.height - 10}"')
         return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.width}" height="{self.height}" viewBox="0 0 {self.width} {self.height}" '
-                f'font-family="IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif">{body}</svg>')
+                f'font-family="IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-label="{esc(self.number)} {esc(self.title)} plan">{body}</svg>')
 
 
 def wrap(t, n):

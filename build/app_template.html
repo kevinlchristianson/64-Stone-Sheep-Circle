@@ -18,10 +18,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* A drawing set: a sheet bar on top (3D, A-1, S-1, E-1, P-1, M-1, the owner's plans, chat); each sheet is a drawing with its notes and schedules below. Barlow Condensed labels, Plex body, Plex Mono numbers. */
+/* layout: a drawing set, the same as the 7824 Zero Rd contractor app. A sheet bar on top (3D, A-1, S-1, E-1, P-1, M-1, the owner's plans, chat); each sheet is a drawing with its notes and schedules below. Barlow Condensed labels, Plex body, Plex Mono numbers. */
 :root {
   --bg: #ebe7df; --panel: #f7f5f0; --panel-2: #eeeae2; --ink: #221f1a; --muted: #6f685d; --line: #d6cfc3;
   --accent: #b4462f; --accent-ink: #ffffff; --focus: #2c6aa0; --sky: #dfe5e9; --paper: #ffffff;
+  --fram: #b8762a; --wet: #2c6aa0; --elec: #c8650a; --plum: #3c3a36; --cold: #2c6aa0; --hot: #c8382b; --vent: #4c8c4a; --block: #c2369a;
   --shadow: 0 1px 2px rgba(30, 24, 16, .12), 0 6px 20px rgba(30, 24, 16, .10);
   --display: "Barlow Condensed", "Arial Narrow", sans-serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
@@ -48,17 +49,16 @@ header.bar { flex: none; display: flex; align-items: center; gap: 14px; padding:
 .brand h1 { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1; margin: 0; }
 .brand .ver { font-family: var(--mono); font-weight: 500; font-size: 11px; vertical-align: middle; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); }
 .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
-.tabs button { font: inherit; font-family: var(--display); font-weight: 600; font-size: 16px; padding: 6px 12px; border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px; position: relative; }
+.tabs button { font: inherit; font-family: var(--display); font-weight: 600; font-size: 16px; padding: 6px 12px; border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px; }
 .tabs button .no { font-family: var(--mono); font-size: 12px; font-weight: 500; padding: 1px 6px; border-radius: 4px; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); }
 .tabs button:hover { background: var(--panel-2); }
 .tabs button[aria-selected="true"] { background: var(--panel-2); border-color: var(--line); }
 .tabs button[aria-selected="true"] .no { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.tabs button .badge { font-family: var(--mono); font-size: 11px; font-weight: 500; min-width: 18px; padding: 1px 5px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); text-align: center; }
+.counts { margin-left: auto; color: var(--muted); font-family: var(--mono); font-size: 12px; }
 main { flex: 1; min-height: 0; }
 .sheet { height: 100%; }
-:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 /* ---------- 3D */
-#sheet-3d { display: grid; grid-template-columns: 300px minmax(0, 1fr); height: 100%; }
+#sheet-3d { display: grid; grid-template-columns: 320px minmax(0, 1fr); height: 100%; }
 #side { min-height: 0; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--line); padding: 16px 18px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 18px; }
 .eyebrow { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
 .lede { margin: 0; color: var(--muted); font-size: 13px; }
@@ -68,95 +68,223 @@ main { flex: 1; min-height: 0; }
 .toggle { display: flex; align-items: center; gap: 10px; padding: 4px 0; cursor: pointer; font-size: 13px; }
 .toggle input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; flex: none; }
 .sw { width: 14px; height: 14px; border-radius: 3px; flex: none; border: 1px solid rgba(0,0,0,.15); }
-.cut { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; font-size: 13px; color: var(--muted); }
+.cut { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding: 4px 0 4px; color: var(--muted); font-size: 13px; }
 .cut label { grid-column: 1 / -1; }
 .cut input { width: 100%; accent-color: var(--accent); margin: 0; }
 .cut output { font-family: var(--mono); font-size: 12px; color: var(--ink); min-width: 5ch; text-align: right; }
-.facts { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; margin: 0; font-size: 13px; }
-.facts dt { color: var(--muted); }
-.facts dd { margin: 0; font-family: var(--mono); font-size: 12.5px; }
 #stage { position: relative; min-width: 0; min-height: 0; background: var(--sky); overflow: hidden; }
 #stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-.hud { position: absolute; z-index: 2; }
-.chip { background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: 6px; }
-.hud-top { top: 12px; right: 14px; display: flex; gap: 8px; }
+.hud { position: absolute; z-index: 2; pointer-events: none; }
+.hud > * { pointer-events: auto; }
+.chip { background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: 6px; }
+.hud-top { top: 12px; left: 14px; right: 14px; display: flex; justify-content: flex-end; align-items: flex-start; gap: 10px; }
 .dragmode { display: flex; padding: 3px; gap: 2px; }
 .dragmode button { font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 4px; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
 .dragmode button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
-.hud-sel { left: 14px; bottom: 12px; padding: 8px 12px; font-size: 13px; max-width: min(80%, 560px); }
-.hud-sel b { font-family: var(--display); font-size: 16px; }
+.compass { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; }
+.compass svg { width: 34px; height: 34px; transition: transform .12s linear; }
+.hud-sel { left: 14px; bottom: 12px; display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 12px; font-size: 13px; max-width: min(80%, 720px); }
+.hud-sel button { padding: 3px 9px; font-size: 12px; flex: none; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); font: inherit; cursor: pointer; }
+.hud-sel .sel-c { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.hud-pop { left: 14px; bottom: 58px; width: min(420px, calc(100% - 28px)); max-height: min(60%, 420px); overflow: auto; padding: 8px 12px 10px; font-size: 13px; }
+.hud-pop .pk-oi { margin-top: 0; padding-top: 0; border-top: 0; }
+.hud-pop .pop-h { display: flex; align-items: flex-start; gap: 8px; }
+.hud-pop .pop-h .pk-oi-h { flex: 1 1 auto; }
+.hud-pop .pop-x { flex: none; padding: 3px 9px; font: inherit; font-size: 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; }
 .hud-hint { right: 14px; bottom: 12px; margin: 0; padding: 4px 9px; font-size: 12px; color: var(--muted); }
-.hud-status { left: 14px; top: 12px; margin: 0; padding: 6px 10px; font-size: 13px; }
+.hud-status { left: 14px; top: 56px; margin: 0; padding: 6px 10px; font-size: 13px; }
 /* ---------- 2D sheets */
 .sheet2d { height: 100%; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 0px); }
 .tools { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
 .tools .zoom { display: flex; gap: 4px; }
-.tools .sel { min-width: 0; flex: 1 1 300px; margin: 0; font-size: 13px; color: var(--muted); }
-.tools .sel.on { color: var(--ink); }
+.tools .sel { min-width: 0; flex: 1 1 300px; margin: 0; font-size: 13px; color: var(--muted); white-space: pre-line; }
+.tools .sel.on { color: var(--ink); white-space: normal; }
+.tools .sel button { margin-left: 8px; }
 a.packet { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; padding: 5px 12px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); text-decoration: none; white-space: nowrap; }
+a.packet:hover { filter: brightness(1.08); }
+a.packet:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .drawing { padding: 16px; background: var(--bg); }
+.paper { position: relative; width: 100%; max-width: 1400px; margin: 0 auto; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); overflow: hidden; transform-origin: 0 0; }
+/* the frame: scrolls (pans) in both directions; the browser keeps one-finger panning, the page script takes pinch and double-tap */
 .scroller { position: relative; overflow: auto; touch-action: pan-x pan-y; overscroll-behavior-x: contain; }
-.paper { position: relative; width: 100%; max-width: 1400px; margin: 0 auto; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); }
 .paper svg { display: block; width: 100%; height: auto; }
 .paper svg .sym, .paper svg .tag { cursor: pointer; }
 .paper svg .sym:hover, .paper svg .tag:hover { filter: drop-shadow(0 0 2px #e08a00); }
 .paper svg .sym.on, .paper svg .tag.on { filter: drop-shadow(0 0 3px #e08a00) drop-shadow(0 0 6px #e08a00); }
-.paper svg .room.on polygon { fill: #e08a00; fill-opacity: .18; }
-.paper svg .sym.on .hit, .paper svg .tag.on .hit { fill: #e08a00; fill-opacity: .35; }
-.paper svg .sym.lit .hit { fill: #2c6aa0; fill-opacity: .35; }
-.paper svg .sym.lit { filter: drop-shadow(0 0 2px #2c6aa0) drop-shadow(0 0 5px #2c6aa0); }
+#sheet-r1 .paper svg:has(g.sym[id^="r1-L"].on) g.sym[id^="r1-L"]:not(.on) { opacity: .15; transition: opacity .15s; }
+.paper svg .sym.on-leg { filter: drop-shadow(0 0 2px #2c6aa0) drop-shadow(0 0 5px #2c6aa0); }
+/* the glow alone is too faint on a phone: the picked device gets an orange disc, every device on its switch leg a blue one */
+.paper svg .sym.on-leg .hit { fill: #2c6aa0; fill-opacity: .3; stroke: #2c6aa0; stroke-width: 2; }
+.paper svg .sym.on .hit { fill: #e08a00; fill-opacity: .35; stroke: #e08a00; stroke-width: 2; }
+.paper svg .wire { display: none; }
+.paper svg[data-ckt-mode] .wire { display: none; }
+.paper svg[data-ckt-mode] .wire.show { display: block; }
+.paper svg[data-ckt-mode] .sym { display: none; }
+.paper svg[data-ckt-mode] .sym.show { display: block; }
+.subtabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 16px 8px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.subtabs button { font: inherit; font-family: var(--mono); font-size: 12px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; }
+.subtabs button span { color: var(--muted); }
+.subtabs button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.subtabs button[aria-pressed="true"] span { color: var(--accent-ink); }
 .picked { position: sticky; bottom: 0; z-index: 4; padding: 0 16px calc(10px + env(safe-area-inset-bottom, 0px)); margin-top: -6px; pointer-events: none; }
-.pk-card { pointer-events: auto; max-width: 960px; margin: 0 auto; max-height: 42vh; overflow-y: auto; background: var(--panel); border: 1px solid var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); border-radius: 10px; padding: 8px 12px 10px; }
+.pk-card { pointer-events: auto; max-width: 960px; margin: 0 auto; max-height: 42vh; overflow-y: auto; overscroll-behavior: contain; background: var(--panel); border: 1px solid var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); border-radius: 10px; padding: 8px 12px 10px; }
 .pk-head { display: flex; align-items: baseline; gap: 10px; padding-bottom: 6px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
-.pk-tag { font-family: var(--mono); font-weight: 600; font-size: 17px; color: var(--accent); }
+.pk-tag { font-family: var(--mono); font-weight: 600; font-size: 17px; color: var(--accent); overflow-wrap: anywhere; }
 .pk-sub { font-weight: 600; font-size: 14.5px; min-width: 0; }
 .pk-x { margin-left: auto; flex: none; font: inherit; font-size: 13px; min-height: 32px; padding: 4px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; }
+.pk-lead { margin: 0 0 6px; font-size: 14px; }
 .pk-dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 3px 12px; margin: 0; font-size: 14px; }
 .pk-dl dt { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 .pk-dl dd { margin: 0; overflow-wrap: anywhere; }
+.ckt-name { padding: 4px 16px 8px; font-size: 13px; color: var(--muted); background: var(--panel); border-bottom: 1px solid var(--line); }
 .below { max-width: 1400px; margin: 0 auto; padding: 8px 16px 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px 28px; }
 .below > section { min-width: 0; }
 .below .wide { grid-column: 1 / -1; }
-h2 { font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1.1; margin: 10px 0 6px; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1.1; margin: 10px 0 6px; text-wrap: balance; }
 h3 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 18px 0 6px; }
 .below p, .below li { font-size: 13.5px; }
 .below ol, .below ul { padding-left: 20px; margin: 0; }
 .below li { margin: 0 0 6px; }
 .open li::marker { color: var(--accent); }
-.summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; padding: 0; list-style: none; }
-.summary li { margin: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); font-size: 13px; }
-.summary b { font-family: var(--mono); font-weight: 500; }
-.tsearch { display: flex; align-items: center; gap: 10px; margin: 6px 0 8px; }
-.tsearch input { flex: 1 1 auto; min-width: 0; max-width: 420px; font: inherit; font-size: 15px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
-.tsearch .cnt { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.oi-list { list-style: none; padding-left: 0 !important; }
+.oi { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; margin: 0 !important; border-bottom: 1px solid var(--line); }
+.oi input { flex: none; width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); cursor: pointer; }
+.oi-main { min-width: 0; flex: 1; }
+.oi-txt { overflow-wrap: anywhere; white-space: pre-wrap; }
+.oi.done .oi-txt { text-decoration: line-through; text-decoration-thickness: 1.5px; color: var(--muted); }
+.oi-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 2px; font-size: 12px; color: var(--muted); }
+.oi-res { color: var(--ink); }
+.oi-del { font: inherit; font-size: 12px; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.oi-st { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); min-height: 1em; }
+.oi-add { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 0; max-width: 90ch; }
+.oi-add .line { display: flex; gap: 8px; align-items: flex-end; }
+.oi-add textarea, .oi-add input { flex: 1 1 auto; min-width: 0; font: inherit; font-size: 16px; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.oi-add textarea { resize: none; max-height: 140px; line-height: 1.35; }
+.oi-add label { font-size: 13px; color: var(--muted); }
+.pk-oi { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--line); }
+.pk-oi-h { font-size: 13px; color: var(--muted); }
+.pk-oi .oi-st:empty { display: none; }
+.feed { color: var(--muted); max-width: 90ch; }
 .tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); }
 table { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width: 700px; }
 th, td { text-align: left; vertical-align: top; padding: 5px 9px; border-bottom: 1px solid var(--line); }
 thead th { position: sticky; top: 0; font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .03em; color: var(--muted); background: var(--panel-2); }
 td:first-child { font-family: var(--mono); font-weight: 500; white-space: nowrap; }
-tbody tr[data-id] { cursor: pointer; }
-tbody tr[data-id]:hover { background: var(--panel-2); }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.loc { min-width: 14em; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--panel-2); }
 tbody tr.on { background: color-mix(in srgb, var(--accent) 14%, var(--panel)); }
 tbody tr:last-child td { border-bottom: 0; }
-/* ---------- the owner's plans */
-.plans { max-width: 1400px; margin: 0 auto; padding: 16px; display: grid; gap: 18px; }
-.plans figure { margin: 0; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); }
-.plans img { display: block; width: 100%; height: auto; }
-.plans figcaption { padding: 8px 12px; font-size: 13px; color: #4d4842; border-top: 1px solid #d6cfc3; background: #f7f5f0; }
-.plans figcaption b { font-family: var(--mono); color: #b4462f; margin-right: 8px; }
-/* ---------- crew chat */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); margin: 0; padding: 0; list-style: none; }
+.legend li { display: flex; align-items: center; gap: 7px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@media (max-width: 760px) {
+  #sheet-3d { display: flex; flex-direction: column; }
+  #stage { flex: 1 1 0; min-height: 0; order: 1; }
+  #side { flex: 0 0 44%; order: 2; border-right: 0; border-top: 1px solid var(--line); padding-top: 12px; gap: 14px; }
+  .hud-hint { display: none; }
+  .counts { display: none; }
+  .brand h1 { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .compass svg { transition: none; } }
+
+/* ---- phone-friendly schedules: one table at a time, search, card rows ---- */
+.pane[hidden] { display: none; }
+.below > .panebar, .below > .panes { grid-column: 1 / -1; min-width: 0; }
+.panebar { position: sticky; top: var(--tools-h, 0px); z-index: 2; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; margin: 0 -16px; padding: 8px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.panebar::-webkit-scrollbar { display: none; }
+.panebar button { flex: none; font: inherit; font-family: var(--display); font-weight: 600; font-size: 16px; min-height: 40px; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.panebar button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.panebar .n { font-family: var(--mono); font-size: 11px; font-weight: 500; opacity: .7; margin-left: 6px; }
+.pane ol, .pane ul, .pane > p { max-width: 90ch; }
+.psearch { display: flex; align-items: center; gap: 10px; margin: 8px 0 10px; }
+.psearch input { flex: 1 1 auto; min-width: 0; font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.psearch .cnt { flex: none; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.backlist { position: fixed; right: 14px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 6; font: inherit; font-family: var(--display); font-weight: 600; font-size: 17px; padding: 10px 16px; border-radius: 24px; border: 0; background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow); cursor: pointer; }
+@media (max-width: 760px) {
+  .subtabs { display: grid; grid-template-columns: repeat(var(--half, 12), max-content); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .subtabs::-webkit-scrollbar { display: none; }
+  .subtabs button { min-height: 36px; padding: 4px 10px; }
+  .below { padding: 0 12px 96px; }
+  .panebar { margin: 0 -12px; padding: 8px 12px; }
+  .tbl { border: 0; background: none; overflow: visible; }
+  .tbl table { display: block; min-width: 0; width: 100%; }
+  .tbl thead { display: none; }
+  .tbl tbody { display: block; }
+  .tbl tbody tr { display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin: 0 0 10px; padding: 10px 12px; }
+  .tbl tbody tr.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .tbl td { display: flex; gap: 10px; align-items: baseline; border: 0; padding: 3px 0; font-size: 14px; white-space: normal; }
+  .tbl td:empty { display: none; }
+  .tbl td::before { content: attr(data-label); flex: 0 0 76px; font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .tbl td:first-child { white-space: normal; display: block; font-size: 17px; font-weight: 600; color: var(--accent); padding: 0 0 6px; margin-bottom: 4px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+  .tbl td:first-child::before { display: none; }
+  .tbl td:nth-child(2) { font-weight: 600; font-size: 15px; }
+  .tbl td.num { white-space: normal; }
+}
+
+/* ---- phones: a two-row header, a one-row toolbar, the drawing in a full-height frame once zoomed ---- */
+@media (max-width: 760px) {
+  header.bar { gap: 2px 10px; padding: 6px 10px 0; padding-top: calc(6px + env(safe-area-inset-top, 0px)); }
+  .brand { flex: 1 1 100%; flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; margin: 0 0 2px; padding: 0 2px; }
+  .brand h1 { font-size: 18px; order: -1; }
+  .brand .eyebrow { font-size: 11px; letter-spacing: .06em; }
+  .tabs { flex: 1 1 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; }
+  .tabs button { flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 48px; padding: 5px 2px 6px; font-size: 13px; line-height: 1; border-radius: 6px 6px 0 0; border-bottom: 2px solid transparent; }
+  .tabs button[aria-selected="true"] { border-bottom-color: var(--accent); }
+  .tabs button .no { font-size: 11px; padding: 2px 6px; }
+  .tools { gap: 8px; padding: 6px 10px; flex-wrap: nowrap; }
+  .tools .zoom { gap: 0; flex: none; }
+  .tools .zoom button { min-width: 44px; padding: 5px 10px; border-radius: 0; margin-left: -1px; }
+  .tools .zoom button:first-child { border-radius: 8px 0 0 8px; margin-left: 0; }
+  .tools .zoom button:last-child { border-radius: 0 8px 8px 0; }
+  .tools .zoom button[aria-pressed="true"] { position: relative; z-index: 1; }
+  .tools .sel { flex: 1 1 auto; font-size: 12.5px; line-height: 1.3; }
+  .tools .sel.on { white-space: normal; font-size: 13px; }
+  .tools .sel button { min-height: 32px; }
+  .tools a.packet { flex: none; min-height: 40px; padding: 5px 10px; }
+  .tools a.packet .pk-name { display: none; }
+  .ckt-name { padding: 4px 10px 6px; font-size: 12.5px; }
+  .drawing { padding: 8px; }
+  .lede, .below p, .below li { font-size: 14.5px; }
+}
+@media (max-width: 760px), (pointer: coarse) {
+  .scroller.zoomed { height: calc(100vh - var(--chrome-h, 140px) - 16px); height: calc(100dvh - var(--chrome-h, 140px) - 16px); }
+  .row button, .tools button, .subtabs button, .panebar button { min-height: 40px; }
+  .toggle { min-height: 40px; }
+  .toggle input { width: 20px; height: 20px; }
+}
+@media (min-width: 761px) and (max-height: 520px) {
+  header.bar { gap: 10px; padding: 4px 12px; padding-top: calc(4px + env(safe-area-inset-top, 0px)); }
+  .brand .eyebrow, .counts { display: none; }
+  .brand h1 { font-size: 18px; }
+  .tools { padding: 4px 12px; }
+  .subtabs { display: grid; grid-template-columns: repeat(var(--half, 12), max-content); overflow-x: auto; scrollbar-width: none; padding: 4px 12px 6px; }
+  .subtabs::-webkit-scrollbar { display: none; }
+  .drawing { padding: 8px; }
+}
+/* ---- crew chat: one shared room for everyone on the job ---- */
+.tabs button .badge { font-family: var(--mono); font-size: 11px; font-weight: 500; min-width: 18px; padding: 1px 5px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); text-align: center; }
 #sheet-chat { display: flex; flex-direction: column; min-height: 0; }
+#sheet-chat[hidden] { display: none; }
 .chat-wrap { flex: 1; min-height: 0; width: 100%; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; }
 .chat-note { margin: 16px; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; font-size: 14px; }
 .chat-note h2 { margin-top: 0; }
 .chat-note p { margin: 6px 0 0; color: var(--muted); }
 .chat-who { display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
 .chat-who b { color: var(--ink); font-weight: 600; }
+.chat-alert { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(20, 18, 16, .55); }
+.chat-alert[hidden] { display: none; }
+.chat-alert .box { width: min(420px, 100%); background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 12px 40px rgba(0, 0, 0, .3); }
+.chat-alert h2 { margin: 0 0 4px; font-size: 18px; }
+.chat-alert .from { font-size: 13px; color: var(--muted); }
+.chat-alert .txt { margin: 10px 0 16px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 30vh; overflow: auto; }
+.chat-alert button { width: 100%; font: inherit; font-weight: 600; padding: 12px; border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-ink); cursor: pointer; }
 .chat-who .st { margin-left: auto; font-family: var(--mono); font-size: 12px; }
 .chat-btn { font: inherit; font-size: 13px; font-weight: 500; padding: 5px 11px; min-height: 32px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; }
 .chat-btn.go { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-family: var(--display); font-weight: 600; font-size: 16px; padding: 8px 16px; }
 .chat-btn:disabled { opacity: .5; cursor: default; }
-.chat-log { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.chat-log { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; overscroll-behavior: contain; }
 .chat-day { align-self: center; font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 8px 0 2px; }
 .msg { max-width: min(80%, 620px); align-self: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 12px 12px 12px 4px; padding: 7px 11px 8px; }
 .msg.mine { align-self: flex-end; background: color-mix(in srgb, var(--accent) 12%, var(--panel)); border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 12px 12px 4px 12px; }
@@ -177,119 +305,126 @@ tbody tr:last-child td { border-bottom: 0; }
 .chat-re span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-left: 3px solid var(--accent); padding-left: 7px; }
 .chat-re input { flex: none; accent-color: var(--accent); width: 18px; height: 18px; margin: 0; }
 @media (max-width: 760px) {
-  header.bar { gap: 2px 10px; padding: 6px 10px 0; padding-top: calc(6px + env(safe-area-inset-top, 0px)); }
-  .brand { flex: 1 1 100%; flex-direction: row; align-items: baseline; gap: 2px 10px; }
-  .brand h1 { font-size: 18px; order: -1; }
-  .tabs { flex: 1 1 100%; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; }
-  .tabs button { flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 48px; padding: 5px 2px 6px; font-size: 11px; line-height: 1; border-radius: 6px 6px 0 0; border-bottom: 2px solid transparent; }
-  .tabs button[aria-selected="true"] { border-bottom-color: var(--accent); }
-  .tabs button .no { font-size: 11px; padding: 2px 5px; }
+  .tabs { grid-template-columns: repeat(var(--ntabs, 8), minmax(0, 1fr)); }
+  .tabs button { font-size: 11px; letter-spacing: -.01em; }
   .tabs button .badge { position: absolute; transform: translate(14px, -16px); }
-  #sheet-3d { display: flex; flex-direction: column; }
-  #stage { flex: 1 1 0; order: 1; }
-  #side { flex: 0 0 42%; order: 2; border-right: 0; border-top: 1px solid var(--line); padding-top: 12px; gap: 14px; }
-  .hud-hint { display: none; }
-  .tools { padding: 6px 10px; }
-  .tools .zoom button { min-width: 44px; min-height: 40px; }
-  .drawing { padding: 8px; }
-  .below { padding: 0 12px 96px; }
-  .tbl { border: 0; background: none; overflow: visible; }
-  .tbl table { display: block; min-width: 0; }
-  .tbl thead { display: none; }
-  .tbl tbody { display: block; }
-  .tbl tbody tr { display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin: 0 0 10px; padding: 10px 12px; }
-  .tbl tbody tr.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
-  .tbl td { display: flex; gap: 10px; align-items: baseline; border: 0; padding: 3px 0; font-size: 14px; white-space: normal; }
-  .tbl td::before { content: attr(data-label); flex: 0 0 84px; font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
-  .tbl td:first-child { display: block; font-size: 17px; font-weight: 600; color: var(--accent); padding: 0 0 6px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
-  .tbl td:first-child::before { display: none; }
-  .msg { max-width: 88%; }
-  .chat-log { padding: 10px; }
+  .tabs button { position: relative; }
+  .chat-log { padding: 10px 10px; }
   .chat-form, .chat-who { padding-left: 10px; padding-right: 10px; }
+  .msg { max-width: 88%; }
 }
-@media (max-width: 760px), (pointer: coarse) {
-  .scroller.zoomed { height: calc(100dvh - var(--chrome-h, 140px) - 16px); }
-  .row button, .tools button { min-height: 40px; }
-  .toggle { min-height: 40px; }
-}
+/* ---- 64 Stone Sheep Circle additions: sheet summary chips, the house facts, the owner's plan set */
+.summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; padding: 0; list-style: none; }
+.summary li { margin: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); font-size: 13px; }
+.summary b { font-family: var(--mono); font-weight: 500; }
+.legend { margin-top: 10px; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; margin: 0; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-family: var(--mono); font-size: 12.5px; }
+.paper svg .room.on polygon { fill: #e08a00; fill-opacity: .18; }
+#sheet-plans { overflow-y: auto; }
+.plans { max-width: 1400px; margin: 0 auto; padding: 16px; display: grid; gap: 18px; }
+.plans figure { margin: 0; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.plans img { display: block; width: 100%; height: auto; }
+.plans figcaption { padding: 8px 12px; font-size: 13px; color: #4d4842; border-top: 1px solid #d6cfc3; background: #f7f5f0; }
+.plans figcaption b { font-family: var(--mono); color: #b4462f; margin-right: 8px; }
+.plans-bar { position: sticky; top: 0; z-index: 3; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); margin: 0; }
 </style>
 </head>
 <body>
 <div id="app">
   <header class="bar">
-    <div class="brand"><span class="eyebrow">64 Stone Sheep Circle · build set</span><h1>Contractor App <span class="ver" id="appver" title="App version">{{VERSION}}</span></h1></div>
+    <div class="brand"><span class="eyebrow">64 Stone Sheep Circle · Powell, WY</span><h1>Contractor App <span class="ver" id="appver" title="App version">{{VERSION}}</span></h1></div>
     <nav class="tabs" role="tablist" aria-label="Sheets">
       <button type="button" role="tab" id="tab-3d" aria-selected="true" aria-controls="sheet-3d" data-sheet="3d"><span class="no">3D</span>Model</button>
 {{TABS}}
       <button type="button" role="tab" id="tab-plans" aria-selected="false" aria-controls="sheet-plans" data-sheet="plans"><span class="no">A</span>Plans</button>
       <button type="button" role="tab" id="tab-chat" aria-selected="false" aria-controls="sheet-chat" data-sheet="chat"><span class="no">✉</span>Chat</button>
     </nav>
+    <span class="counts">{{COUNTS}}</span>
   </header>
   <main>
-    <section class="sheet" id="sheet-3d" role="tabpanel" aria-labelledby="tab-3d">
+    <!-- ================================================================ 3D -->
+    <div class="sheet" id="sheet-3d" role="tabpanel" aria-labelledby="tab-3d">
       <aside id="side">
-        <div>
-          <p class="eyebrow">64 Stone Sheep Circle</p>
-          <p class="lede">The house as drawn on the owner's plans (Larson House, 6/11/26): one story, 9' walls, the kitchen and living vault, porch and patio. Drag to orbit, pinch or scroll to zoom, tap anything to read it.</p>
-        </div>
-        <div>
-          <p class="eyebrow">Show</p>
-          <label class="toggle"><input type="checkbox" data-layer="walls" checked><span class="sw" style="background:#f1ede5"></span>Walls, doors and windows</label>
-          <label class="toggle"><input type="checkbox" data-layer="fix" checked><span class="sw" style="background:#efe9de"></span>Fixtures and cabinets (A-5)</label>
-          <label class="toggle"><input type="checkbox" data-layer="roof"><span class="sw" style="background:#3b3d40"></span>Roof (massing, from A-2)</label>
-          <label class="toggle"><input type="checkbox" data-layer="elec"><span class="sw" style="background:#c8650a"></span>Electrical devices (E-1)</label>
-          <label class="toggle"><input type="checkbox" data-layer="plumb"><span class="sw" style="background:#3c3a36"></span>Plumbing (P-1)</label>
-          <label class="toggle"><input type="checkbox" data-layer="hvac"><span class="sw" style="background:#2c6aa0"></span>HVAC registers and trunks (M-1)</label>
-        </div>
-        <div class="cut">
-          <label for="cut">Wall height (cut the walls down to see in)</label>
-          <input type="range" id="cut" min="1" max="9" step="0.25" value="9"><output id="cutv">9'-0"</output>
-        </div>
-        <div>
-          <p class="eyebrow">Views</p>
-          <div class="row" id="views">
-            <button type="button" data-view="iso" aria-pressed="true">Front corner</button>
-            <button type="button" data-view="rear">Rear corner</button>
-            <button type="button" data-view="top">Plan</button>
-            <button type="button" data-view="front">Front</button>
+        <section>
+          <p class="eyebrow">Layers</p>
+          <!-- One checkbox per layer: id="ly-<group>" switches the 3D group G[<group>] (see LAYERS in the model script). -->
+          <label class="toggle"><input type="checkbox" id="ly-walls" checked><span class="sw" style="background:#f1ede5"></span> Finished interior walls: drywall, interior doors and the ceiling cut</label>
+          <label class="toggle"><input type="checkbox" id="ly-ext" checked><span class="sw" style="background:#8b8578"></span> Finished exterior walls: board-and-batten siding, windows, exterior doors, porch and patio posts</label>
+          <label class="toggle"><input type="checkbox" id="ly-elec" checked><span class="sw" style="background:#d08a00"></span> Electrical devices and lights (E-1)</label>
+          <label class="toggle"><input type="checkbox" id="ly-plumb" checked><span class="sw" style="background:#2c6aa0"></span> Plumbing: drains, stacks, supply (P-1)</label>
+          <label class="toggle"><input type="checkbox" id="ly-hvac" checked><span class="sw" style="background:#e3a05a"></span> HVAC (M-1)</label>
+          <label class="toggle"><input type="checkbox" id="ly-roof"><span class="sw" style="background:#3b3d40"></span> Roof: massing from A-2</label>
+          <label class="toggle"><input type="checkbox" id="ly-furn" checked><span class="sw" style="background:#dfe8df"></span> Fixtures, cabinets and appliances (A-5)</label>
+          <label class="toggle"><input type="checkbox" id="ly-floor" checked><span class="sw" style="background:#ffffff"></span> Plan drawing on the floor (A-1)</label>
+          <div class="cut">
+            <label for="cut">Cut the walls at</label>
+            <input type="range" id="cut" min="1" max="{{CUTMAX}}" step="0.25" value="{{CUTMAX}}">
+            <output id="cutval" for="cut">no cut</output>
           </div>
-        </div>
-        <div>
+        </section>
+        <section>
+          <p class="eyebrow">Reading it</p>
+          <p class="lede">Plan view puts the rear (patio) at the top and the front porch at the bottom, like the drawings; the garage is on the left. Click anything to read what it is: windows and doors carry their A-1 tag, devices their E-1 tag, fixtures and pipes their P-1 tag. The exterior walls show the siding outside and drywall inside, so turning them off leaves the finished interior.</p>
+          <p class="lede">To point a comment at one thing, pick it and press Comment, or name the sheet and the tag in the chat (A-1 W12, E-1 R12, P-1 WC1, M-1 S3).</p>
+        </section>
+        <section>
           <p class="eyebrow">The house</p>
           <dl class="facts">{{FACTS}}</dl>
-        </div>
+        </section>
       </aside>
-      <div id="stage">
-        <div class="hud hud-top"><div class="dragmode chip" id="dragmode" role="group" aria-label="What dragging does"><button type="button" data-mode="orbit" aria-pressed="true">Orbit</button><button type="button" data-mode="pan" aria-pressed="false">Pan</button></div></div>
-        <p class="hud hud-status chip" id="status">Loading the 3D model…</p>
-        <div class="hud hud-sel chip" id="sel" hidden><b id="selname"></b> <span id="seltext"></span></div>
-        <p class="hud hud-hint chip">Drag: orbit · right-drag: pan · scroll: zoom</p>
+      <div id="stage" aria-label="3D model of the house">
+        <div class="hud hud-top">
+          <div class="dragmode chip" id="dragmode" role="group" aria-label="What a one-finger or left-button drag does"><button type="button" data-mode="orbit" aria-pressed="true">Orbit</button><button type="button" data-mode="pan" aria-pressed="false">Pan</button></div>
+          <div class="compass chip" id="compass" aria-hidden="true">
+            <svg id="needle" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" stroke-opacity=".25"/><path d="M18 5 L22.5 19 L18 16.5 L13.5 19 Z" fill="#b4462f"/><path d="M18 31 L22.5 17 L18 19.5 L13.5 17 Z" fill="currentColor" fill-opacity=".35"/><text x="18" y="12.2" text-anchor="middle" font-size="7" font-weight="700" font-family="Barlow Condensed, Arial Narrow, sans-serif" fill="#ffffff">N</text></svg>
+          </div>
+        </div>
+        <p class="hud hud-status chip" id="status">Building the model…</p>
+        <div class="hud hud-sel chip" id="sel" hidden><span id="seltext"></span><span id="selref" hidden></span><button type="button" id="selcomment" class="sel-c" aria-expanded="false" aria-controls="selpop">Comment</button><button type="button" id="selclear">Clear</button></div>
+        <div class="hud hud-pop chip" id="selpop" role="dialog" aria-label="Comments on the selected item" hidden></div>
+        <p class="hud hud-hint chip">Drag to orbit · scroll to zoom · right-drag, shift-drag or the Pan button to pan · click an object to read it</p>
       </div>
-    </section>
+    </div>
+
 {{SHEETS}}
-    <section class="sheet sheet2d" id="sheet-plans" role="tabpanel" aria-labelledby="tab-plans" hidden>
-      <div class="tools"><p class="sel">The owner's plan set as received (Larson House, 6/11/26). <a href="plans/larson-house-plans-2026-06-11.pdf" target="_blank" rel="noopener">Open the PDF</a></p></div>
+    <!-- ================================================================ the owner's plans -->
+    <div class="sheet" id="sheet-plans" role="tabpanel" aria-labelledby="tab-plans" hidden>
+      <p class="plans-bar">The owner's plan set as received (Larson House, 6/11/26). <a href="plans/larson-house-plans-2026-06-11.pdf" target="_blank" rel="noopener">Open the PDF</a></p>
       <div class="plans">
 {{PLANS}}
       </div>
-    </section>
-    <section class="sheet" id="sheet-chat" role="tabpanel" aria-labelledby="tab-chat" hidden><div class="chat-wrap" id="chat"></div></section>
+    </div>
+    <!-- ================================================================ crew chat -->
+    <div class="sheet" id="sheet-chat" role="tabpanel" aria-labelledby="tab-chat" hidden>
+      <div class="chat-wrap" id="chat"></div>
+    </div>
   </main>
 </div>
 
+<!-- Embedded data for the 3D view and the sheets, written by build/build.py from plan/house.json.
+     "house-data" is the model and every pickable item's card; "floor-svg" is the A-1 drawing, base64, laid on the floor. -->
 <script type="application/json" id="house-data">{{DATA}}</script>
 <script type="text/plain" id="floor-svg">{{FLOORSVG}}</script>
 
 <script>
-// ---------------------------------------------------------------- tabs and 2D sheets
+// ---------------------------------------------------------------- tabs and 2D sheets (plain script, runs first)
 (function () {
+  // Sheet title blocks show the app version as their revision.
   const ver = document.querySelector('meta[name="app-version"]').content;
-  for (const t of document.querySelectorAll('svg text.rev')) t.textContent = 'rev ' + ver;
+  for (const t of document.querySelectorAll('text.rev')) t.textContent = 'rev ' + ver;
   const $ = id => document.getElementById(id);
-  const DATA = JSON.parse($('house-data').textContent);
   const tabs = [...document.querySelectorAll('.tabs [role="tab"]')];
+  document.querySelector('.tabs').style.setProperty('--ntabs', tabs.length);   // phones: one row of tabs
+  // each pickable item's card (tag, room, fields), written by the build from the same data as the drawing
+  const PICKS = JSON.parse($('house-data').textContent).picks || {};
   function show(key, setHash = true) {
-    for (const t of tabs) { const on = t.dataset.sheet === key; t.setAttribute('aria-selected', String(on)); $('sheet-' + t.dataset.sheet).hidden = !on; }
+    for (const t of tabs) {
+      const on = t.dataset.sheet === key;
+      t.setAttribute('aria-selected', String(on));
+      $('sheet-' + t.dataset.sheet).hidden = !on;
+    }
     if (setHash) history.replaceState(null, '', '#' + key);
     try { localStorage.setItem('ssc-sheet', key); } catch (e) { /* per-viewer convenience */ }
     dispatchEvent(new Event('resize'));
@@ -301,129 +436,363 @@ tbody tr:last-child td { border-bottom: 0; }
   if (!tabs.some(t => t.dataset.sheet === start)) start = '3d';
   show(start, location.hash.slice(1) === start);
 
-  for (const sheet of document.querySelectorAll('.sheet2d[data-key]')) {
-    const key = sheet.dataset.key, picks = DATA.picks[key] || {};
-    const paper = sheet.querySelector('.paper'), svg = paper.querySelector('svg'), scroller = sheet.querySelector('.scroller'), sel = sheet.querySelector('.sel'), tools = sheet.querySelector('.tools');
-    sel.dataset.hint = sel.textContent;
-    // zoom: Fit / 2x / 4x, ctrl+wheel (trackpad pinch), two-finger pinch, double-tap
+  // each 2D sheet: zoom, pick on the drawing, pick from the schedule
+  for (const sheet of document.querySelectorAll('.sheet2d')) {
+    const paper = sheet.querySelector('.paper'), svg = sheet.querySelector('.paper svg'), sel = sheet.querySelector('.sel'), scroller = sheet.querySelector('.scroller');
+    // zoom. Fit / 2× / 4× buttons; pinch and double-tap on touch; ctrl+wheel (a trackpad pinch) on desktop.
+    // The paper is sized in px (fit width × zoom). A pinch previews with a CSS transform and commits the width when the fingers lift.
+    const tools = sheet.querySelector('.tools'), header = document.querySelector('header.bar');
+    const MAXZ = 8;
+    // the sticky section bar sits under the toolbar and the zoomed frame fills the rest of the screen: publish both heights
+    const measure = () => { const th = tools ? tools.offsetHeight : 0; sheet.style.setProperty('--tools-h', th + 'px'); sheet.style.setProperty('--chrome-h', (th + (header ? header.offsetHeight : 0)) + 'px'); };
     let zoom = 1;
     const fitW = () => Math.min(scroller.clientWidth, 1400);
+    const phone = () => scroller.clientWidth < 700;
+    const framed = () => matchMedia('(max-width: 760px), (pointer: coarse)').matches;
     function layout() {
-      if (!scroller.clientWidth) return;
-      sheet.style.setProperty('--chrome-h', (tools.offsetHeight + document.querySelector('header.bar').offsetHeight) + 'px');
+      if (!scroller.clientWidth) return; // hidden sheet: laid out when shown (show() fires resize)
+      measure();
       paper.style.maxWidth = 'none'; paper.style.width = Math.round(fitW() * zoom) + 'px';
       scroller.classList.toggle('zoomed', zoom > 1.02);
-      for (const b of tools.querySelectorAll('[data-zoom]')) b.setAttribute('aria-pressed', String(Math.abs(zoom - +b.dataset.zoom) < 0.02));
+      for (const o of sheet.querySelectorAll('[data-zoom]')) o.setAttribute('aria-pressed', String(Math.abs(zoom - +o.dataset.zoom) < 0.02));
     }
-    function zoomAt(z, cx, cy) {
-      z = Math.min(8, Math.max(1, z));
-      const pr = paper.getBoundingClientRect(), px = cx - pr.left, py = cy - pr.top, k = z / zoom;
+    // zoom to z keeping the paper point (px, py), in paper px at the current zoom, under the client point (cx, cy)
+    function zoomTo(z, px, py, cx, cy) {
+      z = Math.min(MAXZ, Math.max(1, z)); const k = z / zoom;
       zoom = z; layout();
-      const nr = paper.getBoundingClientRect();
-      scroller.scrollLeft += nr.left + px * k - cx; scroller.scrollTop += nr.top + py * k - cy;
+      const pr = paper.getBoundingClientRect();
+      const dx = pr.left + px * k - cx, dy = pr.top + py * k - cy;
+      scroller.scrollLeft += dx;
+      const was = scroller.scrollTop; scroller.scrollTop += dy;
+      const rest = dy - (scroller.scrollTop - was); if (Math.abs(rest) > 0.5) sheet.scrollTop += rest;
     }
-    const centre = () => { const r = scroller.getBoundingClientRect(); return [r.left + r.width / 2, r.top + Math.min(r.height, innerHeight - r.top) / 2]; };
-    for (const b of tools.querySelectorAll('[data-zoom]')) b.addEventListener('click', () => zoomAt(+b.dataset.zoom, ...centre()));
-    addEventListener('resize', () => { if (!sheet.hidden) layout(); });
-    scroller.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); zoomAt(zoom * Math.exp(-Math.max(-40, Math.min(40, e.deltaY)) * 0.01), e.clientX, e.clientY); }, { passive: false });
-    let pinch = null, lastTap = 0;
-    const mid = t => [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2];
-    const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-    scroller.addEventListener('touchstart', e => { if (e.touches.length === 2) pinch = { d: dist(e.touches), z: zoom }; }, { passive: true });
-    scroller.addEventListener('touchmove', e => { if (!pinch || e.touches.length < 2) return; e.preventDefault(); const [mx, my] = mid(e.touches); zoomAt(pinch.z * dist(e.touches) / pinch.d, mx, my); }, { passive: false });
-    scroller.addEventListener('touchend', e => {
-      if (pinch) { if (e.touches.length < 2) pinch = null; return; }
-      if (e.changedTouches.length !== 1) return;
-      const t = e.changedTouches[0];
-      if (e.timeStamp - lastTap < 320) { e.preventDefault(); zoomAt(zoom < 1.9 ? 3 : 1, t.clientX, t.clientY); lastTap = 0; } else lastTap = e.timeStamp;
-    }, { passive: false });
-    layout();
-
-    // picking: the drawing, the schedules and the card stay in step
-    const card = sheet.querySelector('.picked');
-    let on = null;
-    function clear() {
-      if (on) on.classList.remove('on'); on = null;
-      for (const el of svg.querySelectorAll('.lit')) el.classList.remove('lit');
-      for (const r of sheet.querySelectorAll('tr.on')) r.classList.remove('on');
-      sel.textContent = sel.dataset.hint; sel.classList.remove('on'); card.hidden = true;
+    function zoomAt(z, cx, cy) { const pr = paper.getBoundingClientRect(); zoomTo(z, cx - pr.left, cy - pr.top, cx, cy); }
+    const toolsBottom = () => tools ? tools.getBoundingClientRect().bottom : sheet.getBoundingClientRect().top;
+    function visibleCenter() {
+      const r = scroller.getBoundingClientRect(), s = sheet.getBoundingClientRect();
+      const top = Math.max(r.top, toolsBottom()), bottom = Math.min(r.bottom, s.bottom);
+      return [r.left + r.width / 2, bottom > top ? (top + bottom) / 2 : r.top + r.height / 2];
     }
-    function showCard(tag, sub, fields) {
-      card.querySelector('.pk-tag').textContent = tag; card.querySelector('.pk-sub').textContent = sub || '';
-      const dl = card.querySelector('.pk-dl'); dl.textContent = '';
-      for (const [k, v] of fields) { const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v; dl.append(dt, dd); }
-      card.hidden = false; sel.textContent = 'Selected: ' + tag + (sub ? ' · ' + sub : ''); sel.classList.add('on');
-    }
+    // on a phone the zoomed frame fills the screen below the toolbar: put it there
+    function alignFrame() { measure(); if (framed() && scroller.classList.contains('zoomed')) { const d = scroller.getBoundingClientRect().top - toolsBottom() - 8; if (Math.abs(d) > 2) sheet.scrollTop += d; } }
+    // bring a picked element into view: zoomed enough to read on a phone, centred in the frame, the frame under the toolbar
     function reveal(el) {
-      if (zoom < 1.9 && scroller.clientWidth < 700) { const c = el.getBoundingClientRect(); zoomAt(3, c.left + c.width / 2, c.top + c.height / 2); }
+      measure();
+      if (phone() && zoom < 3.9) { const c = el.getBoundingClientRect(); zoomAt(4, c.left + c.width / 2, c.top + c.height / 2); }
       const r = el.getBoundingClientRect(), p = scroller.getBoundingClientRect();
       scroller.scrollLeft += r.left + r.width / 2 - (p.left + p.width / 2);
-      sheet.scrollTo({ top: sheet.scrollTop + scroller.getBoundingClientRect().top - tools.getBoundingClientRect().bottom - 8, behavior: 'smooth' });
+      if (scroller.scrollHeight > scroller.clientHeight + 1) scroller.scrollTop += r.top + r.height / 2 - (p.top + p.height / 2);
+      const r2 = el.getBoundingClientRect(), s = sheet.getBoundingClientRect(), tb = toolsBottom();
+      const frameTop = scroller.getBoundingClientRect().top - tb - 8, centred = r2.top + r2.height / 2 - (tb + s.bottom) / 2;
+      const by = framed() && scroller.classList.contains('zoomed') ? frameTop : Math.max(frameTop, centred);
+      sheet.scrollTo({ top: sheet.scrollTop + by, behavior: 'smooth' });
     }
-    function pick(id, fromTable) {
+    for (const b of sheet.querySelectorAll('[data-zoom]')) b.addEventListener('click', () => { zoomAt(+b.dataset.zoom, ...visibleCenter()); alignFrame(); });
+    addEventListener('resize', () => {
+      if (sheet.hidden) return;
+      const w = paper.offsetWidth || 1, h = paper.offsetHeight || 1;
+      const fx = (scroller.scrollLeft + scroller.clientWidth / 2 - paper.offsetLeft) / w, fy = (scroller.scrollTop + scroller.clientHeight / 2 - paper.offsetTop) / h;
+      layout();
+      scroller.scrollLeft = fx * paper.offsetWidth + paper.offsetLeft - scroller.clientWidth / 2;
+      scroller.scrollTop = fy * paper.offsetHeight + paper.offsetTop - scroller.clientHeight / 2;
+    });
+    layout();
+    // pinch (two fingers) previews with a transform; double-tap zooms in on the spot, or back to fit
+    let pinch = null, lastTap = { t: 0, x: 0, y: 0 };
+    const mid = t => [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2];
+    const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    scroller.addEventListener('touchstart', e => {
+      if (e.touches.length !== 2) return;
+      const pr = paper.getBoundingClientRect(), [mx, my] = mid(e.touches);
+      pinch = { d0: dist(e.touches), px: mx - pr.left, py: my - pr.top, k: 1, mx, my };
+      paper.style.willChange = 'transform';
+    }, { passive: true });
+    scroller.addEventListener('touchmove', e => {
+      if (!pinch || e.touches.length < 2) return;
+      e.preventDefault();
+      const [mx, my] = mid(e.touches);
+      pinch.k = Math.min(MAXZ, Math.max(1, zoom * dist(e.touches) / pinch.d0)) / zoom; pinch.mx = mx; pinch.my = my;
+      const sr = scroller.getBoundingClientRect();
+      const left = sr.left + paper.offsetLeft - scroller.scrollLeft, top = sr.top + paper.offsetTop - scroller.scrollTop;
+      paper.style.transform = `translate(${mx - left - pinch.px * pinch.k}px, ${my - top - pinch.py * pinch.k}px) scale(${pinch.k})`;
+    }, { passive: false });
+    function endPinch() {
+      if (!pinch) return;
+      const p = pinch; pinch = null;
+      paper.style.transform = ''; paper.style.willChange = '';
+      zoomTo(zoom * p.k, p.px, p.py, p.mx, p.my);
+      alignFrame();
+    }
+    scroller.addEventListener('touchend', e => {
+      if (pinch) { if (e.touches.length < 2) endPinch(); lastTap.t = 0; return; }
+      if (e.touches.length || e.changedTouches.length !== 1) return;
+      const t = e.changedTouches[0], now = e.timeStamp;
+      if (now - lastTap.t < 350 && Math.hypot(t.clientX - lastTap.x, t.clientY - lastTap.y) < 30) {
+        lastTap.t = 0; e.preventDefault();
+        const big = phone() ? 4 : 2;
+        zoomAt(zoom < big - 0.1 ? big : 1, t.clientX, t.clientY); alignFrame();
+      } else lastTap = { t: now, x: t.clientX, y: t.clientY };
+    }, { passive: false });
+    scroller.addEventListener('touchcancel', endPinch);
+    scroller.addEventListener('gesturestart', e => e.preventDefault());
+    scroller.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); zoomAt(zoom * Math.exp(-Math.max(-40, Math.min(40, e.deltaY)) * 0.01), e.clientX, e.clientY); }, { passive: false });
+    // thin pipes and ducts get a wide invisible stroke to catch the tap
+    for (const g of svg.querySelectorAll('.sym')) {
+      if (g.querySelector('circle.hit')) continue;
+      for (const ln of [...g.querySelectorAll('path, line')]) {
+        const h = ln.cloneNode(false); h.removeAttribute('stroke-dasharray');
+        h.setAttribute('class', 'hitline'); h.setAttribute('stroke', '#000'); h.setAttribute('stroke-opacity', '0'); h.setAttribute('stroke-width', '12'); h.setAttribute('fill', 'none'); h.setAttribute('pointer-events', 'stroke');
+        const tt = g.querySelector('title'); g.insertBefore(h, tt ? tt.nextSibling : g.firstChild);
+      }
+    }
+    // the picked item's card, pinned directly below the drawing
+    const card = document.createElement('div'); card.className = 'picked'; card.hidden = true;
+    card.innerHTML = '<div class="pk-card" role="region" aria-live="polite" aria-label="Selected item"><div class="pk-head"><span class="pk-tag"></span><span class="pk-sub"></span><button type="button" class="pk-x">Clear</button></div><div class="pk-body"></div></div>';
+    sheet.querySelector('.drawing').after(card);
+    card.querySelector('.pk-x').addEventListener('click', () => clear());
+    const picks = PICKS[sheet.dataset.key] || {};
+    function showCard(tag, sub, lead, row, fields) {
+      card.querySelector('.pk-tag').textContent = tag; card.querySelector('.pk-sub').textContent = sub || '';
+      const body = card.querySelector('.pk-body'); body.textContent = '';
+      if (lead) { const p = document.createElement('p'); p.className = 'pk-lead'; p.textContent = lead; body.appendChild(p); }
+      if (fields && fields.length) {
+        const dl = document.createElement('dl'); dl.className = 'pk-dl';
+        for (const [k, v] of fields) { const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v; dl.append(dt, dd); }
+        body.appendChild(dl);
+      } else if (row) {
+        const heads = [...row.closest('table').querySelectorAll('thead th')].map(t => t.textContent.trim());
+        const dl = document.createElement('dl'); dl.className = 'pk-dl';
+        [...row.children].forEach((td, i) => { if (i < 2 || !td.textContent.trim()) return; const dt = document.createElement('dt'); dt.textContent = heads[i] || ''; const dd = document.createElement('dd'); dd.textContent = td.textContent.trim(); dl.append(dt, dd); });
+        if (dl.children.length) body.appendChild(dl);
+      }
+      card.hidden = false;
+      sel.textContent = `Selected: ${tag}`; sel.classList.add('on');
+      const btn = document.createElement('button'); btn.type = 'button'; btn.textContent = 'Clear'; btn.addEventListener('click', clear); sel.appendChild(btn);
+    }
+    let on = null;
+    function legs(el) { return (el && el.dataset.leg) ? el.dataset.leg.split(' ') : []; }
+    function lightLegs(ids) {
+      for (const el of svg.querySelectorAll('.sym.on-leg')) el.classList.remove('on-leg');
+      for (const el of svg.querySelectorAll('.sym[data-leg]')) el.classList.toggle('on-leg', legs(el).some(l => ids.includes(l)));
+      for (const r of sheet.querySelectorAll('tr[data-id^="LEG:"]')) r.classList.toggle('on', ids.includes(r.dataset.id.slice(4)));
+    }
+    function clear() {
+      if (on) { on.classList.remove('on'); on = null; }
+      lightLegs([]);
+      for (const r of sheet.querySelectorAll('tr.on')) r.classList.remove('on');
+      sel.textContent = sel.dataset.hint; sel.classList.remove('on');
+      card.hidden = true;
+    }
+    function pick(el, fromTable) {
       clear();
-      const el = svg.querySelector(`[data-id="${CSS.escape(id)}"]`), p = picks[id];
-      if (el) { on = el; el.classList.add('on'); if (fromTable) reveal(el); }
-      for (const r of sheet.querySelectorAll(`tr[data-id="${CSS.escape(id)}"]`)) r.classList.add('on');
-      if (p) {
-        showCard(p.tag, p.sub, p.fields);
-        if (p.ckt) for (const g of svg.querySelectorAll(`.sym[data-ckt="${p.ckt}"]`)) if (g !== el) g.classList.add('lit');
-      } else if (el) { const t = el.querySelector('title'); showCard(id, t ? t.textContent : '', []); }
-      document.dispatchEvent(new CustomEvent('ssc-pick', { detail: key.toUpperCase().replace(/(\D)(\d)/, '$1-$2') + ' · ' + (p ? p.tag + (p.sub ? ' ' + p.sub : '') : id) }));
+      if (!el) return;
+      on = el; el.classList.add('on');
+      const t = el.querySelector('title'), text = t ? t.textContent : el.dataset.id;
+      const row = sheet.querySelector(`tr[data-id="${CSS.escape(el.dataset.id)}"]`);
+      if (row) row.classList.add('on');
+      // the card: the schedule row when there is one (its first two cells as the heading), else the drawing's note
+      let tag = el.dataset.id, sub = '', lead = text;
+      if (row) { tag = row.children[0].textContent.trim(); sub = row.children[1] ? row.children[1].textContent.trim() : ''; lead = ''; }
+      else { const m = /^([^:—]{1,60}?)\s*[:—]\s*(.*)$/s.exec(text); if (m) { tag = m[1]; lead = m[2]; } }
+      const p = picks[el.dataset.id];
+      if (p) { tag = p.tag; sub = p.sub || ''; lead = ''; }
+      // devices on one circuit (data-ckt) light in blue with the picked one, like a switch leg
+      if (p && p.ckt) { for (const g of svg.querySelectorAll(`.sym[data-ckt="${CSS.escape(String(p.ckt))}"]`)) if (g !== el) g.classList.add('on-leg'); }
+      const lg = legs(el);
+      if (lg.length) { lightLegs(lg); const n = svg.querySelectorAll('.sym.on-leg').length; lead = (lead ? lead + ' ' : '') + `Switch leg${lg.length > 1 ? 's' : ''} ${lg.join(', ')}: ${n} devices lit in blue.`; }
+      showCard(tag, sub, lead, row, p && p.fields);
+      if (fromTable) reveal(el);
     }
-    function pickCircuit(n, row) {
-      clear(); row.classList.add('on');
-      const lit = svg.querySelectorAll(`.sym[data-ckt="${n}"]`);
-      for (const g of lit) g.classList.add('lit');
-      showCard('Circuit ' + n, row.children[1].textContent, [['Breaker', row.children[2].textContent + ', ' + row.children[3].textContent], ['Protection', row.children[4].textContent], ['Wire', row.children[5].textContent], ['On the sheet', lit.length + ' devices lit in blue']]);
-      if (lit[0]) reveal(lit[0]);
+    svg.addEventListener('click', e => { const g = e.target.closest('.sym, .tag'); if (g) pick(g, false); else clear(); });
+    const subtabs = sheet.querySelector('.subtabs');
+    if (subtabs) {
+      subtabs.style.setProperty('--half', Math.ceil(subtabs.children.length / 2));   // phones: two rows, read left to right
+      const names = {}; for (const r of sheet.querySelectorAll('tbody tr[data-id^="C"]')) names[r.dataset.id.slice(1)] = r.children[1].textContent + ' · ' + r.children[2].textContent;
+      subtabs.addEventListener('click', e => {
+        const b = e.target.closest('button[data-ckt]'); if (!b) return;
+        const k = b.dataset.ckt;
+        for (const o of subtabs.querySelectorAll('button')) o.setAttribute('aria-pressed', String(o === b));
+        clear();
+        if (k === 'all') { svg.removeAttribute('data-ckt-mode'); for (const el of svg.querySelectorAll('.show')) el.classList.remove('show'); $('ckt-name').textContent = 'All circuits. Pick a circuit sheet to see just its devices and the cable run from the panel.'; return; }
+        svg.setAttribute('data-ckt-mode', k);
+        for (const el of svg.querySelectorAll('.sym, .wire')) {
+          const on = k === 'data' ? (el.dataset.net === '1' || el.dataset.ckt === 'data' || el.dataset.ckt === 'panel') : (el.dataset.ckt === k || (el.classList.contains('sym') && el.dataset.ckt === 'panel'));
+          el.classList.toggle('show', on);
+        }
+        $('ckt-name').textContent = k === 'data' ? 'E-1.D — Cat6 home runs to the media panel' : `${b.textContent.trim()} — ${names[k] || ''}`;
+      });
     }
-    card.querySelector('.pk-x').addEventListener('click', clear);
-    svg.addEventListener('click', e => { const g = e.target.closest('.sym, .tag'); if (g && g.dataset.id) pick(g.dataset.id, false); else clear(); });
     for (const row of sheet.querySelectorAll('tbody tr[data-id]')) {
-      row.tabIndex = 0;
-      const go = () => row.dataset.id.startsWith('ckt-') ? pickCircuit(row.dataset.id.slice(4), row) : pick(row.dataset.id, true);
+      const go = () => {
+        if (row.dataset.id.startsWith('ckt-')) {   // a circuit row: every device on it lit in blue
+          clear(); const n = row.dataset.id.slice(4), lit = [...svg.querySelectorAll(`.sym[data-ckt="${CSS.escape(n)}"]`)];
+          for (const g of lit) g.classList.add('on-leg'); row.classList.add('on');
+          showCard('Circuit ' + n, row.children[1] ? row.children[1].textContent.trim() : '', `${lit.length} devices lit in blue.`, row); if (lit[0]) reveal(lit[0]); return;
+        }
+        if (row.dataset.id.startsWith('LEG:')) { clear(); const l = row.dataset.id.slice(4); lightLegs([l]); row.classList.add('on'); showCard(`Switch leg ${l}`, row.children[1].textContent.trim(), '', row); const first = svg.querySelector(`.sym[data-leg~="${CSS.escape(l)}"]`); if (first) reveal(first); return; }
+        const el = svg.querySelector(`[data-id="${CSS.escape(row.dataset.id)}"]`); if (el) pick(el, true); else { clear(); row.classList.add('on'); showCard(row.children[0].textContent.trim(), row.children[1] ? row.children[1].textContent.trim() : '', 'Not drawn on the sheet; see the schedule.', row); } };
       row.addEventListener('click', go);
       row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
-    }
-    // table search
-    for (const box of sheet.querySelectorAll('.tsearch')) {
-      const input = box.querySelector('input'), cnt = box.querySelector('.cnt'), rows = [...box.nextElementSibling.querySelectorAll('tbody tr')];
-      const run = () => { const q = input.value.trim().toLowerCase(); let n = 0; for (const r of rows) { const hit = !q || r.textContent.toLowerCase().includes(q); r.hidden = !hit; n += hit; } cnt.textContent = q ? `${n} of ${rows.length}` : `${rows.length}`; };
-      input.addEventListener('input', run); run();
     }
   }
 })();
 </script>
 
-<script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }</script>
+<script>
+// ---------------------------------------------------------------- schedules: one table at a time, search, back-to-list
+(function () {
+  const NAMES = [[/room/i, 'Rooms'], [/window/i, 'Windows'], [/load/i, 'Loads'], [/equipment/i, 'Equipment'], [/loop/i, 'Loops'], [/manifold/i, 'Manifolds'], [/truss/i, 'Trusses'], [/mini|head/i, 'Heads'], [/drywall/i, 'Drywall'], [/dimensional lumber/i, 'Lumber'], [/circuit/i, 'Circuits'], [/switch/i, 'Switches'], [/device/i, 'Devices'], [/bill of/i, 'Materials'], [/wall sched/i, 'Walls'], [/door/i, 'Doors'], [/blocking/i, 'Blocking'], [/fixture/i, 'Fixtures'], [/vent/i, 'Vents'], [/register/i, 'Registers'], [/trunk/i, 'Trunks'], [/note/i, 'Notes'], [/open/i, 'Open items']];
+  const short = t => { for (const [re, n] of NAMES) if (re.test(t)) return n; return t.length > 18 ? t.slice(0, 17) + '…' : t; };
+
+  for (const sheet of document.querySelectorAll('.sheet2d')) {
+    const below = sheet.querySelector('.below'), tools = sheet.querySelector('.tools');
+    if (!below) continue;
+    const key = sheet.id;
+    const panes = [];
+    const mk = title => { const d = document.createElement('div'); d.className = 'pane'; d.dataset.title = title; panes.push(d); return d; };
+
+    for (const sec of [...below.querySelectorAll(':scope > section')]) {
+      const h3s = [...sec.querySelectorAll(':scope > h3')];
+      const kids = [...sec.children];
+      if (sec.classList.contains('wide') && h3s.length) {
+        let cur = null;
+        for (const k of kids) {
+          if (k.tagName === 'H3') cur = mk(short(k.textContent));
+          if (!cur) cur = mk(short(h3s[0].textContent));
+          cur.appendChild(k);
+        }
+      } else {
+        const h = h3s.length === 1 ? h3s[0] : sec.querySelector(':scope > h2');
+        const cur = mk(short(h ? h.textContent : 'Info'));
+        for (const k of kids) cur.appendChild(k);
+      }
+      sec.remove();
+    }
+    if (!panes.length) continue;
+
+    // card labels + search
+    for (const pane of panes) {
+      for (const table of pane.querySelectorAll('table')) {
+        const heads = [...table.querySelectorAll('thead th')].map(t => t.textContent.trim());
+        for (const tr of table.querySelectorAll('tbody tr')) [...tr.children].forEach((td, i) => td.dataset.label = heads[i] || '');
+      }
+      const rows = [...pane.querySelectorAll('tbody tr')];
+      pane.dataset.count = rows.length;
+      if (rows.length > 6) {
+        const box = document.createElement('div'); box.className = 'psearch';
+        const inp = document.createElement('input'); inp.type = 'search'; inp.placeholder = 'Search ' + pane.dataset.title.toLowerCase() + '…';
+        inp.setAttribute('aria-label', 'Search ' + pane.dataset.title); inp.autocomplete = 'off'; inp.autocapitalize = 'off'; inp.setAttribute('enterkeyhint', 'search');
+        const cnt = document.createElement('span'); cnt.className = 'cnt'; cnt.textContent = rows.length + '';
+        let pre = '';
+        const apply = () => {
+          const q = inp.value.toLowerCase().split(/\s+/).filter(Boolean); let n = 0;
+          for (const r of rows) { const t = r.textContent.toLowerCase(); const ok = (!pre || r.dataset.pre === pre) && q.every(w => t.includes(w)); r.hidden = !ok; if (ok) n++; }
+          cnt.textContent = (q.length || pre) ? n + ' of ' + rows.length : rows.length + '';
+        };
+        inp.addEventListener('input', apply);
+        // big tables keyed by tag letters (R1, L7, S3...): add one-tap filters by type
+        const m = rows.map(r => /^([A-Z]+)\d/.exec(r.children[0].textContent.trim()));
+        if (rows.length > 40 && m.every(Boolean)) {
+          const TYPES = { R: 'Receptacles', S: 'Switches', L: 'Lights', F: 'Fans', A: 'Appliances', D: 'Alarms', X: 'Panels', W: 'Windows' };
+          rows.forEach((r, i) => r.dataset.pre = m[i][1]);
+          const letters = [...new Set(m.map(x => x[1]))].sort();
+          const chips = document.createElement('div'); chips.className = 'panebar'; chips.style.position = 'static'; chips.style.margin = '0 0 8px'; chips.style.padding = '0'; chips.style.border = '0'; chips.style.background = 'none';
+          const cb = [];
+          for (const l of ['', ...letters]) {
+            const b = document.createElement('button'); b.type = 'button'; b.textContent = l ? (TYPES[l] || l) : 'All'; b.setAttribute('aria-pressed', String(l === ''));
+            b.addEventListener('click', () => { pre = l; cb.forEach(x => x.setAttribute('aria-pressed', String(x === b))); apply(); });
+            cb.push(b); chips.appendChild(b);
+          }
+          pane.chips = chips;
+        }
+        box.append(inp, cnt);
+        pane.querySelector('.tbl').before(box);
+        if (pane.chips) box.before(pane.chips);
+      }
+    }
+
+    // button bar
+    const bar = document.createElement('div'); bar.className = 'panebar'; bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', 'Sections');
+    const wrap = document.createElement('div'); wrap.className = 'panes';
+    const btns = panes.map((pane, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = pane.dataset.title;
+      if (+pane.dataset.count) { const n = document.createElement('span'); n.className = 'n'; n.textContent = pane.dataset.count; b.appendChild(n); }
+      b.addEventListener('click', () => select(i, true));
+      bar.appendChild(b); wrap.appendChild(pane); return b;
+    });
+    below.append(bar, wrap);
+
+    const header = document.querySelector('header.bar');
+    const tools_h = () => { const th = tools ? tools.offsetHeight : 0; sheet.style.setProperty('--tools-h', th + 'px'); sheet.style.setProperty('--chrome-h', (th + (header ? header.offsetHeight : 0)) + 'px'); };
+    tools_h(); addEventListener('resize', tools_h);
+    if (window.ResizeObserver) { const ro = new ResizeObserver(tools_h); if (tools) ro.observe(tools); if (header) ro.observe(header); }
+
+    function select(i, scroll) {
+      panes.forEach((p, j) => { p.hidden = j !== i; btns[j].setAttribute('aria-pressed', String(j === i)); });
+      try { localStorage.setItem('ssc-pane-' + key, panes[i].dataset.title); } catch (e) { /* per-viewer convenience */ }
+      { const bl = btns[i].offsetLeft, bw = btns[i].offsetWidth; if (bl < bar.scrollLeft || bl + bw > bar.scrollLeft + bar.clientWidth) bar.scrollTo({ left: bl - (bar.clientWidth - bw) / 2, behavior: scroll ? 'smooth' : 'auto' }); }
+      if (scroll) {
+        const th = tools ? tools.offsetHeight : 0;
+        const barTop = bar.getBoundingClientRect().top - sheet.getBoundingClientRect().top;
+        if (barTop <= th + 2) sheet.scrollTo({ top: sheet.scrollTop + barTop - th, behavior: 'auto' });
+      }
+    }
+    let first = panes.findIndex(p => +p.dataset.count > 0); if (first < 0) first = 0;
+    try { const saved = localStorage.getItem('ssc-pane-' + key); const j = panes.findIndex(p => p.dataset.title === saved); if (j >= 0) first = j; } catch (e) { /* ignore */ }
+    select(first, false);
+
+    // after tapping a row the drawing scrolls into view; give a one-tap way back to the list
+    const back = document.createElement('button'); back.type = 'button'; back.className = 'backlist'; back.textContent = '↩ Back to list'; back.hidden = true;
+    sheet.appendChild(back);
+    let savedRow = null, savedTop = 0, away = false;
+    sheet.addEventListener('click', e => { const tr = e.target.closest('tbody tr[data-id]'); if (tr) { savedRow = tr; savedTop = tr.getBoundingClientRect().top; away = false; } }, true);
+    sheet.addEventListener('scroll', () => {
+      if (!savedRow) { back.hidden = true; return; }
+      const d = savedRow.getBoundingClientRect().top - savedTop; // how far the row has moved down the screen
+      if (d > 150) away = true;
+      if (away && d < 20) { savedRow = null; away = false; }
+      back.hidden = !savedRow || !away;
+    }, { passive: true });
+    back.addEventListener('click', () => { if (savedRow) sheet.scrollTo({ top: sheet.scrollTop + savedRow.getBoundingClientRect().top - savedTop, behavior: 'smooth' }); back.hidden = true; savedRow = null; away = false; });
+  }
+})();
+</script>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }
+</script>
 <script type="module">
 // ---------------------------------------------------------------- the 3D model, built from the same house data as the sheets
+// Layers follow the Zero Rd app: one THREE.Group per layer in G, switched by the checkbox with id "ly-<group>".
+// To add a layer: add its group name to LAYERS, build into G.<name>, and add the checkbox in the side panel.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const $ = id => document.getElementById(id);
 const DATA = JSON.parse($('house-data').textContent);
 const H = DATA.house, T3 = DATA.trade3d;
-const CEIL = H.meta.ceiling_ft;
+const CEIL = H.meta.ceiling_ft, CUT_MAX = CEIL + 0.5;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const ftIn = v => { let f = Math.floor(v + 1e-9), i = Math.round((v - f) * 12); if (i === 12) { f += 1; i = 0; } return `${f}'-${i}"`; };
-const status = t => { $('status').textContent = t; $('status').hidden = !t; };
-// plan feet (x right, y down the sheet) -> model (x right, z toward the viewer at the front, y up), centred
+const status = t => { const el = $('status'); el.textContent = t; el.hidden = !t; };
+// plan feet (X right toward the bedroom wing, Y down the sheet toward the porch) -> model feet (x right, z toward the porch, y up), centred.
+// The porch is taken to face south (still to confirm), so north is -z, the way the compass reads.
 const CX = 41.7, CY = 35.0;
 const M = (x, y) => ({ x: x - CX, z: y - CY });
 
+// ---------------------------------------------------------------- renderer
 const stage = $('stage');
 let renderer;
-try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch (e) { status('3D needs WebGL, which this browser has turned off. The sheets work without it.'); throw e; }
-renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+try { renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' }); } catch (e) { status('3D needs WebGL, which this browser has turned off. The sheets work without it.'); throw e; }
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.localClippingEnabled = true;
 stage.prepend(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, 1, 0.5, 2000);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = !matchMedia('(prefers-reduced-motion: reduce)').matches; controls.dampingFactor = 0.08;
-controls.maxPolarAngle = Math.PI / 2 - 0.02; controls.minDistance = 6; controls.maxDistance = 400;
+controls.enableDamping = !reduceMotion; controls.dampingFactor = 0.08; controls.maxPolarAngle = Math.PI / 2 + 0.35; controls.minDistance = 4; controls.maxDistance = 400;
+// Orbit / Pan toggle: what a left-button or one-finger drag does. Right-drag and shift+drag pan in Orbit mode; two fingers always pan and pinch.
 function setDragMode(mode) {
   const pan = mode === 'pan';
   controls.mouseButtons = { LEFT: pan ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: pan ? THREE.MOUSE.ROTATE : THREE.MOUSE.PAN };
@@ -432,28 +801,37 @@ function setDragMode(mode) {
 }
 $('dragmode').addEventListener('click', e => { const b = e.target.closest('button[data-mode]'); if (b) setDragMode(b.dataset.mode); });
 setDragMode('orbit');
-scene.add(new THREE.HemisphereLight(0xf3f6ff, 0x8a7c62, 1.1));
+scene.add(new THREE.HemisphereLight(0xf3f6ff, 0x8a7c62, 1.0));
 const sun = new THREE.DirectionalLight(0xfff1da, 2.0); sun.position.set(-60, 110, 80); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
-Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 10, far: 400 }); sun.shadow.bias = -0.0004; scene.add(sun);
-const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-function applySky() { scene.background = new THREE.Color(cssVar('--sky') || '#dfe5e9'); }
+Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 10, far: 400 }); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.05; scene.add(sun);
+function applySky() { const sky = new THREE.Color(cssVar('--sky') || '#dfe5e9'); scene.background = sky; scene.fog = new THREE.Fog(sky, 300, 700); }
 applySky(); matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applySky);
+new MutationObserver(applySky).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 function resize() { const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
-new ResizeObserver(resize).observe(stage); resize();
+new ResizeObserver(resize).observe(stage); addEventListener('resize', resize); resize();
 
-const cutPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 30);
+// ---------------------------------------------------------------- materials and the section cut
+const cutPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), CUT_MAX);
 const cutMats = [];
-const mat = (c, o = {}) => { const m = new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, metalness: 0, clipShadows: true, ...o }); cutMats.push(m); return m; };
+const mat = (c, o = {}) => { const m = new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, metalness: 0, side: THREE.DoubleSide, clipShadows: true, ...o }); cutMats.push(m); return m; };
 const MAT = {
-  ext: mat(0xd8cfb9), int: mat(0xf3efe7), trim: mat(0x5a4632), glass: mat(0x9fc4d6, { transparent: true, opacity: 0.35, roughness: 0.1, depthWrite: false }),
-  door: mat(0xb07a45), garageDoor: mat(0xe6e1d8), post: mat(0x9a6a3c), stone: mat(0x8f8576), slab: mat(0xcfcac2), porch: mat(0xb9b2a6),
-  fix: mat(0xf7f5f1, { roughness: 0.5 }), cab: mat(0x8f6f4f), counter: mat(0xe8e2d6), roof: new THREE.MeshStandardMaterial({ color: 0x34373b, roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }),
-  elec: mat(0xc8650a), plumb: mat(0x3c3a36), cold: mat(0x2c6aa0), hvac: mat(0x2c6aa0, { transparent: true, opacity: 0.6 }), hi: mat(0xe08a00, { emissive: 0x4a2a00 }),
+  wall: mat(0xf1ede5), wallGhost: mat(0xf1ede5, { transparent: true, opacity: 0.12, depthWrite: false }),
+  siding: mat(0x8b8578), sidingGhost: mat(0x8b8578, { transparent: true, opacity: 0.12, depthWrite: false }), trim: mat(0x5a4632),
+  glass: mat(0xa9cddd, { transparent: true, opacity: 0.3, roughness: 0.1, depthWrite: false }),
+  door: mat(0xb07a45), garageDoor: mat(0xe6e1d8), post: mat(0x9a6a3c), porch: mat(0xb9b2a6), ground: mat(0x9fae8a),
+  fix: mat(0xf7f5f1, { roughness: 0.5 }), counter: mat(0xe8e2d6), stone: mat(0x8f8576),
+  roof: new THREE.MeshStandardMaterial({ color: 0x34373b, roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }),
+  elec: mat(0xc8650a), plumb: mat(0x3c3a36), cold: mat(0x2c6aa0, { roughness: 0.4 }), hvac: mat(0xe3a05a, { roughness: 0.6, transparent: true, opacity: 0.85 }),
+  hi: mat(0xe08a00, { emissive: 0x4a2a00 }),
 };
-function setCut(h) { const on = h < CEIL - 0.01; cutPlane.constant = h; for (const m of cutMats) { m.clippingPlanes = on ? [cutPlane] : null; m.needsUpdate = true; } }
-const G = {}; for (const k of ['ground', 'floor', 'walls', 'fix', 'roof', 'elec', 'plumb', 'hvac']) { G[k] = new THREE.Group(); scene.add(G[k]); }
+function setCut(h) { const on = h < CUT_MAX - 0.01; cutPlane.constant = h; for (const m of cutMats) { m.clippingPlanes = on ? [cutPlane] : null; m.needsUpdate = true; } }
+
+// ---------------------------------------------------------------- groups (layers)
+const LAYERS = ['floor', 'walls', 'ext', 'furn', 'roof', 'elec', 'plumb', 'hvac'];
+const G = {}; for (const k of ['ground', ...LAYERS]) { G[k] = new THREE.Group(); scene.add(G[k]); }
 const pickables = [];
 function box(x0, y0, x1, y1, bottom, top, material, data, group) {
+  // a box over the plan rectangle [x0,x1] × [y0,y1] from height bottom to top (feet)
   const a = M(Math.min(x0, x1), Math.min(y0, y1)), b = M(Math.max(x0, x1), Math.max(y0, y1));
   const w = b.x - a.x, d = b.z - a.z, h = top - bottom;
   if (w < 1e-3 || d < 1e-3 || h < 1e-3) return null;
@@ -463,11 +841,11 @@ function box(x0, y0, x1, y1, bottom, top, material, data, group) {
   group.add(m); return m;
 }
 
-// ground and the floor plate, textured with the A-1 drawing
-box(-40, -30, 125, 105, -0.6, -0.5, mat(0x9fae8a), null, G.ground);
+// ---------------------------------------------------------------- ground and the floor slab, textured with the A-1 drawing
+box(-40, -30, 125, 105, -0.6, -0.5, MAT.ground, null, G.ground);
 (function floor() {
   const W = 84, D = 71, S = 11, MX = 60, MY = 60;
-  const plateMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const plateMat = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
   const img = new Image();
   img.onload = () => {
     const K = 3, cv = document.createElement('canvas'); cv.width = W * S * K; cv.height = D * S * K;
@@ -491,44 +869,70 @@ box(-40, -30, 125, 105, -0.6, -0.5, mat(0x9fae8a), null, G.ground);
   const plate = new THREE.Mesh(g, plateMat); plate.receiveShadow = true;
   G.floor.add(plate);
 })();
-// slabs (house, garage, porch, patio) as thin solids so the outline reads from outside
+// porch and patio slabs belong with the exterior
 for (const r of H.rooms) {
+  if (r.kind !== 'outdoor') continue;
   const xs = r.poly.map(p => p[0]), ys = r.poly.map(p => p[1]);
-  const pick = { kind: 'room', name: r.name, text: `${r.label || ''}${r.label ? ' · ' : ''}${Math.round(r.area_sf)} sq ft measured` };
-  if (r.kind === 'outdoor') box(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), -0.5, 0.0, MAT.porch, pick, G.floor);
+  box(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), -0.5, 0.0, MAT.porch, { kind: 'room', name: r.name, text: `${Math.round(r.area_sf)} sq ft slab` }, G.ext);
 }
-// walls: the drawing's rectangles are already broken at every opening, so each one extrudes to the ceiling
-for (const w of H.walls) box(w.x0, w.y0, w.x1, w.y1, 0, CEIL, w.kind === 'E' ? MAT.ext : MAT.int, { kind: 'wall', name: w.kind === 'E' ? 'Exterior wall, 2x6' : 'Interior wall, 2x4', text: `${ftIn(Math.max(w.x1 - w.x0, w.y1 - w.y0))} segment` }, G.walls);
-// openings: header above, sill below, glass or a leaf in between
-const opBox = (o, t, bottom, top, material, data) => {
-  const [s0, s1] = o.span;
-  return o.axis === 'y' ? box(s0, o.at, s1, o.at + t, bottom, top, material, data, G.walls) : box(o.at, s0, o.at + t, s1, bottom, top, material, data, G.walls);
-};
+
+// ---------------------------------------------------------------- finished walls: exterior (siding outside, drywall inside) and interior
+// A wall is a band across the plan: axis 'y' runs along X at Y = at..at+t; axis 'x' runs along Y at X = at..at+t; s0..s1 along it.
+const inside = (r, x, y) => { const p = r.poly; let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [x0, y0] = p[i], [x1, y1] = p[j]; if ((y0 > y) !== (y1 > y) && x < (x1 - x0) * (y - y0) / (y1 - y0) + x0) c = !c; } return c; };
+const indoors = (x, y) => H.rooms.some(r => r.kind !== 'outdoor' && inside(r, x, y));
+// which face of an exterior band is outside: -1 the low side (smaller X or Y), +1 the high side, 0 both indoors (house to garage)
+function outSide(axis, at, t, s0, s1) {
+  const m = (s0 + s1) / 2, pt = c => axis === 'y' ? [m, c] : [c, m];
+  const lo = indoors(...pt(at - 0.35)), hi = indoors(...pt(at + t + 0.35));
+  return lo && !hi ? 1 : hi && !lo ? -1 : 0;
+}
+const SIDING = 1.25 / 12;   // board-and-batten over sheathing, the outside 1-1/4" of the band
+function band(axis, at, t, s0, s1, bottom, top, side, data, group, mats) {
+  const rect = (a, b, material) => axis === 'y' ? box(s0, a, s1, b, bottom, top, material, data, group) : box(a, s0, b, s1, bottom, top, material, data, group);
+  if (!side) return [rect(at, at + t, mats.in)];
+  return side < 0 ? [rect(at, at + SIDING, mats.out), rect(at + SIDING, at + t, mats.in)] : [rect(at, at + t - SIDING, mats.in), rect(at + t - SIDING, at + t, mats.out)];
+}
+const EXT_MATS = { out: MAT.siding, in: MAT.wall }, INT_MATS = { in: MAT.wall };
+const wallBand = w => w.x1 - w.x0 >= w.y1 - w.y0 ? { axis: 'y', at: w.y0, t: w.y1 - w.y0, s0: w.x0, s1: w.x1 } : { axis: 'x', at: w.x0, t: w.x1 - w.x0, s0: w.y0, s1: w.y1 };
+for (const w of H.walls) {
+  const b = wallBand(w), ext = w.kind === 'E', side = ext ? outSide(b.axis, b.at, b.t, b.s0, b.s1) : 0;
+  const data = ext ? { kind: 'wall', name: 'Exterior wall', text: `2x6 at 16" o.c., R-21 batts, sheathing and ${H.meta.siding || 'board-and-batten siding'} outside, 1/2" drywall inside; ${ftIn(b.s1 - b.s0)} segment` }
+                   : { kind: 'wall', name: 'Interior wall', text: `2x4 partition, 1/2" drywall both faces; ${ftIn(b.s1 - b.s0)} segment` };
+  for (const m of band(b.axis, b.at, b.t, b.s0, b.s1, 0, CEIL, side, data, ext ? G.ext : G.walls, ext ? EXT_MATS : INT_MATS)) if (m) m.userData.finish = ext && m.material === MAT.siding ? 'siding' : 'wall';
+}
+// openings: the wall above (and below a window) completes the band; glass or a leaf in the gap
 for (const w of H.windows) {
-  const d = { kind: 'window', name: `${w.id} · window`, text: `${ftIn(w.w)} x ${ftIn(w.h)}, sill ${ftIn(w.sill)} · ${(H.rooms.find(r => r.id === w.room) || {}).name}` };
-  opBox(w, 0.46, w.head, CEIL, MAT.ext, null); opBox(w, 0.46, 0, w.sill, MAT.ext, null);
-  const g = opBox(w, 0.46, w.sill, w.head, MAT.glass, d); if (g) g.castShadow = false;
+  const room = (H.rooms.find(r => r.id === w.room) || {}).name || '';
+  const d = { kind: 'window', name: `${w.id} · window`, ref: w.id, text: `${ftIn(w.w)} × ${ftIn(w.h)}, sill ${ftIn(w.sill)}, head ${ftIn(w.head)} · ${room}` };
+  const [s0, s1] = w.span, t = 0.46, side = outSide(w.axis, w.at, t, s0, s1);
+  band(w.axis, w.at, t, s0, s1, w.head, CEIL, side, null, G.ext, EXT_MATS);
+  band(w.axis, w.at, t, s0, s1, 0, w.sill, side, null, G.ext, EXT_MATS);
+  for (const g of band(w.axis, w.at, t, s0, s1, w.sill, w.head, 0, d, G.ext, { in: MAT.glass })) if (g) g.castShadow = false;
 }
 for (const o of H.doors) {
   if (o.kind === 'glass') continue;
-  const t = o.ext ? 0.46 : 0.293, mt = o.ext ? MAT.ext : MAT.int;
-  const d = { kind: 'door', name: `${o.id} · ${o.name}`, text: `${ftIn(o.w)} x ${ftIn(o.h)} (${o.kind})` };
-  if (o.h < CEIL) opBox(o, t, o.h, CEIL, mt, null);
+  const ext = !!o.ext, t = ext ? 0.46 : 0.293, [s0, s1] = o.span, group = ext ? G.ext : G.walls;
+  const side = ext ? outSide(o.axis, o.at, t, s0, s1) : 0;
+  const d = { kind: 'door', name: `${o.id} · ${o.name}`, ref: o.id, text: `${ftIn(o.w)} × ${ftIn(o.h)} (${o.kind})` };
+  if (o.h < CEIL) band(o.axis, o.at, t, s0, s1, o.h, CEIL, side, null, group, ext ? EXT_MATS : INT_MATS);
   if (o.kind === 'opening') continue;
   const leaf = o.kind === 'overhead' ? MAT.garageDoor : o.kind === 'french' ? MAT.glass : MAT.door;
-  const [s0, s1] = o.span, th = 0.15, mid = o.at + t / 2;
-  if (o.axis === 'y') box(s0, mid - th / 2, s1, mid + th / 2, 0, o.h, leaf, d, G.walls); else box(mid - th / 2, s0, mid + th / 2, s1, 0, o.h, leaf, d, G.walls);
+  const th = 0.15, mid = o.at + t / 2;
+  if (o.axis === 'y') box(s0, mid - th / 2, s1, mid + th / 2, 0, o.h, leaf, d, group); else box(mid - th / 2, s0, mid + th / 2, s1, 0, o.h, leaf, d, group);
 }
-for (const [x, y] of H.posts) box(x - 0.33, y - 0.33, x + 0.33, y + 0.33, 0, CEIL, MAT.post, { kind: 'post', name: 'Porch / patio post', text: '' }, G.walls);
-// fixtures and cabinets
+for (const [x, y] of H.posts) box(x - 0.33, y - 0.33, x + 0.33, y + 0.33, 0, CEIL, MAT.post, { kind: 'post', name: 'Porch / patio post', text: 'Timber post (A-1, A-3)' }, G.ext);
+
+// ---------------------------------------------------------------- fixtures, cabinets and appliances (A-5)
 const FH = { wc: 1.4, tub: 1.8, lav: 2.8, sink: 3.0, shower: 0.1, drain: 0.05, cabinet: 3.0, island: 3.0, range: 3.0, ref: 6.0, dw: 2.9, washer: 3.2, dryer: 3.2, fireplace: 3.5 };
 for (const f of H.fixtures) {
   const [x, y] = f.at, [w, d] = f.size, h = FH[f.kind] ?? 3;
   const material = f.kind === 'cabinet' || f.kind === 'island' ? MAT.counter : f.kind === 'fireplace' ? MAT.stone : MAT.fix;
-  if (f.kind === 'lav' || f.kind === 'sink') { box(x - w / 2, y - d / 2, x + w / 2, y + d / 2, h - 0.25, h + 0.02, MAT.fix, { kind: 'fixture', name: f.name, text: f.id }, G.fix); continue; }
-  box(x - w / 2, y - d / 2, x + w / 2, y + d / 2, 0, h, material, { kind: 'fixture', name: f.name, text: f.id }, G.fix);
+  const data = { kind: 'furn', name: f.name, ref: f.id, text: f.id };
+  if (f.kind === 'lav' || f.kind === 'sink') { box(x - w / 2, y - d / 2, x + w / 2, y + d / 2, h - 0.25, h + 0.02, MAT.fix, data, G.furn); continue; }
+  box(x - w / 2, y - d / 2, x + w / 2, y + d / 2, 0, h, material, data, G.furn);
 }
-// roof massing from A-2: hip roofs over the three wings at 6:12, eaves 1'-6" past the walls, a 2:12 porch shed
+
+// ---------------------------------------------------------------- roof massing from A-2: hips over the wings at 6:12, eaves 1'-6" past the walls, a 2:12 porch shed
 (function roof() {
   const OH = 1.5, top = CEIL + 1.0;
   function hip(x0, y0, x1, y1, pitch) {
@@ -551,129 +955,205 @@ for (const f of H.fixtures) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute([a.x, top, a.z, b.x, top, a.z, b.x, top - rise, b.z, a.x, top, a.z, b.x, top - rise, b.z, a.x, top - rise, b.z], 3)); g.computeVertexNormals();
   const m = new THREE.Mesh(g, MAT.roof); m.userData = { kind: 'roof', name: 'Front porch roof', text: '2:12 shed (A-2)' }; pickables.push(m); G.roof.add(m);
-  G.roof.visible = false;
 })();
-// trade overlays: devices, fixtures and registers from E-1, P-1 and M-1
+
+// ---------------------------------------------------------------- trade overlays: devices, fixtures and registers from E-1, P-1 and M-1
 for (const t of T3) {
   const g = G[t.layer], s = t.size || 0.5, h = t.h ?? 1;
-  box(t.x - s / 2, t.y - s / 2, t.x + s / 2, t.y + s / 2, h - s / 2, h + s / 2, MAT[t.layer === 'plumb' ? (t.cold ? 'cold' : 'plumb') : t.layer], { kind: t.layer, name: t.name, text: t.text }, g);
+  if (!g) continue;
+  const [name, ...rest] = String(t.name).split(' · ');
+  box(t.x - s / 2, t.y - s / 2, t.x + s / 2, t.y + s / 2, h - s / 2, h + s / 2, MAT[t.layer === 'plumb' ? (t.cold ? 'cold' : 'plumb') : t.layer], { kind: t.layer, name: t.name, ref: t.ref || name, text: t.text }, g);
 }
 for (const line of DATA.lines3d) {
   const g = G[line.layer], material = line.layer === 'plumb' ? MAT.plumb : MAT.hvac, r = line.r || 0.2;
+  if (!g) continue;
   for (let i = 1; i < line.pts.length; i++) {
     const [x0, y0] = line.pts[i - 1], [x1, y1] = line.pts[i];
     box(Math.min(x0, x1) - r, Math.min(y0, y1) - r, Math.max(x0, x1) + r, Math.max(y0, y1) + r, line.h - r, line.h + r, material, { kind: line.layer, name: line.name, text: '' }, g);
   }
 }
-for (const k of ['elec', 'plumb', 'hvac']) G[k].visible = false;
-for (const cb of document.querySelectorAll('#side input[data-layer]')) {
-  cb.addEventListener('change', () => { G[cb.dataset.layer].visible = cb.checked; if (cb.dataset.layer === 'walls' && !cb.checked) G.roof.visible = false; });
-}
-$('cut').addEventListener('input', e => { const h = +e.target.value; $('cutv').textContent = ftIn(h); setCut(h); });
 
-// views
-const VIEWS = { iso: [[-58, 62, 92], [0, 0, 4]], rear: [[78, 58, -70], [0, 0, -4]], top: [[0, 125, 0.01], [0, 0, 0]], front: [[0, 14, 110], [0, 4, 0]] };
-function view(k) {
-  const [p, t] = VIEWS[k]; camera.position.set(...p); controls.target.set(...t); controls.update();
-  for (const b of $('views').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.view === k));
+// ---------------------------------------------------------------- picking
+const raycaster = new THREE.Raycaster(); let picked = null, downAt = null;
+function clearPick() { if (!picked) return; picked.mesh.material = picked.mat; picked = null; $('sel').hidden = true; $('selpop').hidden = true; $('selcomment').setAttribute('aria-expanded', 'false'); }
+// a picked item's comments are open items on its trade's sheet, under the same tag the sheet's card uses, so both show the same comments
+const SHEET_OF = { elec: 'e1', plumb: 'p1', hvac: 'm1', radiant: 'r1', framing: 's1', truss: 's1', roof: 's1', wall: 's1', window: 'a1', door: 'a1', room: 'a1', post: 'a1' };
+function refOf3d({ kind, name, ref, text }) {
+  const sheet = SHEET_OF[kind] || (kind === 'furn' && /toilet|tub|lav|sink|shower|washer|drain/i.test(name + ' ' + text) ? 'p1' : 'a1');
+  return { sheet, ref: String(ref || String(name).split(' · ')[0]).slice(0, 60) };
 }
-$('views').addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if (b) view(b.dataset.view); });
-view('iso');
-
-// picking
-const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
-let picked = null, pickedMat = null, down = null;
-renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+function pick(mesh) {
+  clearPick(); picked = { mesh, mat: mesh.material }; mesh.material = MAT.hi;
+  const u = mesh.userData; $('seltext').textContent = u.text ? `${u.name}: ${u.text}` : u.name; $('sel').hidden = false;
+  const { sheet, ref } = refOf3d(u); $('sel').dataset.sheet = sheet; $('selref').textContent = ref;
+}
+$('selclear').addEventListener('click', clearPick);
+renderer.domElement.addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY]; });
 renderer.domElement.addEventListener('pointerup', e => {
-  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+  const far = !downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5; downAt = null; if (far) return;
   const r = renderer.domElement.getBoundingClientRect();
-  ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-  ray.setFromCamera(ptr, camera);
-  const hits = ray.intersectObjects(pickables.filter(m => { for (let o = m; o; o = o.parent) if (!o.visible) return false; return true; }), false)
-    .filter(h => !cutPlane.constant || cutMats.every(m => !m.clippingPlanes) || h.point.y <= cutPlane.constant + 1e-3);
-  if (picked) { picked.material = pickedMat; picked = null; }
-  if (!hits.length) { $('sel').hidden = true; return; }
-  picked = hits[0].object; pickedMat = picked.material; picked.material = MAT.hi;
-  $('selname').textContent = picked.userData.name; $('seltext').textContent = picked.userData.text || ''; $('sel').hidden = false;
-  document.dispatchEvent(new CustomEvent('ssc-pick', { detail: '3D · ' + picked.userData.name }));
+  raycaster.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
+  const shown = m => { for (let o = m; o; o = o.parent) if (!o.visible) return false; return true; };
+  const hit = raycaster.intersectObjects(pickables.filter(shown), false).find(h => h.point.y <= cutPlane.constant + 0.02 || !h.object.material.clippingPlanes);
+  if (hit) pick(hit.object); else clearPick();
 });
-function loop() { controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop); }
-status(''); loop();
+
+// ---------------------------------------------------------------- start view, layers, loop
+camera.position.set(-58, 62, 92); controls.target.set(0, 0, 4); controls.update();   // bird's eye from the front corner, over the garage
+function applyLayers() {
+  for (const k of Object.keys(G)) { const cb = $('ly-' + k); if (cb) G[k].visible = cb.checked; }
+  // with framing on (when a framing layer is added), the finishes go to a ghost so the studs read
+  const fr = !!($('ly-framing') && $('ly-framing').checked);
+  for (const m of G.walls.children) if (m.userData.finish === 'wall') m.material = fr ? MAT.wallGhost : MAT.wall;
+  for (const m of G.ext.children) if (m.userData.finish) m.material = fr ? (m.userData.finish === 'siding' ? MAT.sidingGhost : MAT.wallGhost) : (m.userData.finish === 'siding' ? MAT.siding : MAT.wall);
+  const h = parseFloat($('cut').value); $('cutval').value = h >= CUT_MAX ? 'no cut' : ftIn(h); setCut(h);
+  if (picked && fr) clearPick();
+}
+for (const cb of document.querySelectorAll('#side input[id^="ly-"]')) cb.addEventListener('input', applyLayers);
+$('cut').addEventListener('input', applyLayers);
+applyLayers(); status('');
+const needle = $('needle');
+function frame() {
+  requestAnimationFrame(frame);
+  if (document.hidden || $('sheet-3d').hidden) return;
+  controls.update();
+  needle.style.transform = `rotate(${THREE.MathUtils.radToDeg(controls.getAzimuthalAngle()).toFixed(1)}deg)`;
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(frame);
 </script>
 
 <script src="chat-config.js"></script>
+<script>
+// ---------------------------------------------------------------- one Firebase connection (anonymous sign-in) shared by the chat and the open items
+(function () {
+  const cfg = window.SSC_CHAT || {};
+  if (!cfg.firebase || !cfg.firebase.projectId) return;
+  const V = cfg.sdk || '12.18.0', base = `https://www.gstatic.com/firebasejs/${V}/`;
+  window.sscFirebase = Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')])
+    .then(async ([A, U, F]) => {
+      const app = A.initializeApp(cfg.firebase, 'ssc-chat');
+      const auth = U.getAuth(app), db = F.getFirestore(app);
+      const cred = await U.signInAnonymously(auth);
+      return { F, db, uid: cred.user.uid, room: cfg.room || 'stone-sheep-crew' };
+    });
+})();
+</script>
 <script>
 // ---------------------------------------------------------------- crew chat: one room for everyone on the job, kept in Firebase (see CHAT-SETUP.md)
 (function () {
   const cfg = window.SSC_CHAT || {};
   const root = document.getElementById('chat'), panel = document.getElementById('sheet-chat'), tab = document.getElementById('tab-chat');
+  if (!root) return;
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* per-viewer convenience */ } } };
+  const visible = () => !panel.hidden && document.visibilityState === 'visible';
+
   if (!cfg.firebase || !cfg.firebase.projectId) {
     const n = el('div', 'chat-note');
-    n.append(el('h2', null, 'Crew chat'), el('p', null, 'Chat isn’t switched on yet. Once the owner connects it (CHAT-SETUP.md in the repository), questions posted here go to everyone on the job.'));
-    root.append(n); return;
+    n.append(el('h2', null, 'Crew chat'), el('p', null, 'Chat isn’t switched on yet. Once the owner connects it, questions posted here go to everyone on the job.'));
+    root.append(n);
+    return;
   }
+
+  // the thing last picked on a sheet, so a question can say what it's about
   let lastPick = null;
-  document.addEventListener('ssc-pick', e => { lastPick = String(e.detail).slice(0, 120); if (form.refreshRe) form.refreshRe(); });
+  const sheetNo = node => { const s = node.closest('.sheet'); const t = s && document.getElementById('tab-' + s.id.slice(6)); return t ? t.querySelector('.no').textContent : ''; };
+  const watchPick = (node, isOn) => new MutationObserver(() => {
+    if (isOn()) lastPick = (sheetNo(node) + ' · ' + node.textContent.trim()).slice(0, 120);
+    else if (lastPick && lastPick.startsWith(sheetNo(node) + ' ')) lastPick = null;
+  }).observe(node, { childList: true, characterData: true, subtree: true, attributes: true });
+  for (const s of document.querySelectorAll('.tools .sel')) watchPick(s, () => s.classList.contains('on'));
+  { const t = document.getElementById('seltext'), box = document.getElementById('sel'); if (t && box) watchPick(t, () => !box.hidden && t.textContent.trim() !== ''); }
+
+  // who's talking
   let me = { name: store.get('ssc-chat-name') || '', trade: store.get('ssc-chat-trade') || '' };
   const who = el('div', 'chat-who'), log = el('div', 'chat-log'), form = el('form', 'chat-form');
   log.setAttribute('aria-live', 'polite'); log.setAttribute('aria-label', 'Messages');
   const status = el('span', 'st', 'connecting…');
   root.append(who, log, form);
+
   function drawWho() {
     who.replaceChildren();
     if (!me.name) { who.append(el('span', null, 'Everyone on the job sees this room.'), status); return; }
+    const b = el('b', null, me.name + (me.trade ? ' · ' + me.trade : ''));
     const ch = el('button', 'chat-btn', 'Change'); ch.type = 'button'; ch.addEventListener('click', () => { me.name = ''; drawWho(); drawForm(); });
-    who.append(el('span', null, 'You’re '), el('b', null, me.name + (me.trade ? ' · ' + me.trade : '')), ch, status);
+    who.append(el('span', null, 'You’re '), b, ch, status);
   }
-  let send = null;
+
+  let send = null; // set once signed in
   function drawForm() {
-    form.replaceChildren(); form.refreshRe = null;
+    form.replaceChildren();
     if (!me.name) {
-      const n = el('input'); n.placeholder = 'Your name'; n.required = true; n.maxLength = 40; n.autocomplete = 'name'; n.setAttribute('aria-label', 'Your name');
-      const t = el('input'); t.placeholder = 'Trade (optional)'; t.maxLength = 40; t.setAttribute('aria-label', 'Trade or company');
+      const n = el('input'); n.placeholder = 'Your name'; n.required = true; n.maxLength = 40; n.autocomplete = 'name'; n.value = store.get('ssc-chat-name') || ''; n.setAttribute('aria-label', 'Your name');
+      const t = el('input'); t.placeholder = 'Trade (optional)'; t.maxLength = 40; t.value = store.get('ssc-chat-trade') || ''; t.setAttribute('aria-label', 'Trade or company');
       const go = el('button', 'chat-btn go', 'Join'); go.type = 'submit';
       const line = el('div', 'line'); line.append(n, t);
       form.append(el('label', null, 'Tell the crew who you are'), line, go);
       form.onsubmit = e => { e.preventDefault(); me = { name: n.value.trim().slice(0, 40), trade: t.value.trim().slice(0, 40) }; if (!me.name) return; store.set('ssc-chat-name', me.name); store.set('ssc-chat-trade', me.trade); drawWho(); drawForm(); };
       return;
     }
-    const re = el('label', 'chat-re'), reBox = el('input'), reTxt = el('span'); reBox.type = 'checkbox'; reBox.checked = true; re.append(reBox, reTxt);
-    form.refreshRe = () => { re.hidden = !lastPick; reTxt.textContent = lastPick ? 'About ' + lastPick : ''; reBox.checked = true; };
-    form.refreshRe();
+    const re = el('label', 'chat-re'); const reBox = el('input'); reBox.type = 'checkbox'; reBox.checked = true; const reTxt = el('span');
+    re.append(reBox, reTxt); re.hidden = true;
+    const refreshRe = () => { re.hidden = !lastPick; reTxt.textContent = lastPick ? 'About ' + lastPick : ''; reBox.checked = true; };
+    form.refreshRe = refreshRe; refreshRe();
     const ta = el('textarea'); ta.rows = 1; ta.maxLength = 2000; ta.placeholder = 'Ask the crew a question…'; ta.setAttribute('aria-label', 'Message'); ta.setAttribute('enterkeyhint', 'send');
     const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 140) + 'px'; };
     ta.addEventListener('input', fit);
+    // Enter sends on a keyboard; Shift+Enter (or the phone's return key with enterkeyhint) makes a new line
     ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(pointer: fine)').matches) { e.preventDefault(); form.requestSubmit(); } });
-    const go = el('button', 'chat-btn go', 'Send'); go.type = 'submit'; go.disabled = !send; form.goBtn = go;
-    const line = el('div', 'line'); line.append(ta, go); form.append(re, line);
+    const go = el('button', 'chat-btn go', 'Send'); go.type = 'submit'; go.disabled = !send;
+    form.goBtn = go;
+    const line = el('div', 'line'); line.append(ta, go);
+    form.append(re, line);
     form.onsubmit = async e => {
       e.preventDefault();
       const text = ta.value.trim(); if (!text || !send) return;
       const msg = { name: me.name, text: text.slice(0, 2000) };
       if (me.trade) msg.trade = me.trade;
       if (!re.hidden && reBox.checked && lastPick) msg.sheet = lastPick;
-      ta.value = ''; fit(); lastPick = null; form.refreshRe();
+      ta.value = ''; fit(); lastPick = null; refreshRe();
       try { await send(msg); } catch (err) { ta.value = text; fit(); status.textContent = 'not sent: ' + (err.code || err.message || 'error'); }
     };
   }
   drawWho(); drawForm();
+  new MutationObserver(() => { if (!panel.hidden) { if (form.refreshRe) form.refreshRe(); seen(); scrollEnd(); } }).observe(panel, { attributes: true, attributeFilter: ['hidden'] });
+
+  // unread count on the tab, from the last message seen on this device
   const badge = el('span', 'badge'); badge.hidden = true; tab.appendChild(badge);
-  let msgs = [], myUid = null, remove = null;
-  const visible = () => !panel.hidden && document.visibilityState === 'visible';
+  let msgs = [], myUid = null;
   const lastAt = () => msgs.length ? msgs[msgs.length - 1].at : 0;
-  function seen() { if (visible() && msgs.length) { store.set('ssc-chat-seen-' + cfg.room, String(lastAt())); badge.hidden = true; } }
+  // a new message from someone else covers the app until this phone opens the chat; after that every tab works again
+  const alertBox = el('div', 'chat-alert'); alertBox.hidden = true;
+  alertBox.setAttribute('role', 'alertdialog'); alertBox.setAttribute('aria-modal', 'true'); alertBox.setAttribute('aria-labelledby', 'chat-alert-h');
+  const alertCard = el('div', 'box'), alertH = el('h2', null, 'New message'), alertFrom = el('div', 'from'), alertTxt = el('div', 'txt');
+  const alertGo = el('button', null, 'Open chat'); alertGo.type = 'button'; alertH.id = 'chat-alert-h';
+  alertGo.addEventListener('click', () => tab.click());
+  alertCard.append(alertH, alertFrom, alertTxt, alertGo); alertBox.append(alertCard); document.body.append(alertBox);
+  function seen() { if (visible() && msgs.length) { store.set('ssc-chat-seen-' + cfg.room, String(lastAt())); badge.hidden = true; } if (!panel.hidden) alertBox.hidden = true; }
   function countUnread() {
     const since = +(store.get('ssc-chat-seen-' + cfg.room) || 0);
-    const n = msgs.filter(m => m.at > since && m.uid !== myUid && !m.pending).length;
+    const unread = msgs.filter(m => m.at > since && m.uid !== myUid && !m.pending), n = unread.length;
     badge.textContent = n > 99 ? '99+' : String(n); badge.hidden = !n || visible();
+    tab.setAttribute('aria-label', 'Chat' + (n ? `, ${n} unread` : ''));
+    if (n && panel.hidden) {
+      const last = unread[n - 1], wasHidden = alertBox.hidden;
+      alertH.textContent = n > 1 ? `${n} new messages` : 'New message';
+      alertFrom.textContent = (n > 1 ? 'Latest from ' : 'From ') + (last.name || '?') + (last.trade ? ' · ' + last.trade : '');
+      alertTxt.textContent = last.text.length > 280 ? last.text.slice(0, 280) + '…' : last.text;
+      alertBox.hidden = false;
+      if (wasHidden) alertGo.focus();
+    } else alertBox.hidden = true;
   }
-  new MutationObserver(() => { if (!panel.hidden) { seen(); countUnread(); log.scrollTop = log.scrollHeight; } }).observe(panel, { attributes: true, attributeFilter: ['hidden'] });
   document.addEventListener('visibilitychange', () => { seen(); countUnread(); });
-  const dayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }), timeFmt = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+
+  const nearEnd = () => log.scrollHeight - log.scrollTop - log.clientHeight < 80;
+  const scrollEnd = () => { log.scrollTop = log.scrollHeight; };
+  const dayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  const timeFmt = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+  let remove = null;
   function draw() {
-    const stick = log.scrollHeight - log.scrollTop - log.clientHeight < 80 || !log.childElementCount;
+    const stick = nearEnd() || !log.childElementCount;
     log.replaceChildren();
     if (!msgs.length) log.append(el('p', 'chat-empty', 'No messages yet. Ask the first question: everyone on the job will see it here.'));
     let day = '';
@@ -681,21 +1161,25 @@ status(''); loop();
       const d = new Date(m.at || Date.now()), ds = dayFmt.format(d);
       if (ds !== day) { day = ds; log.append(el('div', 'chat-day', ds)); }
       const box = el('div', 'msg' + (m.uid === myUid ? ' mine' : '') + (m.pending ? ' pending' : ''));
-      const meta = el('div', 'meta'); meta.append(el('b', null, m.name || '?')); if (m.trade) meta.append(el('span', null, m.trade));
+      const meta = el('div', 'meta'); meta.append(el('b', null, m.name || '?'));
+      if (m.trade) meta.append(el('span', null, m.trade));
       const t = el('time', null, m.pending ? 'sending…' : timeFmt.format(d)); t.dateTime = d.toISOString(); meta.append(t);
-      box.append(meta); if (m.sheet) box.append(el('div', 're', m.sheet)); box.append(el('div', 'txt', m.text));
+      box.append(meta);
+      if (m.sheet) box.append(el('div', 're', m.sheet));
+      box.append(el('div', 'txt', m.text));
       if (m.uid === myUid && remove && !m.pending) { const x = el('button', 'del', 'Delete'); x.type = 'button'; x.addEventListener('click', () => { if (confirm('Delete this message for everyone?')) remove(m.id).catch(() => {}); }); box.append(x); }
       log.append(box);
     }
-    if (stick) log.scrollTop = log.scrollHeight;
+    if (stick) scrollEnd();
     seen(); countUnread();
   }
-  const V = cfg.sdk || '12.18.0', base = `https://www.gstatic.com/firebasejs/${V}/`;
-  Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')])
-    .then(async ([A, U, F]) => {
-      const app = A.initializeApp(cfg.firebase, 'ssc-chat'), auth = U.getAuth(app), db = F.getFirestore(app);
-      myUid = (await U.signInAnonymously(auth)).user.uid;
-      const col = F.collection(db, 'rooms', cfg.room, 'messages');
+
+  window.sscFirebase
+    .then(({ F, db, uid, room }) => {
+      myUid = uid;
+      // until chat-config.js names an owner, show this phone's sign-in ID so it can be copied into `owners` and firestore.rules
+      if (!(cfg.owners || []).length) { const id = el('span', null, 'Phone ID for the owner list: '); const code = el('code', null, uid); code.style.userSelect = 'all'; id.append(code); id.style.fontSize = '11px'; who.after(id); id.style.padding = '0 16px 6px'; id.style.display = 'block'; id.style.color = 'var(--muted)'; }
+      const col = F.collection(db, 'rooms', room, 'messages');
       send = msg => F.addDoc(col, { ...msg, uid: myUid, at: F.serverTimestamp() });
       remove = id => F.deleteDoc(F.doc(col, id));
       if (form.goBtn) form.goBtn.disabled = false;
@@ -709,8 +1193,192 @@ status(''); loop();
     .catch(err => { status.textContent = navigator.onLine ? 'can’t connect: ' + (err.code || err.message || 'error') : 'offline'; });
 })();
 </script>
+
 <script>
-  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+// ---------------------------------------------------------------- open items: tick off to resolve (struck through for everyone), add new ones per trade,
+// or comment on a picked item from its card (the comment is an open item tied to that item); kept in Firebase next to the chat
+(function () {
+  const TRADES = { a1: 'Plan', s1: 'Framing', e1: 'Electrical', p1: 'Plumbing', m1: 'HVAC', r1: 'Radiant' };
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* per-viewer convenience */ } } };
+  // a drawn item is keyed by its sheet and its wording, so it stays resolved until the wording changes
+  const hash = t => { let h = 5381; for (let i = 0; i < t.length; i++) h = (h * 33 ^ t.charCodeAt(i)) >>> 0; return h.toString(36); };
+  const dateFmt = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+  const when = ms => ms ? dateFmt.format(new Date(ms)) : '';
+
+  const me = () => store.get('ssc-chat-name') || '';
+  let fb = null, items = [], done = new Map(), hidden = new Set(), state = 'connecting…';
+  // owners (chat-config.js) can delete anyone's item, and hide the items drawn on the sheets
+  const owner = () => !!fb && ((window.SSC_CHAT || {}).owners || []).includes(fb.uid);
+  const lists = [];
+  let L3 = null;   // the 3D view's comment popup, set up below
+
+  for (const sheet of document.querySelectorAll('.sheet2d')) {
+    const ul = sheet.querySelector('.open ul'); if (!ul) continue;
+    const key = sheet.id.slice(6), trade = TRADES[key] || '';
+    const pane = ul.closest('.pane'), wrap = pane && pane.parentElement, bar = wrap && wrap.previousElementSibling;
+    const btn = bar && bar.children[[...wrap.children].indexOf(pane)];
+    const drawn = [...ul.children].map(li => { const span = el('span', 'oi-txt'); span.append(...li.childNodes); return { id: 'b-' + key + '-' + hash(span.textContent.trim()), body: span }; });
+    ul.classList.add('oi-list');
+    const st = el('p', 'oi-st');
+    const form = el('form', 'oi-add');
+    ul.after(st, form);
+    const L = { key, trade, ul, drawn, st, form, btn };
+    // the picked item's card gets its own open items and a comment box
+    const pk = sheet.querySelector('.picked .pk-card'), tag = pk && pk.querySelector('.pk-tag');
+    if (tag) {
+      L.card = { box: el('div', 'pk-oi'), h: el('div', 'pk-oi-h'), ul: el('ul', 'oi-list'), st: el('p', 'oi-st'), form: el('form', 'oi-add'), tag };
+      L.card.box.append(L.card.h, L.card.ul, L.card.st, L.card.form); pk.append(L.card.box);
+      new MutationObserver(() => drawCard(L)).observe(tag, { childList: true, characterData: true, subtree: true });
+    }
+    lists.push(L); drawForms(L);
+  }
+  if (!lists.length) return;
+  // the 3D view: the item ribbon's Comment button pops up the picked item's open items and a comment box
+  { const sel = document.getElementById('sel'), ref = document.getElementById('selref'), pop = document.getElementById('selpop'), btn = document.getElementById('selcomment');
+    if (sel && ref && pop && btn) {
+      L3 = { get key() { return sel.dataset.sheet || 'a1'; }, get trade() { return TRADES[this.key] || ''; }, btn, st: el('p', 'oi-st'),
+        card: { box: el('div', 'pk-oi'), h: el('div', 'pk-oi-h'), ul: el('ul', 'oi-list'), st: el('p', 'oi-st'), form: el('form', 'oi-add'), tag: ref } };
+      const head = el('div', 'pop-h'), x = el('button', 'pop-x', 'Close'); x.type = 'button';
+      head.append(L3.card.h, x); L3.card.box.append(head, L3.card.ul, L3.card.st, L3.card.form); pop.append(L3.card.box);
+      const show = on => { pop.hidden = !on; btn.setAttribute('aria-expanded', String(on)); if (on) { drawForms(L3); const ta = pop.querySelector('textarea, input'); if (ta && matchMedia('(hover: hover)').matches) ta.focus(); } };
+      btn.addEventListener('click', () => show(pop.hidden)); x.addEventListener('click', () => show(false));
+      new MutationObserver(() => { drawCard(L3); if (!pop.hidden) drawForms(L3); }).observe(ref, { childList: true, characterData: true, subtree: true });
+      drawForms(L3);
+    }
+  }
+  const all = () => L3 ? [...lists, L3] : lists;
+
+  function row(L, id, body, meta, mine, itemId) {
+    const d = done.get(id);
+    const li = el('li', 'oi' + (d ? ' done' : ''));
+    const box = el('input'); box.type = 'checkbox'; box.checked = !!d; box.disabled = !fb;
+    box.setAttribute('aria-label', d ? 'Resolved; untick to reopen' : 'Mark resolved');
+    box.addEventListener('change', () => toggle(L, id, box));
+    const main = el('div', 'oi-main'); main.append(body);
+    const m = el('div', 'oi-meta');
+    if (meta) m.append(el('span', null, meta));
+    if (d) m.append(el('span', 'oi-res', 'Resolved by ' + (d.name || '?') + (d.at ? ' · ' + when(d.at) : '')));
+    if (mine) { const x = el('button', 'oi-del', 'Delete'); x.type = 'button'; x.addEventListener('click', () => { if (!confirm('Delete this open item for everyone?')) return; const { F, db, room } = fb; (itemId ? F.deleteDoc(F.doc(db, 'rooms', room, 'items', itemId)) : F.setDoc(F.doc(db, 'rooms', room, 'hidden', id), { uid: fb.uid, at: F.serverTimestamp() })).then(() => d && F.deleteDoc(F.doc(db, 'rooms', room, 'done', id))).catch(err => say(L, 'not deleted: ' + (err.code || 'error'))); }); m.append(x); }
+    if (m.childElementCount) main.append(m);
+    li.append(box, main);
+    return li;
+  }
+
+  function draw() {
+    for (const L of lists) {
+      L.ul.replaceChildren();
+      let open = 0;
+      for (const b of L.drawn) { if (hidden.has(b.id)) continue; L.ul.append(row(L, b.id, b.body.cloneNode(true), '', owner())); if (!done.has(b.id)) open++; }
+      for (const it of items) {
+        if (it.sheet !== L.key) continue;
+        const id = 'i-' + it.id;
+        L.ul.append(row(L, id, el('span', 'oi-txt', it.text), (it.ref ? 'On ' + it.ref + ' · ' : '') + 'Added by ' + (it.name || '?') + (it.trade ? ' (' + it.trade + ')' : '') + ' · ' + when(it.at), fb && (it.uid === fb.uid || owner()), it.id));
+        if (!done.has(id)) open++;
+      }
+      if (L.btn) { let n = L.btn.querySelector('.n'); if (!n) { n = el('span', 'n'); L.btn.appendChild(n); } n.textContent = open; L.btn.title = open + ' open'; }
+      if (!L.err) L.st.textContent = state;
+      drawCard(L);
+    }
+    if (L3) drawCard(L3);
+  }
+  function refOf(L) { return L.card.tag.textContent.trim().slice(0, 60); }
+  function drawCard(L) {
+    if (!L.card) return;
+    const ref = refOf(L), mine = items.filter(it => it.sheet === L.key && it.ref === ref);
+    L.card.ul.replaceChildren();
+    for (const it of mine) L.card.ul.append(row(L, 'i-' + it.id, el('span', 'oi-txt', it.text), 'Added by ' + (it.name || '?') + (it.trade ? ' (' + it.trade + ')' : '') + ' · ' + when(it.at), fb && (it.uid === fb.uid || owner()), it.id));
+    const open = mine.filter(it => !done.has('i-' + it.id)).length;
+    L.card.h.textContent = mine.length ? `Open items on ${ref}: ${open} open` : `Comments on ${ref} become open items for ${L.trade || 'this sheet'} until resolved.`;
+    if (L === L3) L.btn.textContent = open ? `Comments (${open})` : 'Comment';
+    const ta = L.card.form.querySelector('textarea'); if (ta && L !== L3) ta.placeholder = 'Comment on ' + ref + '…';
+    if (!L.err) L.card.st.textContent = state;
+  }
+  function sts(L) { return L.card ? [L.st, L.card.st] : [L.st]; }
+  function say(L, msg) { L.err = true; sts(L).forEach(x => x.textContent = msg); setTimeout(() => { L.err = false; sts(L).forEach(x => x.textContent = state); }, 6000); }
+
+  function needName(L) {
+    if (me()) return false;
+    const forms = [L.card && !L.card.box.closest('[hidden]') && L.card.form, L.form].filter(Boolean);
+    const n = forms.map(f => f.querySelector('input[name=who]')).find(Boolean);
+    if (n) { n.focus(); say(L, 'Put your name in first, so the crew knows who resolved it.'); }
+    return true;
+  }
+
+  async function toggle(L, id, box) {
+    if (!fb || needName(L)) { box.checked = !box.checked; return; }
+    const { F, db, room, uid } = fb, ref = F.doc(db, 'rooms', room, 'done', id);
+    try {
+      if (box.checked) await F.setDoc(ref, { name: me(), uid, at: F.serverTimestamp() });
+      else await F.deleteDoc(ref);
+    } catch (err) { box.checked = !box.checked; say(L, 'not saved: ' + (err.code || err.message || 'error')); }
+  }
+
+  function drawForms(L) { if (L.form) drawForm(L, L.form, false); if (L.card) drawForm(L, L.card.form, true); }
+  function drawForm(L, f, onCard) {
+    f.replaceChildren();
+    if (!me()) {
+      const n = el('input'); n.name = 'who'; n.placeholder = 'Your name'; n.maxLength = 40; n.autocomplete = 'name'; n.setAttribute('aria-label', 'Your name');
+      const ok = el('button', 'chat-btn', 'Save'); ok.type = 'button';
+      ok.addEventListener('click', () => { const v = n.value.trim().slice(0, 40); if (!v) return n.focus(); store.set('ssc-chat-name', v); if (!store.get('ssc-chat-trade') && L.trade) store.set('ssc-chat-trade', L.trade); all().forEach(x => { x.err = false; drawForms(x); }); draw(); });
+      const line = el('div', 'line'); line.append(n, ok);
+      f.append(el('label', null, 'Your name, to resolve or add items (the chat uses it too)'), line);
+      return;
+    }
+    const ta = el('textarea'); ta.rows = 1; ta.maxLength = 1000; ta.placeholder = onCard ? (L === L3 ? 'Add a comment…' : 'Comment on ' + refOf(L) + '…') : 'Add an open item for ' + (L.trade || 'this sheet') + '…'; ta.setAttribute('aria-label', onCard ? 'Comment on this item (adds an open item)' : 'New open item');
+    const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 140) + 'px'; };
+    ta.addEventListener('input', fit);
+    const go = el('button', 'chat-btn go', onCard ? 'Post' : 'Add'); go.type = 'submit';
+    const line = el('div', 'line'); line.append(ta, go);
+    f.append(line);
+    f.onsubmit = async e => {
+      e.preventDefault();
+      const text = ta.value.trim(); if (!text) return;
+      if (!fb) return say(L, 'not connected yet; try again in a moment');
+      const { F, db, room, uid } = fb, it = { sheet: L.key, text: text.slice(0, 1000), name: me(), uid, at: F.serverTimestamp() };
+      const t = store.get('ssc-chat-trade'); if (t) it.trade = t.slice(0, 40);
+      if (onCard && refOf(L)) it.ref = refOf(L);
+      ta.value = ''; fit();
+      try { await F.addDoc(F.collection(db, 'rooms', room, 'items'), it); } catch (err) { ta.value = text; fit(); say(L, 'not added: ' + (err.code || err.message || 'error')); }
+    };
+  }
+
+  draw();
+  if (!window.sscFirebase) { state = 'Resolving and adding items needs the crew chat switched on (CHAT-SETUP.md).'; draw(); return; }
+  window.sscFirebase.then(conn => {
+    fb = conn; state = ''; draw();
+    const { F, db, room } = conn;
+    const onErr = err => { state = 'can’t load: ' + (err.code || 'error'); draw(); };
+    F.onSnapshot(F.query(F.collection(db, 'rooms', room, 'items'), F.orderBy('at'), F.limit(500)), snap => {
+      items = snap.docs.map(d => { const x = d.data({ serverTimestamps: 'estimate' }); return { id: d.id, sheet: x.sheet, ref: x.ref, text: x.text, name: x.name, trade: x.trade, uid: x.uid, at: x.at ? x.at.toMillis() : Date.now() }; });
+      state = snap.metadata.fromCache ? 'offline: showing the last copy' : ''; draw();
+    }, onErr);
+    F.onSnapshot(F.query(F.collection(db, 'rooms', room, 'done'), F.limit(2000)), snap => {
+      done = new Map(snap.docs.map(d => { const x = d.data({ serverTimestamps: 'estimate' }); return [d.id, { name: x.name, at: x.at ? x.at.toMillis() : Date.now() }]; }));
+      draw();
+    }, onErr);
+    F.onSnapshot(F.query(F.collection(db, 'rooms', room, 'hidden'), F.limit(2000)), snap => { hidden = new Set(snap.docs.map(d => d.id)); draw(); }, () => {});   // quiet until the rules with `hidden` are published
+  }).catch(err => { state = navigator.onLine ? 'can’t connect: ' + (err.code || err.message || 'error') : 'offline'; draw(); });
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  // A home-screen app on a phone resumes without reloading, so check for a new version
+  // whenever it comes back to the foreground, and reload once the new copy takes over.
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloaded) return;
+    reloaded = true;
+    location.reload();
+  });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+    }).catch(() => {});
+  });
+}
 </script>
 </body>
 </html>

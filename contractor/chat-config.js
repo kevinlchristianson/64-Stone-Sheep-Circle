@@ -15,6 +15,10 @@ window.SSC_CHAT = {
   // One conversation per room. Change it to start a fresh thread.
   room: 'stone-sheep-crew',
 
+  // App sign-in IDs that may delete anyone's open item and hide the ones drawn on a sheet (the owner's phone).
+  // Must match isOwner() in firestore.rules. While this is empty, the Chat tab shows each phone's ID to copy here.
+  owners: [],
+
   // Firebase JS SDK version loaded from gstatic.
   sdk: '12.18.0'
 };

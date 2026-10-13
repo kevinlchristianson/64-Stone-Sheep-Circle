@@ -18,7 +18,7 @@ import base64, html, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
-VERSION = 'v2'
+VERSION = 'v3'
 
 import plan, framing, electrical, plumbing, hvac   # noqa: E402
 from setlib import HOUSE, ft_in                     # noqa: E402
@@ -29,15 +29,19 @@ SHEETS = [('a1', 'A-1', 'Plan', plan), ('s1', 'S-1', 'Framing', framing), ('e1',
 esc = lambda t: html.escape(str(t), quote=True)
 
 
+NUM = re.compile(r'^-?[\d$][\d,.\'"\- /x×]*( ?[A-Za-z/%]{1,6})?$')   # a number or measurement: set in mono, as on Zero Rd
+
+
 def table_html(t, key):
+    # Zero Rd schedule markup: a wide section per table, rows keyed by tag and focusable; the page script turns each
+    # section into a tab of the schedule bar, adds search and one-tap type filters
     heads = ''.join(f'<th scope="col">{esc(c)}</th>' for c in t['cols'])
     body = []
     for rid, cells in t['rows']:
-        tds = ''.join(f'<td data-label="{esc(t["cols"][i])}">{esc(c)}</td>' for i, c in enumerate(cells))
-        body.append(f'<tr data-id="{esc(rid)}">{tds}</tr>' if rid else f'<tr>{tds}</tr>')
-    search = f'<div class="tsearch"><input type="search" placeholder="Search {esc(t["title"].lower())}" aria-label="Search {esc(t["title"])}"><span class="cnt"></span></div>' if len(t['rows']) > 12 else ''
+        tds = ''.join(f'<td class="{"num" if i and NUM.match(str(c).strip()) else ""}">{esc(c)}</td>' for i, c in enumerate(cells))
+        body.append(f'<tr data-id="{esc(rid)}" tabindex="0">{tds}</tr>' if rid else f'<tr>{tds}</tr>')
     lede = f'<p class="lede">{esc(t["lede"])}</p>' if t.get('lede') else ''
-    return f'<section class="wide"><h3>{esc(t["title"])}</h3>{lede}{search}<div class="tbl"><table><thead><tr>{heads}</tr></thead><tbody>{"".join(body)}</tbody></table></div></section>'
+    return f'<section class="wide"><h3>{esc(t["title"])}</h3>{lede}<div class="tbl"><table><thead><tr>{heads}</tr></thead><tbody>{"".join(body)}</tbody></table></div></section>'
 
 
 def summary_html(key, s):
@@ -52,25 +56,32 @@ def summary_html(key, s):
     return f'<ul class="summary">{items}</ul>'
 
 
+PDF_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>'
+            '<path d="M9.5 1.5V5H13M8.5 7.5v4.5M6.5 10l2 2 2-2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+HINT = 'These zoom buttons are your friend.\nEverything you see is clickable.'
+
+
 def sheet_section(key, no, name, b):
+    # the Zero Rd sheet: toolbar (zoom, packet PDF, selection line), optional sub-tabs (E-1 circuit sheets), the drawing,
+    # then Notes / Open items / schedules, which the page script turns into one pane at a time
     sh = b['sheet']
     notes = ''.join(f'<li>{esc(n)}</li>' for n in b['notes'])
     opens = ''.join(f'<li>{esc(n)}</li>' for n in b['open'])
     tables = ''.join(table_html(t, key) for t in b['tables'])
-    return f'''    <section class="sheet sheet2d" id="sheet-{key}" data-key="{key}" role="tabpanel" aria-labelledby="tab-{key}" hidden>
-      <div class="tools">
-        <div class="zoom" role="group" aria-label="Zoom"><button type="button" data-zoom="1">Fit</button><button type="button" data-zoom="2">2×</button><button type="button" data-zoom="4">4×</button></div>
-        <p class="sel">Tap a tag on the drawing or a row in a schedule.</p>
-        <a class="packet" href="packets/{no}-{name.lower()}-packet.pdf" target="_blank" rel="noopener">⎙ <span class="pk-name">{no} packet</span></a>
-      </div>
+    legend = ''.join(f'<li><span class="sw" style="background:{esc(c)}"></span>{esc(t)}</li>' for c, t in b.get('legend', []))
+    legend = f'<ul class="legend">{legend}</ul>' if legend else ''
+    subtabs = b.get('subtabs_html', '')
+    return f'''    <!-- ================================================================ {no} -->
+    <div class="sheet sheet2d" id="sheet-{key}" data-key="{key}" role="tabpanel" aria-labelledby="tab-{key}" hidden>
+      <div class="tools"><div class="zoom" role="group" aria-label="Zoom"><button type="button" data-zoom="1" aria-pressed="true">Fit</button><button type="button" data-zoom="2" aria-pressed="false">2×</button><button type="button" data-zoom="4" aria-pressed="false">4×</button></div><a class="packet" href="packets/{no}-{name.lower()}-packet.pdf" target="_blank" rel="noopener">{PDF_ICON}<span class="pk-name">{esc(name)} packet </span>PDF</a><p class="sel" data-hint="{esc(HINT)}">{esc(HINT)}</p></div>{subtabs}
       <div class="drawing"><div class="scroller"><div class="paper">{sh.svg()}</div></div></div>
-      <div class="picked" hidden><div class="pk-card" role="region" aria-live="polite" aria-label="Selected item"><div class="pk-head"><span class="pk-tag"></span><span class="pk-sub"></span><button type="button" class="pk-x">Clear</button></div><dl class="pk-dl"></dl></div></div>
       <div class="below">
-        <section><h2>{no} {esc(sh.title)}</h2><p class="lede">{esc(sh.subtitle)}</p>{summary_html(key, b.get('summary'))}<h3>Notes</h3><ol>{notes}</ol></section>
-        <section><h2>Open items</h2><p class="lede">The particulars to settle on this sheet.</p><ul class="open">{opens}</ul></section>
+        <section><h2>{no} {esc(sh.title)}</h2><p class="lede">{esc(sh.subtitle)}</p>{summary_html(key, b.get('summary'))}{legend}
+          <h3>Notes</h3><ol>{notes}</ol></section>
+        <section><h2>Open items</h2><p class="lede">The particulars to settle on this sheet.</p><div class="open"><ul>{opens}</ul></div></section>
         {tables}
       </div>
-    </section>
+    </div>
 '''
 
 
@@ -168,9 +179,13 @@ def main():
                 ('A-3', 'Front and rear elevations'), ('A-4', 'Left and right elevations'), ('A-5', 'Floor plan with fixtures, cabinets and appliances')]
     for i, (no, cap) in enumerate(captions, 1):
         plans_html.append(f'        <figure><a href="plans/sheet-{i}.jpg" target="_blank" rel="noopener"><img src="plans/sheet-{i}.jpg" alt="Owner\'s sheet {no}: {esc(cap)}" loading="lazy" width="2592" height="1728"></a><figcaption><b>{no}</b>{esc(cap)}</figcaption></figure>')
+    sm = {k: (b.get('summary') or {}) for k, (no, name, b) in built.items()}
+    counts = ' · '.join(f'{v:,} {label}' for v, label in [(len(HOUSE['walls']), 'wall segments'), (len(HOUSE['doors']), 'doors'), (len(HOUSE['windows']), 'windows'),
+                                                          (sm['e1'].get('devices', 0), 'electrical devices'), (sm['p1'].get('fixtures', 0), 'plumbing fixtures')] if v)
     tpl = open(os.path.join(HERE, 'app_template.html')).read()
     page = (tpl.replace('{{VERSION}}', VERSION).replace('{{TABS}}', '\n'.join(tabs)).replace('{{SHEETS}}', ''.join(sections))
             .replace('{{PLANS}}', '\n'.join(plans_html)).replace('{{FACTS}}', ''.join(f'<dt>{esc(k)}</dt><dd>{esc(v)}</dd>' for k, v in facts))
+            .replace('{{COUNTS}}', esc(counts)).replace('{{CUTMAX}}', f"{HOUSE['meta']['ceiling_ft'] + 0.5:g}")
             .replace('{{DATA}}', json.dumps(data, separators=(',', ':')).replace('</', '<\\/')).replace('{{FLOORSVG}}', floor_svg))
     with open(os.path.join(out_c, 'index.html'), 'w') as f: f.write(page)
 

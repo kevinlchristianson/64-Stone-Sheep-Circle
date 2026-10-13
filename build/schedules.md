@@ -286,14 +286,14 @@ Devices, switch legs and circuits for panel P1, drawn on the walls they go in.
 8. Lighting circuits by area, whole switch legs only: 33 master suite, master hall, laundry, powder, mud room; 34 kitchen, dining, pantry, mech room, living, entry, coat closet, porch and patio; 35 office, bedroom wing and every smoke and CO alarm (so a tripped alarm circuit shows as dark lights). Garage and garage exterior lights on 36. Each is well under the 1,440 W continuous limit of a 15A circuit at LED design wattages.
 9. Smoke alarms in every bedroom and the office; smoke + CO combination alarms outside each sleeping area (master hall, bedroom hall, entry outside the office). All 120V, interconnected, battery backup (IRC R314, R315; CO because of the attached garage, the wood fireplace and the gas boiler).
 10. Bath exhaust fans 110 CFM with humidity sensing and an integrated LED light: the light switches with the room's other lights, the fan on its own rocker with a timer (14/3 from the bank). Ducted outside in rigid duct.
-11. Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (18k) sits in the left side yard on the master closet wall and CU-2 (36k) in the right side yard behind the bedroom 3 closet, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).
+11. Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (24k, master, dining and living heads) sits under the west end of the front porch against the mechanical room wall and CU-2 (24k, bedrooms 1-3) in the right side yard behind the bedroom 3 closet, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).
 12. Radiant (R-1): the wall-hung boiler HS-1, its system circulator and the zone controller share 15A circuit 31 with a service switch at the boiler, and each remote manifold station has a receptacle on 31 for its actuator wiring module (MF-1 laundry, MF-2/MF-G on the garage side of the mud room wall with the garage circulator, MF-3 bedroom hall). The water heater's power vent is on 32. Thermostats are 24V back to the zone controller, not line voltage. The MF-3 cabinet sits below the hall 3-way S at 48".
 13. Low voltage: Cat6 home runs to the media panel on the pantry's mech-room wall (master and living TV boxes, office desk, video doorbell at the front door), powered from circuit 37.
 
 ### Open items
 
 - Range fuel: the 48" range is drawn electric on a 50A circuit. A gas or dual-fuel range drops that to a 120V receptacle and adds a gas line.
-- Mini-split breakers are sized from M-1's nominal units (CU-1 18k on 20A/#12, CU-2 36k on 40A/#8; 30A/#10 if the chosen model's MOP allows); set them to the nameplate MCA/MOCP of the units bought. If the living head moves to CU-1, CU-1 grows and 5-6 goes to 25-30A.
+- Mini-split breakers are sized from M-1's nominal units (two 24k 3-port units, MCA about 20A, on 25A/#10); set them to the nameplate MCA/MOCP of the units bought.
 - Utility service: overhead or underground, and which side of the house the meter goes on. The meter-main is drawn on the garage wall facing the porch end.
 - EV-ready: a 50A NEMA 14-50 receptacle is drawn in the garage. Keep, swap for a hardwired charger, or drop?
 - Mounting heights: standard heights are drawn. Zero Rd used 30" receptacles and 42" switches for accessibility; say if this house should match.
@@ -306,8 +306,8 @@ Devices, switch legs and circuits for panel P1, drawn on the walls they go in.
 |---|---|---|---|---|---|
 | 1-2 | Range, 48" electric | 240V 50A 2P | #6 Cu | kitchen, left wall | 1 |
 | 3-4 | Dryer | 240V 30A 2P | #10 Cu | laundry | 1 |
-| 5-6 | Mini-split CU-1, 18k (master, dining heads) | 240V 20A 2P | #12 Cu | left side yard, master closet wall; heads fed from the unit (MCA ~17A) | 1 |
-| 7-8 | Mini-split CU-2, 36k (bedrooms 1-3, living heads) | 240V 40A 2P | #8 Cu | right side yard, bedroom 3 closet wall; heads fed from the unit (MCA ~28A, MOP 35-40A) | 1 |
+| 5-6 | Mini-split CU-1, 24k (master, dining, living heads) | 240V 25A 2P | #10 Cu | front porch, west end, against the mechanical room wall; heads fed from the unit (MCA ~20A) | 1 |
+| 7-8 | Mini-split CU-2, 24k (bedrooms 1-3 heads) | 240V 25A 2P | #10 Cu | right side yard, bedroom 3 closet wall; heads fed from the unit (MCA ~20A) | 1 |
 | 9-10 | EV-ready receptacle (NEMA 14-50) | 240V 50A 2P | #6 Cu | garage, front wall | 1 |
 | 11 | Kitchen small appliance 1 | 20A GFCI/AFCI | #12 | left counter run | 4 |
 | 12 | Kitchen small appliance 2 | 20A GFCI/AFCI | #12 | island, front counter | 3 |
@@ -613,8 +613,8 @@ One row per switch leg. Pick a row to light up its switch and lights on the draw
 | L90 | exterior LED, wet location, dark-sky | Outside: outside, on the house wall, 0" from the garage-door wall, 39'-1" from the master bedroom's rear wall | 84" | 36 | garage door coach light |
 | L91 | exterior LED, wet location, dark-sky | Outside: outside, on the house wall, 0" from the garage-door wall, 52'-1" from the master bedroom's rear wall | 84" | 36 | garage door coach light |
 | L92 | exterior LED, wet location, dark-sky | Outside: outside, on the house wall, 0" from the garage-door wall, 65'-1" from the master bedroom's rear wall | 84" | 36 | garage door coach light |
-| X4 | fused disconnect DS1, CU-1 | Outside: outside, on the house wall, 5'-4 1/2" from the garage-door wall, 31'-7" from the master bedroom's rear wall | 48" | 5-6 | left side yard, on the master closet wall beside the unit (M-1) |
-| R94 | weatherproof GFCI receptacle, in-use cover | Outside: outside, on the house wall, 5'-4 1/2" from the garage-door wall, 25'-7" from the master bedroom's rear wall | 24" | 30 | service receptacle within 25 ft of CU-1 (210.63) |
+| X4 | fused disconnect DS1, CU-1 | Outside: outside, on the house wall, 31'-0" from the garage-door wall, 54'-7" from the master bedroom's rear wall | 54" | 5-6 | front porch, on the garage wall beside the unit (M-1) |
+| R94 | weatherproof GFCI receptacle, in-use cover | Outside: outside, on the house wall, 31'-0" from the garage-door wall, 57'-7" from the master bedroom's rear wall | 24" | 30 | porch; service receptacle within 25 ft of CU-1 (210.63) |
 | X5 | fused disconnect DS2, CU-2 | Outside: outside, on the house wall, 83'-5 1/2" from the garage-door wall, 45'-0" from the master bedroom's rear wall | 48" | 7-8 | right side yard, on the bedroom 3 closet wall beside the unit (M-1) |
 | R95 | weatherproof GFCI receptacle, in-use cover | Outside: outside, on the house wall, 83'-5 1/2" from the garage-door wall, 40'-11" from the master bedroom's rear wall | 24" | 30 | service receptacle within 25 ft of CU-2 (210.63) |
 | X6 | low-voltage drop: Cat6 for a video doorbell | Outside: outside, on the house wall, 50'-11" from the garage-door wall, 53'-9" from the master bedroom's rear wall | 48" | 37 | right of the front door |
@@ -628,8 +628,8 @@ One row per switch leg. Pick a row to light up its switch and lights on the draw
 | Laundry circuit | 1 x 1,500 VA (18) | 1,500 VA |
 | Fixed appliances, nameplate | range, dryer, EV-ready, fridge, DW, disposal, hood, openers, boiler, water heater, media | 32,500 VA |
 | All other load, demand | first 10 kVA at 100%, rest at 40% (220.82(B)) | 25,222 VA |
-| Heating / cooling | two mini-split outdoor units at 100% (220.82(C)); radiant boiler and water heater are gas or propane (owner, 2026-10-13) | 10,800 VA |
-| Calculated load | 36,022 VA / 240 V | 150 A on a 200 A service |
+| Heating / cooling | two mini-split outdoor units at 100% (220.82(C)); radiant boiler and water heater are gas or propane (owner, 2026-10-13) | 9,600 VA |
+| Calculated load | 34,822 VA / 240 V | 145 A on a 200 A service |
 
 ### Bill of materials
 

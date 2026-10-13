@@ -586,7 +586,7 @@
    "devices": 228,
    "circuits": 32,
    "spaces": 40,
-   "amps": 150,
+   "amps": 145,
    "receptacles": 94,
    "lights": 91,
    "switches": 27
@@ -627,7 +627,7 @@
   ],
   "E-1": [
    "Range fuel: the 48\" range is drawn electric on a 50A circuit. A gas or dual-fuel range drops that to a 120V receptacle and adds a gas line.",
-   "Mini-split breakers are sized from M-1's nominal units (CU-1 18k on 20A/#12, CU-2 36k on 40A/#8; 30A/#10 if the chosen model's MOP allows); set them to the nameplate MCA/MOCP of the units bought. If the living head moves to CU-1, CU-1 grows and 5-6 goes to 25-30A.",
+   "Mini-split breakers are sized from M-1's nominal units (two 24k 3-port units, MCA about 20A, on 25A/#10); set them to the nameplate MCA/MOCP of the units bought.",
    "Utility service: overhead or underground, and which side of the house the meter goes on. The meter-main is drawn on the garage wall facing the porch end.",
    "EV-ready: a 50A NEMA 14-50 receptacle is drawn in the garage. Keep, swap for a hardwired charger, or drop?",
    "Mounting heights: standard heights are drawn. Zero Rd used 30\" receptacles and 42\" switches for accessibility; say if this house should match.",

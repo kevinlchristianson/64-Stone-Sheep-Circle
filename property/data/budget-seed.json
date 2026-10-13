@@ -217,7 +217,7 @@
    "qty": 1,
    "unit": "lot",
    "price": 6500,
-   "basis": "load calc about 150 A"
+   "basis": "load calc about 145 A"
   },
   {
    "id": "b25",

@@ -35,8 +35,8 @@ ROOMNAME = {**{r['id']: r['name'] for r in HOUSE['rooms']}, 'outside': 'Outside'
 CIRCUITS = [
     ('1-2', '240V 50A 2P', '#6 Cu', 'Range, 48" electric', 'kitchen, left wall', '240', 12000),
     ('3-4', '240V 30A 2P', '#10 Cu', 'Dryer', 'laundry', '240', 5000),
-    ('5-6', '240V 20A 2P', '#12 Cu', 'Mini-split CU-1, 18k (master, dining heads)', 'left side yard, master closet wall; heads fed from the unit (MCA ~17A)', '240', 4080),
-    ('7-8', '240V 40A 2P', '#8 Cu', 'Mini-split CU-2, 36k (bedrooms 1-3, living heads)', 'right side yard, bedroom 3 closet wall; heads fed from the unit (MCA ~28A, MOP 35-40A)', '240', 6720),
+    ('5-6', '240V 25A 2P', '#10 Cu', 'Mini-split CU-1, 24k (master, dining, living heads)', 'front porch, west end, against the mechanical room wall; heads fed from the unit (MCA ~20A)', '240', 4800),
+    ('7-8', '240V 25A 2P', '#10 Cu', 'Mini-split CU-2, 24k (bedrooms 1-3 heads)', 'right side yard, bedroom 3 closet wall; heads fed from the unit (MCA ~20A)', '240', 4800),
     ('9-10', '240V 50A 2P', '#6 Cu', 'EV-ready receptacle (NEMA 14-50)', 'garage, front wall', '240', 9600),
     ('11', '20A GFCI/AFCI', '#12', 'Kitchen small appliance 1', 'left counter run', 'rec', 1500),
     ('12', '20A GFCI/AFCI', '#12', 'Kitchen small appliance 2', 'island, front counter', 'rec', 1500),
@@ -373,8 +373,8 @@ at(WP, 'patio', 63.0, 16.39, 'front', 24, '', '30')
 at(EXT, 'outside', 5.15, 36.67, 'front', 78, '', '36', ['garage-ext'], note='service door')
 for y in (39.1, 52.1, 65.1):
     at(EXT, 'outside', 0.0, y, 'right', 84, '', '36', ['garage-ext'], note='garage door coach light')
-at(DISC, 'outside', 5.373, 31.6, 'right', 48, '', '5-6', legend='fused disconnect DS1, CU-1', note='left side yard, on the master closet wall beside the unit (M-1)')
-at(WP, 'outside', 5.373, 25.6, 'right', 24, '', '30', note='service receptacle within 25 ft of CU-1 (210.63)')
+at(DISC, 'outside', 31.0, 54.6, 'left', 54, '', '5-6', legend='fused disconnect DS1, CU-1', note='front porch, on the garage wall beside the unit (M-1)')
+at(WP, 'outside', 31.0, 57.6, 'left', 24, '', '30', note='porch; service receptacle within 25 ft of CU-1 (210.63)')
 at(DISC, 'outside', 83.44, 45.0, 'left', 48, '', '7-8', legend='fused disconnect DS2, CU-2', note='right side yard, on the bedroom 3 closet wall beside the unit (M-1)')
 at(WP, 'outside', 83.44, 40.9, 'left', 24, '', '30', note='service receptacle within 25 ft of CU-2 (210.63)')
 at(LV, 'outside', 50.9, 53.73, 'rear', 48, '', '37', legend='low-voltage drop: Cat6 for a video doorbell', note='right of the front door')
@@ -747,13 +747,13 @@ def build():
         'Lighting circuits by area, whole switch legs only: 33 master suite, master hall, laundry, powder, mud room; 34 kitchen, dining, pantry, mech room, living, entry, coat closet, porch and patio; 35 office, bedroom wing and every smoke and CO alarm (so a tripped alarm circuit shows as dark lights). Garage and garage exterior lights on 36. Each is well under the 1,440 W continuous limit of a 15A circuit at LED design wattages.',
         'Smoke alarms in every bedroom and the office; smoke + CO combination alarms outside each sleeping area (master hall, bedroom hall, entry outside the office). All 120V, interconnected, battery backup (IRC R314, R315; CO because of the attached garage, the wood fireplace and the gas boiler).',
         'Bath exhaust fans 110 CFM with humidity sensing and an integrated LED light: the light switches with the room\'s other lights, the fan on its own rocker with a timer (14/3 from the bank). Ducted outside in rigid duct.',
-        'Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (18k) sits in the left side yard on the master closet wall and CU-2 (36k) in the right side yard behind the bedroom 3 closet, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).',
+        'Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (24k, master, dining and living heads) sits under the west end of the front porch against the mechanical room wall and CU-2 (24k, bedrooms 1-3) in the right side yard behind the bedroom 3 closet, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).',
         'Radiant (R-1): the wall-hung boiler HS-1, its system circulator and the zone controller share 15A circuit 31 with a service switch at the boiler, and each remote manifold station has a receptacle on 31 for its actuator wiring module (MF-1 laundry, MF-2/MF-G on the garage side of the mud room wall with the garage circulator, MF-3 bedroom hall). The water heater\'s power vent is on 32. Thermostats are 24V back to the zone controller, not line voltage. The MF-3 cabinet sits below the hall 3-way S at 48".',
         'Low voltage: Cat6 home runs to the media panel on the pantry\'s mech-room wall (master and living TV boxes, office desk, video doorbell at the front door), powered from circuit 37.',
     ]
     open_items = [
         'Range fuel: the 48" range is drawn electric on a 50A circuit. A gas or dual-fuel range drops that to a 120V receptacle and adds a gas line.',
-        'Mini-split breakers are sized from M-1\'s nominal units (CU-1 18k on 20A/#12, CU-2 36k on 40A/#8; 30A/#10 if the chosen model\'s MOP allows); set them to the nameplate MCA/MOCP of the units bought. If the living head moves to CU-1, CU-1 grows and 5-6 goes to 25-30A.',
+        'Mini-split breakers are sized from M-1\'s nominal units (two 24k 3-port units, MCA about 20A, on 25A/#10); set them to the nameplate MCA/MOCP of the units bought.',
         'Utility service: overhead or underground, and which side of the house the meter goes on. The meter-main is drawn on the garage wall facing the porch end.',
         'EV-ready: a 50A NEMA 14-50 receptacle is drawn in the garage. Keep, swap for a hardwired charger, or drop?',
         'Mounting heights: standard heights are drawn. Zero Rd used 30" receptacles and 42" switches for accessibility; say if this house should match.',

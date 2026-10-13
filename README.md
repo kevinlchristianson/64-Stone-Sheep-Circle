@@ -19,6 +19,7 @@ Two web apps built from the owner's plans for 64 Stone Sheep Circle ("Larson Hou
 1. Cloudflare dashboard > **Workers & Pages > Create > Import a repository**: pick `64-Stone-Sheep-Circle`, branch `main`, and keep the default deploy command (`npx wrangler deploy`). It deploys as `64-stone-sheep-circle.<your-subdomain>.workers.dev`, and redeploys on every push to `main`.
 2. In the new Worker: **Settings > Domains & Routes > workers.dev > Enable Cloudflare Access**. Open the Access application it creates (**Zero Trust > Access > Applications**), set its policy to allow only your email, and copy its **Application Audience (AUD) tag**. Your **team name** is under **Zero Trust > Settings > Custom pages** (the part before `.cloudflareaccess.com`).
 3. Put both in `wrangler.jsonc` as `ACCESS_TEAM` and `ACCESS_AUD` and push. Until they're set, the property pages answer "finish the Access setup" instead of opening.
+4. If the property pages still say "finish the Access setup" after that, the live Worker is an old build: check **Settings > Builds** shows the repo connected (not "disconnected from your Git account") with production branch `main`, and that **Deployments** lists a build of the latest `main` commit.
 
 The budget then saves to the Worker's store as well as the browser, and every device signed in sees the same ledger (the newer copy wins). Opened anywhere else (GitHub Pages, from disk) it stays in that browser only.
 

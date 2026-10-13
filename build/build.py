@@ -18,7 +18,7 @@ import base64, html, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
-VERSION = 'v4'
+VERSION = 'v5'
 
 import plan, framing, electrical, plumbing, hvac   # noqa: E402
 import structure3d                                  # noqa: E402
@@ -42,6 +42,7 @@ def table_html(t, key):
         tds = ''.join(f'<td class="{"num" if i and NUM.match(str(c).strip()) else ""}">{esc(c)}</td>' for i, c in enumerate(cells))
         body.append(f'<tr data-id="{esc(rid)}" tabindex="0">{tds}</tr>' if rid else f'<tr>{tds}</tr>')
     lede = f'<p class="lede">{esc(t["lede"])}</p>' if t.get('lede') else ''
+    if t.get('feed'): lede += f'<p class="feed">{esc(t["feed"])}</p>'   # E-1: the panel's feed line above the circuit schedule
     return f'<section class="wide"><h3>{esc(t["title"])}</h3>{lede}<div class="tbl"><table><thead><tr>{heads}</tr></thead><tbody>{"".join(body)}</tbody></table></div></section>'
 
 
@@ -123,12 +124,7 @@ li {{ margin: 0 0 4px; }}
 
 def trade3d(e, p, m):
     items = []
-    names = {'rec': 'Receptacle', 'rec-gfci': 'GFCI receptacle', 'rec-20': 'Washer receptacle', 'rec-240': 'Dryer receptacle', 'rec-wr': 'Exterior receptacle', 'switch': 'Switch',
-             'light': 'Light', 'can': 'Recessed light', 'pend': 'Pendant', 'strip': 'Under-cabinet light', 'wall-light': 'Wall light', 'fan': 'Fan', 'appl': 'Appliance circuit', 'smoke': 'Smoke alarm', 'smoke-co': 'Smoke/CO alarm'}
-    for d in e['devices']:
-        h = d['h'] if d['h'] is not None else 1.0
-        if d['kind'] in ('light', 'can', 'pend', 'fan', 'smoke', 'smoke-co') and d['h'] is None: h = 8.85
-        items.append(dict(layer='elec', x=d['at'][0], y=d['at'][1], h=min(h, 8.85), size=0.45, name=f"{d['id']} · {names[d['kind']]}", text=d['desc']))
+    # E-1 devices are built by the model script's buildElectrical() from DATA.elec3d
     for f in HOUSE['fixtures']:
         if f['kind'] in plumbing.TABLE:
             items.append(dict(layer='plumb', x=f['at'][0], y=f['at'][1], h=0.3, size=0.35, name=f"{f['id']} · {f['name']}", text='drain and supply, see P-1'))
@@ -168,7 +164,7 @@ def main():
 
     items, lines = trade3d(built['e1'][2], built['p1'][2], built['m1'][2])
     house_lite = {k: HOUSE[k] for k in ('meta', 'rooms', 'windows', 'doors', 'fixtures', 'posts', 'walls', 'totals')}
-    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]))
+    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]), elec3d=built['e1'][2]['devices'])
     floor = plan.build()['sheet']
     floor.L['grid'] = []; floor.L['title'] = []; floor.L['tags'] = []
     floor_svg = base64.b64encode(floor.svg().encode()).decode()

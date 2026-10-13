@@ -1,9 +1,17 @@
 rules_version = '2';
 // Crew chat: anyone signed in to the app (anonymous sign-in) can read the room and post.
-// A message can't be edited, only deleted by whoever sent it. Paste this into
+// A message can't be edited, only deleted by whoever sent it.
+// Open items: anyone signed in can add an item to a sheet, optionally on one picked item (`ref`);
+// only its author (or an owner below) can delete it; owners can also hide an item drawn on a sheet,
+// and anyone can resolve an item (a doc in `done`) or reopen it (delete that doc). Paste this into
 // Firebase console > Firestore Database > Rules and press Publish.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Owners can delete anyone's open item and hide the ones drawn on a sheet. These are app sign-in IDs (one per
+    // browser) in this job's Firebase project, so Zero Rd's IDs don't carry over; keep the list in step with `owners`
+    // in chat-config.js. Until an ID is added here, nobody is an owner. (The Chat tab shows a phone's ID while the list is empty.)
+    function isOwner() { return request.auth.uid in []; }
+
     match /rooms/{room}/messages/{id} {
       allow read: if request.auth != null;
       allow create: if request.auth != null
@@ -16,6 +24,43 @@ service cloud.firestore {
         && (!('trade' in request.resource.data) || (request.resource.data.trade is string && request.resource.data.trade.size() <= 40))
         && (!('sheet' in request.resource.data) || (request.resource.data.sheet is string && request.resource.data.sheet.size() <= 120));
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    match /rooms/{room}/items/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['sheet', 'ref', 'text', 'name', 'trade', 'uid', 'at'])
+        && request.resource.data.keys().hasAll(['sheet', 'text', 'name', 'uid', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.at == request.time
+        && request.resource.data.sheet is string && request.resource.data.sheet.size() > 0 && request.resource.data.sheet.size() <= 20
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 40
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+        && (!('trade' in request.resource.data) || (request.resource.data.trade is string && request.resource.data.trade.size() <= 40))
+        && (!('ref' in request.resource.data) || (request.resource.data.ref is string && request.resource.data.ref.size() <= 60));
+      allow delete: if request.auth != null && (resource.data.uid == request.auth.uid || isOwner());
+    }
+    // Owners can hide an open item drawn on a sheet (doc id = the drawn item's b-<sheet>-<hash> key).
+    match /rooms/{room}/hidden/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && isOwner()
+        && id.size() <= 80
+        && request.resource.data.keys().hasOnly(['uid', 'at'])
+        && request.resource.data.keys().hasAll(['uid', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.at == request.time;
+      allow delete: if request.auth != null && isOwner();
+    }
+    match /rooms/{room}/done/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && id.size() <= 80
+        && request.resource.data.keys().hasOnly(['name', 'uid', 'at'])
+        && request.resource.data.keys().hasAll(['name', 'uid', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.at == request.time
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 40;
+      allow delete: if request.auth != null;
     }
   }
 }

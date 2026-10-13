@@ -4,7 +4,7 @@ Two web apps built from the owner's plans for 64 Stone Sheep Circle ("Larson Hou
 
 | Folder | App | Who it's for |
 | --- | --- | --- |
-| `contractor/` | **Contractor App**: one page with a 3D model, the A-1 plan, S-1 framing, E-1 electrical, P-1 plumbing and M-1 HVAC sheets (every symbol tappable), printable packets, the owner's original sheets, and crew chat. Installs as a phone app. | The crews |
+| `contractor/` | **Contractor App**: the same format, layers and features as the 7824 Zero Rd contractor app. A 3D model with layers, the A-1 plan, S-1 framing, E-1 electrical, P-1 plumbing and M-1 HVAC sheets (every symbol tappable, schedules one pane at a time), shared open items you can resolve or comment on, printable packets, the owner's original sheets, and crew chat. Installs as a phone app. | The crews |
 | `property/` | **Property App**: construction budget and payment ledger, rooms and open questions, hour-by-hour heating and cooling on Powell, WY weather, and the contractor app inside it. Installs as a phone app. | The owner |
 
 `index.html` at the root links to both. Everything is static files, so any static host works.

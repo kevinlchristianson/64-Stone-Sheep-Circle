@@ -354,14 +354,13 @@ tbody tr:last-child td { border-bottom: 0; }
           <label class="toggle"><input type="checkbox" id="ly-ext" checked><span class="sw" style="background:#8b8578"></span> Finished exterior walls: board-and-batten siding, windows, exterior doors, porch and patio posts</label>
           <label class="toggle"><input type="checkbox" id="ly-framing"><span class="sw" style="background:#c9a46a"></span> Framing: studs, plates, headers (S-1); green staggered, magenta blocking</label>
           <label class="toggle"><input type="checkbox" id="ly-elec" checked><span class="sw" style="background:#d08a00"></span> Electrical devices and lights (E-1)</label>
-          <label class="toggle"><input type="checkbox" id="ly-plumb" checked><span class="sw" style="background:#2c6aa0"></span> Plumbing: drains, stacks, supply (P-1)</label>
+          <label class="toggle"><input type="checkbox" id="ly-plumb" checked><span class="sw" style="background:#2c6aa0"></span> Plumbing: drains and PEX supply under the slab, vents up the walls and across the attic, stacks through the roof, floor drains (P-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-hvac" checked><span class="sw" style="background:#e3a05a"></span> HVAC: mini-split heads, outdoor units and line sets (M-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-trusses"><span class="sw" style="background:#a98a5c"></span> Roof trusses: 6:12 at 24" o.c., scissors over the kitchen and living vault, girder G1 (S-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-roof"><span class="sw" style="background:#3b3d40"></span> Roof: massing from A-2</label>
           <label class="toggle"><input type="checkbox" id="ly-radiant" checked><span class="sw" style="background:#c62828"></span> Radiant floor heat: PEX loops in the slab, manifolds and the boiler (R-1); red zone 1, orange 2, blue 3, green garage. Turn the plan drawing off to see the slab</label>
           <label class="toggle"><input type="checkbox" id="ly-furn" checked><span class="sw" style="background:#dfe8df"></span> Fixtures, cabinets and appliances (A-5)</label>
-          <label class="toggle"><input type="checkbox" id="ly-floor" checked><span class="sw" style="background:#ffffff"></span> Plan drawing on the floor (A-1)</label>
-          <label class="toggle"><input type="checkbox" id="ly-grid" checked><span class="sw" style="background:#2c6aa0"></span> 5' grid from the 0,0 datum (rear-left layout corner, as every sheet)</label>
+          <label class="toggle"><input type="checkbox" id="ly-floor" checked><span class="sw" style="background:#ffffff"></span> Plan drawing on the floor and the slab (A-1); turn it off to see everything under the slab</label>
           <div class="cut">
             <label for="cut">Cut the walls at</label>
             <input type="range" id="cut" min="1" max="{{CUTMAX}}" step="0.25" value="{{CUTMAX}}">
@@ -828,13 +827,13 @@ const MAT = {
   roof: new THREE.MeshStandardMaterial({ color: 0x34373b, roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }),
   radiant: mat(0x6a1b9a),
   elec: mat(0xc8650a), rec: mat(0xc8650a), sw: mat(0x8a5a00), light: mat(0xfff2c4, { emissive: 0xd9a400, emissiveIntensity: 0.35 }), alarm: mat(0xb4462f), panel: mat(0x333333), lv: mat(0x1f5f8b),
-  plumb: mat(0x3c3a36), cold: mat(0x2c6aa0, { roughness: 0.4 }), hvac: mat(0xe3a05a, { roughness: 0.6, transparent: true, opacity: 0.85 }),
+  plumb: mat(0x3c3a36), drain: mat(0x3c3a36, { roughness: 0.5 }), vent: mat(0x4c8c4a, { roughness: 0.5 }), cold: mat(0x2c6aa0, { roughness: 0.4 }), hot: mat(0xc8382b, { roughness: 0.4 }), hvac: mat(0xe3a05a, { roughness: 0.6, transparent: true, opacity: 0.85 }),
   hi: mat(0xe08a00, { emissive: 0x4a2a00 }),
 };
 function setCut(h) { const on = h < CUT_MAX - 0.01; cutPlane.constant = h; for (const m of cutMats) { m.clippingPlanes = on ? [cutPlane] : null; m.needsUpdate = true; } }
 
 // ---------------------------------------------------------------- groups (layers)
-const LAYERS = ['floor', 'walls', 'ext', 'framing', 'furn', 'trusses', 'roof', 'elec', 'plumb', 'hvac', 'grid', 'radiant'];
+const LAYERS = ['floor', 'walls', 'ext', 'framing', 'furn', 'trusses', 'roof', 'elec', 'plumb', 'hvac', 'radiant'];
 const G = {}; for (const k of ['ground', ...LAYERS]) { G[k] = new THREE.Group(); scene.add(G[k]); }
 const pickables = [], PICK_FX = [];   // PICK_FX: layer hooks run after a pick (mesh) and on clear (null)
 function box(x0, y0, x1, y1, bottom, top, material, data, group) {
@@ -849,7 +848,22 @@ function box(x0, y0, x1, y1, bottom, top, material, data, group) {
 }
 
 // ---------------------------------------------------------------- ground and the floor slab, textured with the A-1 drawing
-box(-40, -30, 125, 105, -0.6, -0.5, MAT.ground, null, G.ground);
+// the ground has the house footprint cut out of it; the slab fills the hole and goes with the plan drawing (layer 'floor'), so turning
+// that layer off opens the ground and shows what is under the slab (drains, PEX, radiant) down to the bottom of a pit
+const occluders = [];   // not pickable, but a click on them stops there instead of picking something hidden underneath
+const FOOT = (DATA.footprint || []).map(([x, y]) => { const m = M(x, y); return new THREE.Vector2(m.x, -m.z); });
+function flatShape(pts) { const sh = new THREE.Shape(); pts.forEach((p, i) => i ? sh.lineTo(p.x, p.y) : sh.moveTo(p.x, p.y)); return sh; }
+(function ground() {
+  const outer = [M(-40, -30), M(125, -30), M(125, 105), M(-40, 105)].map(m => new THREE.Vector2(m.x, -m.z));
+  const sh = flatShape(outer); if (FOOT.length) sh.holes.push(new THREE.Path(FOOT));
+  const g = new THREE.ShapeGeometry(sh); g.rotateX(-Math.PI / 2);
+  const m = new THREE.Mesh(g, MAT.ground); m.position.y = -0.5; m.receiveShadow = true; m.userData.occluder = true; occluders.push(m); G.ground.add(m);
+  if (!FOOT.length) return;
+  const PIT = 5.0, pit = new THREE.ExtrudeGeometry(flatShape(FOOT), { depth: PIT, bevelEnabled: false }); pit.rotateX(-Math.PI / 2);
+  const pm = new THREE.Mesh(pit, new THREE.MeshStandardMaterial({ color: 0x8a7a62, roughness: 1, side: THREE.BackSide })); pm.position.y = -0.5 - PIT; pm.receiveShadow = true; G.ground.add(pm);
+  const slab = new THREE.ExtrudeGeometry(flatShape(FOOT), { depth: 0.5, bevelEnabled: false }); slab.rotateX(-Math.PI / 2);
+  const sm = new THREE.Mesh(slab, new THREE.MeshStandardMaterial({ color: 0xc9c4ba, roughness: 0.95 })); sm.position.y = -0.5; sm.receiveShadow = true; sm.userData.occluder = true; occluders.push(sm); G.floor.add(sm);
+})();
 (function floor() {
   const W = 84, D = 71, S = 11, MX = 60, MY = 60;
   const plateMat = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
@@ -873,7 +887,7 @@ box(-40, -30, 125, 105, -0.6, -0.5, MAT.ground, null, G.ground);
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.computeVertexNormals();
-  const plate = new THREE.Mesh(g, plateMat); plate.receiveShadow = true;
+  const plate = new THREE.Mesh(g, plateMat); plate.receiveShadow = true; plate.userData.occluder = true; occluders.push(plate);
   G.floor.add(plate);
 })();
 // porch and patio slabs belong with the exterior
@@ -932,6 +946,7 @@ for (const [x, y] of H.posts) box(x - 0.33, y - 0.33, x + 0.33, y + 0.33, 0, CEI
 // ---------------------------------------------------------------- fixtures, cabinets and appliances (A-5)
 const FH = { wc: 1.4, tub: 1.8, lav: 2.8, sink: 3.0, shower: 0.1, drain: 0.05, cabinet: 3.0, island: 3.0, range: 3.0, ref: 6.0, dw: 2.9, washer: 3.2, dryer: 3.2, fireplace: 3.5 };
 for (const f of H.fixtures) {
+  if (f.kind === 'drain') continue;   // floor drains are on the plumbing layer
   const [x, y] = f.at, [w, d] = f.size, h = FH[f.kind] ?? 3;
   const material = f.kind === 'cabinet' || f.kind === 'island' ? MAT.counter : f.kind === 'fireplace' ? MAT.stone : MAT.fix;
   const data = { kind: 'furn', name: f.name, ref: f.id, text: f.id };
@@ -1001,6 +1016,30 @@ for (const t of T3) {
     else box(x, y - sz, x + nx * dp, y + sz, h - hz, h + hz, m, data, G.elec);
   }
 })();
+// ---------------------------------------------------------------- plumbing (P-1), as Zero Rd's buildPlumbing(): pipes as tubes at their real depth.
+// Drains under the slab with a riser to each fixture, stacks through the roof, vents up the walls and across the attic,
+// PEX home runs from the manifold under the slab and up to each fixture (build/plumbing.py model3d()).
+(function buildPlumbing() {
+  const P = DATA.plumb3d; if (!P) return;
+  const tube = (a, b, r, material, data) => {
+    const p = M(a[0], a[1]), q = M(b[0], b[1]);
+    const va = new THREE.Vector3(p.x, a[2], p.z), vb = new THREE.Vector3(q.x, b[2], q.z), len = va.distanceTo(vb);
+    if (len < 1e-3) return;
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len + r, 10), material);   // + r: the ends overlap at the bends
+    m.position.copy(va).add(vb).multiplyScalar(0.5);
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), vb.clone().sub(va).normalize());
+    m.castShadow = true; m.userData = data; pickables.push(m); G.plumb.add(m);
+  };
+  for (const p of P) {
+    const data = { kind: 'plumb', name: p.name, ref: p.ref, text: p.text }, material = MAT[p.m];
+    if (p.shape === 'box') { const [x0, y0, x1, y1, b, t] = p.box; box(x0, y0, x1, y1, b, t, material, data, G.plumb); continue; }
+    if (p.shape === 'cyl') {
+      const c = M(p.at[0], p.at[1]), m = new THREE.Mesh(new THREE.CylinderGeometry(p.r, p.r, p.h[1] - p.h[0], 24), material);
+      m.position.set(c.x, (p.h[0] + p.h[1]) / 2, c.z); m.castShadow = true; m.userData = data; pickables.push(m); G.plumb.add(m); continue;
+    }
+    for (let i = 1; i < p.pts.length; i++) tube(p.pts[i - 1], p.pts[i], p.r, material, data);
+  }
+})();
 for (const line of DATA.lines3d) {
   const g = G[line.layer], material = line.color ? (MAT[line.color] ??= mat(parseInt(line.color.slice(1), 16))) : line.layer === 'plumb' ? MAT.plumb : MAT.hvac, r = line.r || 0.2;
   if (!g) continue;
@@ -1009,7 +1048,7 @@ for (const line of DATA.lines3d) {
     box(Math.min(x0, x1) - r, Math.min(y0, y1) - r, Math.max(x0, x1) + r, Math.max(y0, y1) + r, line.h - r, line.h + r, material, { kind: line.layer, name: line.name, ref: line.ref, text: line.text || '' }, g);
   }
 }
-// ---------------------------------------------------------------- structure layers: framing, roof trusses, the datum grid (build/structure3d.py)
+// ---------------------------------------------------------------- structure layers: framing and roof trusses (build/structure3d.py)
 (function structure() {
   const ST = DATA.struct3d; if (!ST) return;
   const SM = { wood: mat(0xc9a46a, { roughness: 0.8 }), sound: mat(0xa8c49a, { roughness: 0.8 }), header: mat(0xa9824a, { roughness: 0.8 }), pt: mat(0x8f9f7a, { roughness: 0.8 }), block: mat(0xc2369a, { roughness: 0.7 }), wood6: mat(0x9fb6c9, { roughness: 0.8 }),
@@ -1049,27 +1088,6 @@ for (const line of DATA.lines3d) {
     add(merged(parts), SM[t.k === 'girder' ? 'girder' : t.k === 'rafter' ? 'rafter' : 'truss'], G.trusses, { kind: 'truss', name: t.name, text: t.text, ref: t.ref });
   }
   for (const b of ST.beams) { const [x0, y0, x1, y1, lo, hi] = b.box; box(x0, y0, x1, y1, lo, hi, SM.beam, { kind: 'truss', name: b.name, text: b.text }, G.trusses); }
-  // the grid: string lines on the slab every 5', labels at both ends, the datum target at 0,0
-  const g = ST.grid, [gx0, gy0, gx1, gy1] = g.extent, pts = [];
-  for (const x of g.x) { const a = M(x, gy0), b = M(x, gy1); pts.push(a.x, 0.05, a.z, b.x, 0.05, b.z); }
-  for (const y of g.y) { const a = M(gx0, y), b = M(gx1, y); pts.push(a.x, 0.05, a.z, b.x, 0.05, b.z); }
-  const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-  G.grid.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x2c6aa0, transparent: true, opacity: 0.55 })));
-  function label(text, x, y, size = 1.1, color = '#2c6aa0') {
-    const cv = document.createElement('canvas'), ctx = cv.getContext('2d'), fs = 64;
-    ctx.font = `700 ${fs}px IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif`;
-    cv.width = Math.ceil(ctx.measureText(text).width + 24); cv.height = fs + 20;
-    ctx.font = `700 ${fs}px IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif`; ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.fillStyle = color; ctx.textBaseline = 'middle'; ctx.fillText(text, 12, cv.height / 2);
-    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthWrite: false }));
-    const p = M(x, y); sp.position.set(p.x, 0.6, p.z); sp.scale.set(size * cv.width / cv.height, size, 1); G.grid.add(sp); return sp;
-  }
-  for (const x of g.x) { label(String(x), x, gy0 - 1.2); label(String(x), x, gy1 + 1.2); }
-  for (const y of g.y) { label(String(y), gx0 - 1.6, y); label(String(y), gx1 + 1.6, y); }
-  label('0,0 datum', 4.2, -3.6, 1.3);
-  const tgt = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.12, 32), new THREE.MeshBasicMaterial({ color: 0x2c6aa0 }));
-  const d0 = M(0, 0); tgt.position.set(d0.x, 0.08, d0.z); tgt.userData = { kind: 'grid', name: '0,0 datum', text: g.note }; pickables.push(tgt); G.grid.add(tgt);
 })();
 
 // ---------------------------------------------------------------- HVAC (M-1): ductless mini-splits
@@ -1149,7 +1167,8 @@ const HI_FREE = new THREE.MeshStandardMaterial({ color: 0xe08a00, emissive: 0x4a
     add(tubes(segs, 0.1), RM.feed, d);
   }
   { const h = R.hs; box(h.box[0], h.box[1], h.box[2], h.box[3], h.z[0], h.z[1], RM.boiler, { kind: 'radiant', name: h.name, ref: h.id, text: h.text }, G.radiant); }
-  // the foam under the slab, the rooms' own outlines, so the loops read as tied down on it before the pour and no ground shows inside the house
+  // the foam under the slab, the rooms' own outlines, as a ghost so the loops read as tied down on it before the pour while the drains
+  // and PEX below (P-1) still show through and can be picked
   if (R.foam) {
     const pos = [], [lo, hi] = R.foam.z;
     for (const rm of H.rooms) {
@@ -1158,7 +1177,7 @@ const HI_FREE = new THREE.MeshStandardMaterial({ color: 0xe08a00, emissive: 0x4a
       for (const [a, b, c] of THREE.ShapeUtils.triangulateShape(pts, [])) for (const i of [a, c, b]) { const m = M(rm.poly[i][0], rm.poly[i][1]); pos.push(m.x, hi, m.z); }
     }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.computeVertexNormals();
-    const m = new THREE.Mesh(g, mat(0xdcd8cf, { roughness: 0.95 })); m.receiveShadow = true; m.userData = { kind: 'radiant', name: R.foam.name, ref: R.foam.ref, text: R.foam.text }; pickables.push(m); G.radiant.add(m);
+    G.radiant.add(new THREE.Mesh(g, mat(0xe4e0d8, { roughness: 0.95, transparent: true, opacity: 0.35, depthWrite: false })));
   }
   for (const t of R.stats) box(t.at[0] - 0.18, t.at[1] - 0.18, t.at[0] + 0.18, t.at[1] + 0.18, 4.6, 5.05, zone(t.color), { kind: 'radiant', name: t.name, ref: t.id, text: t.text }, G.radiant);
   // picking a loop dims the others, as the R-1 sheet does
@@ -1187,10 +1206,16 @@ renderer.domElement.addEventListener('pointerup', e => {
   const r = renderer.domElement.getBoundingClientRect();
   raycaster.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
   const shown = m => { for (let o = m; o; o = o.parent) if (!o.visible) return false; return true; };
-  // what sits below the slab top (radiant loops, under-slab plumbing) is covered while the plan drawing is on, so it is not picked through it
-  const covered = h => G.floor.visible && h.point.y < -0.005 && (h.object.parent === G.radiant || h.object.parent === G.plumb);
-  const hit = raycaster.intersectObjects(pickables.filter(shown), false).find(h => (h.point.y <= cutPlane.constant + 0.02 || !h.object.material.clippingPlanes) && !covered(h));
-  if (hit) pick(hit.object.userData.proxyFor || hit.object); else clearPick();
+  // nearest hit wins, except that a loop's invisible pad only catches what nothing else claims: a pipe or a tube seen through the pad
+  // is picked first, and an occluder (the slab, the ground) ends the search
+  let hit = null, pad = null;
+  for (const h of raycaster.intersectObjects([...pickables, ...occluders].filter(shown), false)) {
+    if (!(h.point.y <= cutPlane.constant + 0.02 || !h.object.material.clippingPlanes)) continue;
+    if (h.object.userData.occluder) break;
+    if (h.object.userData.proxyFor) { pad ??= h.object.userData.proxyFor; continue; }
+    hit = h.object; break;
+  }
+  if (hit || pad) pick(hit || pad); else clearPick();
 });
 
 // ---------------------------------------------------------------- start view, layers, loop

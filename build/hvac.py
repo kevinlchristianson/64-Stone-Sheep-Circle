@@ -104,7 +104,8 @@ LIVING_ON = 'CU-1'
 UNITS = {
     # CU-1 under the west end of the front porch (the owner's pick, 2026-10-13): out of the snow under the porch roof, the
     # garage wall screening it from the driveway side, and the mechanical-room attic right above it, so every head is under 70 ft
-    'CU-1': dict(at=(33.05, 55.3), axis='y', wall=53.733, stand=1.0, sub='Front porch, west end, against the mechanical room wall',
+    'CU-1': dict(at=(33.05, 55.3), axis='y', wall=53.733, stand=1.0, ds=(31.0, 54.6),  # DS1 on the garage's porch-side face, as E-1 has it
+                 sub='Front porch, west end, against the mechanical room wall',
                  why='Under the porch roof, so no roof snow lands on it and it needs only a low stand; the garage\'s side wall screens it from the driveway; the mechanical room behind it has no living space, and its attic connects to the garage, mud-room and office attics, so the master, dining and living line sets all stay under about 70 ft. It is at the front of the house: a slatted screen at the porch end hides it from the street.'),
     # on a 24" stand, its back 2'-6" off the wall so it sits outside the 1'-6" eave drip line of the metal roof
     'CU-2': dict(at=(86.52, 42.8), axis='x', wall=83.44, stand=2.0, sub='Right side yard, on the Bedroom 3 closet wall',
@@ -122,9 +123,10 @@ def unit_geo(u):
                     inside=lambda o: (u['wall'] + sg * 0.23, y + o), out=lambda o: (u['wall'], y + o), backo=lambda o: (x + sg * CU_D / 2, y + o),
                     ds=(u['wall'] - sg * 0.25, y + 2.6), ds3=(u['wall'] - sg * 0.08, y + 2.6), sg=sg, dist=abs(x - u['wall']))
     sg = 1 if u['wall'] > y else -1
+    ds = u.get('ds')
     return dict(rect=(x - CU_W / 2, y - CU_D / 2, x + CU_W / 2, y + CU_D / 2), back=(x, y + sg * CU_D / 2), wallpt=(x, u['wall']),
                 inside=lambda o: (x + o, u['wall'] + sg * 0.23), out=lambda o: (x + o, u['wall']), backo=lambda o: (x + o, y + sg * CU_D / 2),
-                ds=(x - CU_W / 2 - 0.6, u['wall'] - sg * 0.25), ds3=(x - CU_W / 2 - 0.6, u['wall'] - sg * 0.08), sg=sg, dist=abs(y - u['wall']))
+                ds=(ds[0] + 0.25, ds[1]) if ds else (x - CU_W / 2 - 0.6, u['wall'] - sg * 0.25), ds3=(ds[0] + 0.08, ds[1]) if ds else (x - CU_W / 2 - 0.6, u['wall'] - sg * 0.08), sg=sg, dist=abs(y - u['wall']))
 
 # (id, room, wall face side, centre along the wall, unit, rooms it serves, condensate, controller spot)
 HEADS = [
@@ -345,7 +347,7 @@ def build():
         'Heads mount high on the wall, top 6" below the ceiling, on a wall that lets them throw across the room. Exterior-wall heads drain condensate by gravity straight out the wall to a splash block; interior-wall heads (IU-2, IU-3) get a mini condensate pump behind the head that discharges outside with the line set.',
         'Line sets: from the unit in a painted line-hide to the wall, through a sealed sleeve about 18" up, inside the wall in their own stud bay to the attic, on the ceiling framing under the attic insulation, then down the wall to the head. The kitchen and living vault has no attic, so nothing crosses it. Pressure test, evacuate and pull a micron vacuum per the maker.',
         'CU-2 on a 24" stand above the snow, its back 2\'-6" off the wall so it sits outside the drip line of the metal roof (1\'-6" eaves), with snow guards on the roof above. CU-1 is under the porch roof on a 12" stand with its back 12" off the mechanical-room wall, discharging toward the open front of the porch; a slatted screen at the porch end hides it, with at least 12" clear around and nothing closing the front.',
-        'Each outdoor unit has a dedicated 240 V circuit and a fused disconnect on the wall within sight (DS1, DS2), sized to the nameplate MCA/MOCP once the units are picked (E-1). The heads are powered from their outdoor unit through the 14/4 interconnect run with the line set.',
+        'Each outdoor unit has a dedicated 240 V circuit and a fused disconnect on the wall within sight (DS1 on the garage's porch-side face beside CU-1, DS2 on the Bedroom 3 closet wall), sized to the nameplate MCA/MOCP once the units are picked (E-1). The heads are powered from their outdoor unit through the 14/4 interconnect run with the line set.',
         'Wired wall controllers T1-T6 at 48" by each door; set the heads to cool and to heat only below the slab\'s setpoint so they don\'t fight the radiant.',
         'Ventilation: with no ducts, the draft assumes continuous low-speed bath fans (exhaust-only, E-1) for the IRC whole-house rate; paired through-wall ERVs are the upgrade (see open items).',
     ]
@@ -387,7 +389,8 @@ def build():
                                   name=f"{cu} · {u['nominal'] // 1000}k {u['ports']}-port outdoor unit",
                                   text=f"{u['sub']}. Heads: " + ', '.join(f"{h['id']} {h['size'] // 1000}k" for h in u['heads']) + f'. {st * 12:.0f}" stand.'))
         dx, dy = g['ds3']
-        hv3d['parts'].append(dict(x0=dx - (0.1 if u['axis'] == 'x' else 0.3), y0=dy - (0.3 if u['axis'] == 'x' else 0.1), x1=dx + (0.1 if u['axis'] == 'x' else 0.3), y1=dy + (0.3 if u['axis'] == 'x' else 0.1),
+        vert = u['axis'] == 'x' or 'ds' in u      # disconnect on a wall running up the sheet
+        hv3d['parts'].append(dict(x0=dx - (0.1 if vert else 0.3), y0=dy - (0.3 if vert else 0.1), x1=dx + (0.1 if vert else 0.3), y1=dy + (0.3 if vert else 0.1),
                                   b=4.0, t=5.0, name=f"DS{cu[-1]} · disconnect for {cu}", text='240 V fused disconnect within sight of the unit (E-1)'))
         for k, h in enumerate(u['heads']):
             off = (k - (len(u['heads']) - 1) / 2) * 0.25

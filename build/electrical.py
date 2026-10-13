@@ -35,8 +35,8 @@ ROOMNAME = {**{r['id']: r['name'] for r in HOUSE['rooms']}, 'outside': 'Outside'
 CIRCUITS = [
     ('1-2', '240V 50A 2P', '#6 Cu', 'Range, 48" electric', 'kitchen, left wall', '240', 12000),
     ('3-4', '240V 30A 2P', '#10 Cu', 'Dryer', 'laundry', '240', 5000),
-    ('5-6', '240V 25A 2P', '#10 Cu', 'Mini-split CU-1, 24k (master, dining, living heads)', 'front porch, west end, against the mechanical room wall; heads fed from the unit (MCA ~20A)', '240', 4800),
-    ('7-8', '240V 25A 2P', '#10 Cu', 'Mini-split CU-2, 24k (bedrooms 1-3 heads)', 'right side yard, bedroom 3 closet wall; heads fed from the unit (MCA ~20A)', '240', 4800),
+    ('5-6', '240V 25A 2P', '#10 Cu', 'Mini-split CU-1, 24k (master, dining, living heads)', 'rear alcove between the master bedroom and the covered patio; heads fed from the unit (MCA ~20A)', '240', 4800),
+    ('7-8', '240V 25A 2P', '#10 Cu', 'Mini-split CU-2, 24k (bedrooms 1-3 heads)', 'right side yard, Bath 2 wall; heads fed from the unit (MCA ~20A)', '240', 4800),
     ('9-10', '240V 50A 2P', '#6 Cu', 'EV-ready receptacle (NEMA 14-50)', 'garage, front wall', '240', 9600),
     ('11', '20A GFCI/AFCI', '#12', 'Kitchen small appliance 1', 'left counter run', 'rec', 1500),
     ('12', '20A GFCI/AFCI', '#12', 'Kitchen small appliance 2', 'island, front counter', 'rec', 1500),
@@ -373,10 +373,10 @@ at(WP, 'patio', 63.0, 16.39, 'front', 24, '', '30')
 at(EXT, 'outside', 5.15, 36.67, 'front', 78, '', '36', ['garage-ext'], note='service door')
 for y in (39.1, 52.1, 65.1):
     at(EXT, 'outside', 0.0, y, 'right', 84, '', '36', ['garage-ext'], note='garage door coach light')
-at(DISC, 'outside', 31.0, 54.6, 'left', 54, '', '5-6', legend='fused disconnect DS1, CU-1', note='front porch, on the garage wall beside the unit (M-1)')
-at(WP, 'outside', 31.0, 57.6, 'left', 24, '', '30', note='porch; service receptacle within 25 ft of CU-1 (210.63)')
-at(DISC, 'outside', 83.44, 45.0, 'left', 48, '', '7-8', legend='fused disconnect DS2, CU-2', note='right side yard, on the bedroom 3 closet wall beside the unit (M-1)')
-at(WP, 'outside', 83.44, 40.9, 'left', 24, '', '30', note='service receptacle within 25 ft of CU-2 (210.63)')
+at(DISC, 'outside', 31.0, 3.5, 'left', 54, '', '5-6', legend='fused disconnect DS1, CU-1', note='rear alcove, on the master bedroom\'s east wall, in sight of the unit (M-1)')
+at(WP, 'outside', 31.0, 1.5, 'left', 24, '', '30', note='rear alcove; service receptacle within 25 ft of CU-1 (210.63)')
+at(DISC, 'outside', 83.44, 40.6, 'left', 54, '', '7-8', legend='fused disconnect DS2, CU-2', note='right side yard, on the Bath 2 wall beside the unit (M-1)')
+at(WP, 'outside', 83.44, 42.6, 'left', 24, '', '30', note='right side yard; service receptacle within 25 ft of CU-2 (210.63)')
 at(LV, 'outside', 50.9, 53.73, 'rear', 48, '', '37', legend='low-voltage drop: Cat6 for a video doorbell', note='right of the front door')
 
 PREFIX = {REC: 'R', USB: 'R', GFCI: 'R', R20: 'R', R240: 'R', WP: 'R', FLOOR: 'R', TV: 'R', DATA: 'R', LV: 'X',
@@ -747,7 +747,7 @@ def build():
         'Lighting circuits by area, whole switch legs only: 33 master suite, master hall, laundry, powder, mud room; 34 kitchen, dining, pantry, mech room, living, entry, coat closet, porch and patio; 35 office, bedroom wing and every smoke and CO alarm (so a tripped alarm circuit shows as dark lights). Garage and garage exterior lights on 36. Each is well under the 1,440 W continuous limit of a 15A circuit at LED design wattages.',
         'Smoke alarms in every bedroom and the office; smoke + CO combination alarms outside each sleeping area (master hall, bedroom hall, entry outside the office). All 120V, interconnected, battery backup (IRC R314, R315; CO because of the attached garage, the wood fireplace and the gas boiler).',
         'Bath exhaust fans 110 CFM with humidity sensing and an integrated LED light: the light switches with the room\'s other lights, the fan on its own rocker with a timer (14/3 from the bank). Ducted outside in rigid duct.',
-        'Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (24k, master, dining and living heads) sits under the west end of the front porch against the mechanical room wall and CU-2 (24k, bedrooms 1-3) in the right side yard behind the bedroom 3 closet, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).',
+        'Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (24k, master, dining and living heads) sits in the rear alcove between the master bedroom and the covered patio, and CU-2 (24k, bedrooms 1-3) in the right side yard against the Bath 2 wall, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).',
         'Radiant (R-1): the wall-hung boiler HS-1, its system circulator and the zone controller share 15A circuit 31 with a service switch at the boiler, and each remote manifold station has a receptacle on 31 for its actuator wiring module (MF-1 laundry, MF-2/MF-G on the garage side of the mud room wall with the garage circulator, MF-3 bedroom hall). The water heater\'s power vent is on 32. Thermostats are 24V back to the zone controller, not line voltage. The MF-3 cabinet sits below the hall 3-way S at 48".',
         'Low voltage: Cat6 home runs to the media panel on the pantry\'s mech-room wall (master and living TV boxes, office desk, video doorbell at the front door), powered from circuit 37.',
     ]

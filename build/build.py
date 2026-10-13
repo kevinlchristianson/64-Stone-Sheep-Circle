@@ -18,7 +18,7 @@ import base64, html, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
-VERSION = 'v6'
+VERSION = 'v7'
 
 import plan, framing, electrical, plumbing, hvac, radiant   # noqa: E402
 import structure3d                                  # noqa: E402
@@ -53,7 +53,7 @@ def summary_html(key, s):
         'e1': [('devices', 'devices'), ('receptacles', 'receptacles'), ('lights', 'lights'), ('switches', 'switches'), ('circuits', 'circuits'), ('amps', 'A calculated load')],
         'p1': [('fixtures', 'fixtures'), ('dfu', 'DFU'), ('wsfu', 'WSFU'), ('stacks', 'stacks')],
         'r1': [('loops', 'loops'), ('tube_ft', 'ft of 1/2" PEX'), ('manifolds', 'manifolds'), ('house_heat', 'Btu/h house'), ('heat', 'Btu/h with the garage'), ('supply_f', '°F supply at design')],
-        'm1': [('heat', 'Btu/h heating'), ('cool', 'Btu/h cooling'), ('tons', 'ton heat pump'), ('cfm', 'CFM'), ('registers', 'supply registers'), ('backup_kw', 'kW backup heat')],
+        'm1': [('heat', 'Btu/h heating'), ('cool', 'Btu/h cooling'), ('units', 'outdoor units'), ('tons', 'tons of mini-split'), ('heads', 'wall heads')],
     }.get(key, [])
     items = ''.join(f'<li><b>{s[k]:,}</b> {esc(v)}</li>' if isinstance(s[k], int) else f'<li><b>{s[k]:g}</b> {esc(v)}</li>' for k, v in labels if k in s)
     return f'<ul class="summary">{items}</ul>'
@@ -134,11 +134,8 @@ def trade3d(e, p, m):
         items.append(dict(layer='plumb', x=s['at'][0], y=s['at'][1], h=9.5, size=0.3, name=f"{s['id']} · vent", text='vent through the roof'))
     for h in p['hose']:
         items.append(dict(layer='plumb', x=h['at'][0], y=h['at'][1], h=1.5, size=0.35, cold=True, name=h['id'], text=h['name']))
-    for r in m['regs']:
-        items.append(dict(layer='hvac', x=r['at'][0], y=r['at'][1], h=8.9, size=0.9, name=r['id'], text=r['name']))
     # stacks drawn as tall thin boxes: give them height via two points (bottom and top)
     lines = [dict(layer='plumb', name=l['name'], pts=l['pts'], h=0.15, r=l['r']) for l in p['lines']]
-    lines += [dict(layer='hvac', name='Supply trunk (attic)', pts=t, h=9.8, r=0.45) for t in m['trunks']]
     return items, lines
 
 
@@ -171,13 +168,13 @@ def main():
     items, lines = trade3d(built['e1'][2], built['p1'][2], built['m1'][2])
     ri, rl = radiant3d(built['r1'][2]); items += ri; lines += rl
     house_lite = {k: HOUSE[k] for k in ('meta', 'rooms', 'windows', 'doors', 'fixtures', 'posts', 'walls', 'totals')}
-    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]), elec3d=built['e1'][2]['devices'])
+    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]), elec3d=built['e1'][2]['devices'], hvac3d=built['m1'][2]['hvac3d'])
     floor = plan.build()['sheet']
     floor.L['grid'] = []; floor.L['title'] = []; floor.L['tags'] = []
     floor_svg = base64.b64encode(floor.svg().encode()).decode()
     t = HOUSE['totals']; hv = built['m1'][2]['summary']; el = built['e1'][2]['summary']
     facts = [('Heated', f"{t['heated_gross_sf']:,} sq ft"), ('Garage', f"{t['garage_gross_sf']:,} sq ft"), ('Porch / patio', f"{t['porch_sf']} / {t['patio_sf']} sq ft"),
-             ('Bedrooms', '3 + office'), ('Baths', '2 full + master + powder'), ('Ceilings', "9' · 4:12 vault"), ('Heat pump', f"{hv['tons']:g} tons (draft)"), ('Service', f"200 A ({el['amps']} A calc.)")]
+             ('Bedrooms', '3 + office'), ('Baths', '2 full + master + powder'), ('Ceilings', "9' · 4:12 vault"), ('Cooling', f"{hv['units']} mini-splits, {hv['heads']} heads"), ('Service', f"200 A ({el['amps']} A calc.)")]
     plans_html = []
     captions = [('A-1', 'First floor plan with room sizes and dimensions'), ('A-2', 'Roof plan over the floor plan: pitches, vaulted ceiling notes'), ('A-3', 'Site plan with the north arrow'),
                 ('A-3', 'Front and rear elevations'), ('A-4', 'Left and right elevations'), ('A-5', 'Floor plan with fixtures, cabinets and appliances')]

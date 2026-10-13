@@ -39,7 +39,7 @@ def build(house):
     add('Exterior', 'Board-and-batten siding and trim', siding, 'sq ft', 9, f'about {siding:,} sq ft of wall')
     add('Exterior', 'Stone veneer on the garage gable', 260, 'sq ft', 32, 'A-3 front elevation')
     add('Exterior', 'Porch and patio posts, beams and ceilings', t['porch_sf'] + t['patio_sf'], 'sq ft', 28, '')
-    add('Mechanical', 'Heat pump, air handler, ducts and ERV', 1, 'lot', 30000, f"{tr['m1']['tons']}-ton cold-climate heat pump, {tr['m1']['registers']} registers (M-1)")
+    add('Mechanical', 'Mini-split heat pumps, heads and line sets', 1, 'lot', 22000, f"{tr['m1']['units']} cold-climate multi-zone units, {tr['m1']['heads']} wall heads, {tr['m1']['tons']:g} tons (M-1)")
     add('Mechanical', 'Fireplace and venting', 1, 'lot', 7500, 'living room fireplace, chimney route open')
     add('Plumbing', 'Rough and finish plumbing', tr['p1']['fixtures'], 'fixture', 1900, f"{tr['p1']['fixtures']} fixtures, {tr['p1']['stacks']} stacks (P-1)")
     add('Plumbing', 'Water heater', 1, 'each', 3200, 'heat-pump water heater in the mechanical room')

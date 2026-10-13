@@ -1,5 +1,5 @@
 {
- "version": "v12",
+ "version": "v13",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -653,12 +653,13 @@
    "Fixture models: A-5 tags the drains K-9135 and K-9136; tub, toilet, faucet and valve models still to pick."
   ],
   "M-1": [
-   "CU-1 on the front porch (owner's pick, 2026-10-13): confirm the maker's clearances for a unit under a roof, pick the screen, and check the porch slab can take the stand and the condensate/defrost water (drain it off the slab edge).",
-   "Office: no head as drawn (the ask was the right-side bedrooms). A 6k head on the office's right wall would make CU-2 a 5-port.",
-   "Exact models: pick the brand, then confirm the heads are an allowed combination and the line lengths are inside the unit's limits. CU-1's three sets total about 196 ft (longest 74): some 24k 3-port units cap the total near 164 ft, so check it, or step up to the next size, which usually allows more.",
+   "CU-1 in the rear alcove: it is 2 ft from the edge of the covered patio and under the dining windows, so it is heard on the patio and in the dining room when it runs. The alternatives are the master bedroom's left wall (quiet, but the living set runs about 105 ft, past the per-head limit) or the front porch (every set under 75 ft, in sight of the street).",
+   "CU-2 on the Bath 2 wall: 3 ft from Bedroom 2's window W14. The Bath 1 wall is the quiet spot (8 ft from any bedroom window) for about 10 ft more line.",
+   "Exact models: pick the brand, then confirm the heads are an allowed combination and the line lengths are inside the unit's limits (CU-1: longest 69 ft, total 145 ft; CU-2: longest 57 ft, total 102 ft).",
+   "Truss maker: the living set crosses the scissor trusses at Y 17'-6\"; leave web openings for a 2\" bundle there, or run it along a truss.",
+   "Office: no head as drawn (the ask was the right-side bedrooms). A 6k head on the office's right wall would make CU-2 a 4-port.",
    "Bed walls: the master and Bedroom 1 heads sit on the rear wall between the windows, where a headboard may go. A head over a headboard works with its vanes set level; otherwise it moves to a side wall. Confirm furniture walls before rough-in.",
-   "Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about 133 CFM continuous under the IRC).",
-   "Mechanical room: no air handler now; CU-1's line sets rise in its front wall, so keep that stud bay clear, so it is free for the radiant boiler or heat pump and manifold (R-1)."
+   "Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about 133 CFM continuous under the IRC)."
   ],
   "R-1": [
    "L14 (Closet (Bedroom 2), Bath 1): the floor carries all but about 135 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",

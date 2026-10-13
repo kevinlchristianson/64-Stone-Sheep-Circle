@@ -628,8 +628,9 @@ tbody tr:last-child td { border-bottom: 0; }
     }
     for (const row of sheet.querySelectorAll('tbody tr[data-id]')) {
       const go = () => {
-        if (row.dataset.id.startsWith('ckt-')) {   // a circuit row: every device on it lit in blue
-          clear(); const n = row.dataset.id.slice(4), lit = [...svg.querySelectorAll(`.sym[data-ckt="${CSS.escape(n)}"]`)];
+        const ck = /^(?:ckt-|C(?=\d))(.+)$/.exec(row.dataset.id);
+        if (ck) {   // a circuit row (ckt-N, or Zero Rd's CN): every device on it lit in blue
+          clear(); const n = ck[1], lit = [...svg.querySelectorAll(`.sym[data-ckt="${CSS.escape(n)}"]`)];
           for (const g of lit) g.classList.add('on-leg'); row.classList.add('on');
           showCard('Circuit ' + n, row.children[1] ? row.children[1].textContent.trim() : '', `${lit.length} devices lit in blue.`, row); if (lit[0]) reveal(lit[0]); return;
         }
@@ -825,7 +826,9 @@ const MAT = {
   door: mat(0xb07a45), garageDoor: mat(0xe6e1d8), post: mat(0x9a6a3c), porch: mat(0xb9b2a6), ground: mat(0x9fae8a),
   fix: mat(0xf7f5f1, { roughness: 0.5 }), counter: mat(0xe8e2d6), stone: mat(0x8f8576),
   roof: new THREE.MeshStandardMaterial({ color: 0x34373b, roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }),
-  radiant: mat(0x6a1b9a), elec: mat(0xc8650a), plumb: mat(0x3c3a36), cold: mat(0x2c6aa0, { roughness: 0.4 }), hvac: mat(0xe3a05a, { roughness: 0.6, transparent: true, opacity: 0.85 }),
+  radiant: mat(0x6a1b9a),
+  elec: mat(0xc8650a), rec: mat(0xc8650a), sw: mat(0x8a5a00), light: mat(0xfff2c4, { emissive: 0xd9a400, emissiveIntensity: 0.35 }), alarm: mat(0xb4462f), panel: mat(0x333333), lv: mat(0x1f5f8b),
+  plumb: mat(0x3c3a36), cold: mat(0x2c6aa0, { roughness: 0.4 }), hvac: mat(0xe3a05a, { roughness: 0.6, transparent: true, opacity: 0.85 }),
   hi: mat(0xe08a00, { emissive: 0x4a2a00 }),
 };
 function setCut(h) { const on = h < CUT_MAX - 0.01; cutPlane.constant = h; for (const m of cutMats) { m.clippingPlanes = on ? [cutPlane] : null; m.needsUpdate = true; } }
@@ -968,6 +971,36 @@ for (const t of T3) {
   const [name, ...rest] = String(t.name).split(' · ');
   box(t.x - s / 2, t.y - s / 2, t.x + s / 2, t.y + s / 2, h - s / 2, h + s / 2, MAT[t.layer === 'plumb' ? (t.cold ? 'cold' : 'plumb') : t.layer], { kind: t.layer, name: t.name, ref: t.ref || name, text: t.text }, g);
 }
+// ---------------------------------------------------------------- electrical (E-1), as Zero Rd's buildElectrical(): plates flush on the wall faces
+// at their heights, ceiling lights and alarms as discs, pendants hung on a cord. side = the wall the device is on (rear/front/left/right of its room), c = ceiling/floor.
+(function buildElectrical() {
+  const N = { rear: [0, 1], front: [0, -1], left: [1, 0], right: [-1, 0], c: [0, 0] };
+  const SWT = ['sw', 'sw3', 'dim', 'occ'], LIT = ['can', 'wet', 'surf', 'closet', 'pend', 'fanbox', 'ef', 'sconce', 'strip', 'ext'];
+  for (const d of DATA.elec3d) {
+    const t = d.type, x = d.x, y = d.y, h = d.h / 12, [nx, ny] = N[d.side] || [0, 0];
+    const text = d.legend + (d.h < 100 ? `, ${d.h}" AFF` : '') + (d.ckt ? `, circuit ${d.ckt}` : '') + (d.note ? ` — ${d.note}` : '');
+    const data = { kind: 'elec', name: `${d.id} · ${d.legend.split(',')[0]}`, text, ref: d.id };
+    const m = SWT.includes(t) ? MAT.sw : LIT.includes(t) ? MAT.light : t === 'smoke' || t === 'combo' ? MAT.alarm : t === 'panel' ? MAT.panel : t === 'data' || t === 'lv' ? MAT.lv : MAT.rec;
+    const put = mesh => { const p = M(x, y); mesh.userData = data; pickables.push(mesh); G.elec.add(mesh); return mesh.position.set(p.x, 0, p.z); };
+    if (t === 'strip') { box(x, d.y0, x + 0.15, d.y1, h - 0.08, h, m, data, G.elec); continue; }
+    if (t === 'pend') {
+      box(x - 0.02, y - 0.02, x + 0.02, y + 0.02, h + 0.35, CEIL, MAT.panel, null, G.elec);
+      const r = d.room === 'dining' ? 0.4 : 0.3; put(new THREE.Mesh(new THREE.SphereGeometry(r, 14, 10), m)).setY(h); continue;
+    }
+    if (!nx && !ny) {
+      if (t === 'floor') { box(x - 0.2, y - 0.2, x + 0.2, y + 0.2, 0, 0.08, m, data, G.elec); continue; }
+      if (d.h < 100) { box(x - 0.2, y - 0.2, x + 0.2, y + 0.2, h - 0.2, h + 0.2, m, data, G.elec); continue; }   // boxes in the island base
+      const r = { ef: 0.5, fanbox: 0.35, smoke: 0.3, combo: 0.3 }[t] || 0.33;
+      put(new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.08, 20), m)).setY(CEIL - 0.04); continue;
+    }
+    const part = d.part || t;
+    const sz = { tv: 0.5, sconce: 0.35, ext: 0.3, hood: 1.5, panel: 0.7, mp: 0.5, disc: 0.4, meter: 0.5 }[part] || 0.2;
+    const hz = { panel: 1.25, mp: 0.8, hood: 0.35, meter: 0.6 }[part] || sz;
+    const dp = { hood: 2.0, panel: 0.35, mp: 0.3, disc: 0.3, meter: 0.35 }[part] || 0.12;
+    if (ny) box(x - sz, y, x + sz, y + ny * dp, h - hz, h + hz, m, data, G.elec);
+    else box(x, y - sz, x + nx * dp, y + sz, h - hz, h + hz, m, data, G.elec);
+  }
+})();
 for (const line of DATA.lines3d) {
   const g = G[line.layer], material = line.color ? (MAT[line.color] ??= mat(parseInt(line.color.slice(1), 16))) : line.layer === 'plumb' ? MAT.plumb : MAT.hvac, r = line.r || 0.2;
   if (!g) continue;

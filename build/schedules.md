@@ -272,288 +272,364 @@ Rough-order quantities from the wall data, for pricing. The framer takes off the
 
 ## E-1 Electrical
 
-First-draft device layout to NEC 2023 minimums, for the electrician to lay out and the owner to walk through.
+Devices, switch legs and circuits for panel P1, drawn on the walls they go in.
 
 ### Notes
 
-1. Main panel P1, 200 A, in the garage on the wall to the mud room (W43), 36 spaces used of a 40-space panel. Penetrations through the garage wall fire-caulked.
-2. Service size from the NEC 220.82 calculation below: about 134 A with a heat pump assumed; 200 A leaves room for an EV charger (add a 50 A 240 V circuit in the garage if wanted).
-3. AFCI on every 120 V 15/20 A branch circuit in the living spaces (210.12); GFCI in baths, kitchen counters, laundry, garage, outdoors, dishwasher (210.8).
-4. Tamper-resistant receptacles throughout (406.12). Receptacles at 16" to center, counters 44", vanity 40".
-5. Smoke alarms in every bedroom, outside the sleeping areas and on the living level; combination smoke/CO in the halls outside the sleeping areas (attached garage and wood fireplace); all interconnected.
-6. Kitchen and living ceilings are vaulted 4:12: sloped-ceiling recessed housings and a fan downrod sized for the slope.
-7. Device positions are drawn to the room, not measured to studs: the electrician sets final boxes at the walk-through.
+1. Panel P1, 200A main breaker, 40 spaces, in the garage on the mud room wall beside D6, 60" to centre, 36" clear in front (110.26). It sits next to the mechanical room (boiler, water heater) and the kitchen, the two heaviest groups of circuits. A meter-main outside on the garage's porch-side wall carries the service disconnect (NEC 2023 230.85 emergency disconnect) and feeds P1 with 4-wire 2/0 Al SER (or #2/0 Al in conduit), neutral isolated in P1.
+2. Code basis: NEC 2023 (confirm the edition Powell / Park County enforces). AFCI on every 120V 15A and 20A branch circuit in the house except the bath receptacle circuits and the garage and exterior circuits (210.12); GFCI in baths, kitchen counters and island, dishwasher, disposal, laundry, garage, outdoors, and within 6 ft of any sink (210.8). Tamper-resistant receptacles throughout (406.12).
+3. Positions: every wall device is drawn on the face of the wall it goes in, with its stem to that wall; the schedule gives the wall and the distance from the nearer corner. Ceiling devices give two distances. Final boxes are set to the studs at the owner walk-through.
+4. Mounting heights (standard): receptacles 16" to centre, switches 48", counter and laundry GFCIs 44", vanity GFCIs 40", vanity lights 84", exterior lights 72" or 84".
+5. Switch plan: every light belongs to one switch leg (table below), switched in the room it lights, at the latch side of the door you walk in through. Rooms with two ways in get 3-ways: the master hall, mud room, kitchen, bedroom hall and garage; the living cans have three control points (entry dimmer, 4-way at the patio doors, 3-way at the bedroom hall). A switch tag that appears in several legs is a multi-gang bank, one rocker per leg. On the page, picking a light or switch lights every device on its legs in blue.
+6. Circuit sheets E-1.1 onward show one circuit each with its cable run drawn from P1 through every device in nearest-neighbour order (solid for receptacle and appliance circuits, dashed for lighting). The run is a proposed order, not a required one. E-1.D shows the Cat6 home runs to the media panel.
+7. Kitchen: three 20A small-appliance circuits (11 left counter, 12 island and front counter, 13 dining and pantry, 210.11(C)(1)), counter receptacles at 4 ft spacing (210.52(C)); range, refrigerator, dishwasher, disposal and hood each on their own circuit. The island has a receptacle in each end panel on the living side, below the counter edge. Kitchen and living ceilings are vaulted 4:12: sloped-ceiling can trims and a fan downrod sized for the slope.
+8. Lighting circuits by area, whole switch legs only: 33 master suite, master hall, laundry, powder, mud room; 34 kitchen, dining, pantry, mech room, living, entry, coat closet, porch and patio; 35 office, bedroom wing and every smoke and CO alarm (so a tripped alarm circuit shows as dark lights). Garage and garage exterior lights on 36. Each is well under the 1,440 W continuous limit of a 15A circuit at LED design wattages.
+9. Smoke alarms in every bedroom and the office; smoke + CO combination alarms outside each sleeping area (master hall, bedroom hall, entry outside the office). All 120V, interconnected, battery backup (IRC R314, R315; CO because of the attached garage, the wood fireplace and the gas boiler).
+10. Bath exhaust fans 110 CFM with humidity sensing and an integrated LED light: the light switches with the room's other lights, the fan on its own rocker with a timer (14/3 from the bank). Ducted outside in rigid duct.
+11. Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (24k, master, dining and living heads) sits under the west end of the front porch against the mechanical room wall and CU-2 (24k, bedrooms 1-3) in the right side yard behind the bedroom 3 closet, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).
+12. Radiant (R-1): the wall-hung boiler HS-1, its system circulator and the zone controller share 15A circuit 31 with a service switch at the boiler, and each remote manifold station has a receptacle on 31 for its actuator wiring module (MF-1 laundry, MF-2/MF-G on the garage side of the mud room wall with the garage circulator, MF-3 bedroom hall). The water heater's power vent is on 32. Thermostats are 24V back to the zone controller, not line voltage. The MF-3 cabinet sits below the hall 3-way S at 48".
+13. Low voltage: Cat6 home runs to the media panel on the pantry's mech-room wall (master and living TV boxes, office desk, video doorbell at the front door), powered from circuit 37.
 
 ### Open items
 
-- Range fuel: the 48" range (BS655Z-48) could be gas, dual-fuel or electric. Electric is assumed (50 A 240 V); a gas or dual-fuel range drops that circuit and adds a gas line.
-- Heating and water heating fuel (heat pump / gas furnace / electric) set the mechanical circuits and the service load.
-- Meter and service entrance location (overhead or underground, which side of the house) is not on the site plan.
-- EV charger in the garage: yes or no.
-- Lighting choices (cans vs. surface fixtures, pendants, fan locations) for the owner's walk-through.
-- Low-voltage: network drops, TV at the fireplace wall, doorbell, security.
+- Range fuel: the 48" range is drawn electric on a 50A circuit. A gas or dual-fuel range drops that to a 120V receptacle and adds a gas line.
+- Mini-split breakers are sized from M-1's nominal units (two 24k 3-port units, MCA about 20A, on 25A/#10); set them to the nameplate MCA/MOCP of the units bought.
+- Utility service: overhead or underground, and which side of the house the meter goes on. The meter-main is drawn on the garage wall facing the porch end.
+- EV-ready: a 50A NEMA 14-50 receptacle is drawn in the garage. Keep, swap for a hardwired charger, or drop?
+- Mounting heights: standard heights are drawn. Zero Rd used 30" receptacles and 42" switches for accessibility; say if this house should match.
+- Ceiling fans in the master, living, three bedrooms and the patio: keep the fan-rated boxes, or cans instead?
+- Low voltage: TVs in the bedrooms, ceiling Wi-Fi access points, cameras, and whether the media panel should move out of the pantry.
 
-### Circuit schedule, main panel P1
+### Circuit schedule, panel P1
 
-| Ckt | Serves | Breaker | Poles | Protection | Wire (Cu) | Devices | Notes |
-|---|---|---|---|---|---|---|---|
-| 1 | Range | 50 A | 2-pole | 240 V | 6 AWG | 1 | electric range assumed; drop if gas |
-| 2 | Dishwasher | 20 A | 1-pole | GFCI | 12 AWG | 1 | — |
-| 3 | Disposal | 20 A | 1-pole | GFCI | 12 AWG | 1 | — |
-| 4 | Refrigerator | 20 A | 1-pole | — | 12 AWG | 1 | — |
-| 5 | Range hood | 15 A | 1-pole | — | 14 AWG | 1 | — |
-| 6 | Air handler / furnace | 30 A | 2-pole | 240 V | 10 AWG | 1 | size to the equipment; electric strip heat would need 60 A |
-| 7 | Water heater | 30 A | 2-pole | 240 V | 10 AWG | 1 | heat-pump or electric; drop if gas |
-| 8 | Heat pump / AC | 30 A | 2-pole | 240 V | 10 AWG | 1 | size to the equipment nameplate |
-| 9 | Fireplace blower | 15 A | 1-pole | AFCI | 14 AWG | 1 | — |
-| 10 | Kitchen counter 1 (small appliance) | 20 A | 1-pole | GFCI/AFCI | 12 AWG | 4 | — |
-| 11 | Kitchen counter 2 (small appliance) | 20 A | 1-pole | GFCI/AFCI | 12 AWG | 3 | — |
-| 12 | Washer | 20 A | 1-pole | GFCI/AFCI | 12 AWG | 1 | laundry circuit |
-| 13 | Dryer | 30 A | 2-pole | 240 V | 10 AWG | 1 | — |
-| 14 | Laundry counter | 20 A | 1-pole | GFCI/AFCI | 12 AWG | 1 | — |
-| 15 | Bath receptacles (all baths) | 20 A | 1-pole | GFCI | 12 AWG | 6 | — |
-| 16 | Garage receptacles | 20 A | 1-pole | GFCI | 12 AWG | 8 | — |
-| 17 | Garage door openers | 20 A | 1-pole | GFCI | 12 AWG | 2 | — |
-| 18 | Exterior receptacles | 20 A | 1-pole | GFCI | 12 AWG | 4 | — |
-| 19 | Master suite receptacles | 20 A | 1-pole | AFCI | 12 AWG | 7 | — |
-| 20 | Dining and mud receptacles | 20 A | 1-pole | AFCI | 12 AWG | 6 | — |
-| 21 | Living receptacles | 20 A | 1-pole | AFCI | 12 AWG | 7 | — |
-| 22 | Office receptacles | 20 A | 1-pole | AFCI | 12 AWG | 7 | — |
-| 23 | Bedroom 1 receptacles | 20 A | 1-pole | AFCI | 12 AWG | 6 | — |
-| 24 | Bedroom 2 and hall receptacles | 20 A | 1-pole | AFCI | 12 AWG | 7 | — |
-| 25 | Bedroom 3 receptacles | 20 A | 1-pole | AFCI | 12 AWG | 6 | — |
-| 26 | Lights: master suite, laundry, mud, powder | 15 A | 1-pole | AFCI | 14 AWG | 26 | — |
-| 27 | Lights: kitchen, dining, pantry | 15 A | 1-pole | AFCI | 14 AWG | 19 | — |
-| 28 | Lights: living, entry, office, porch, patio | 15 A | 1-pole | AFCI | 14 AWG | 34 | — |
-| 29 | Lights: bedroom wing | 15 A | 1-pole | AFCI | 14 AWG | 30 | — |
-| 30 | Lights: garage | 15 A | 1-pole | — | 14 AWG | 6 | — |
-| 31 | Smoke / CO alarms (interconnected) | 15 A | 1-pole | AFCI | 14 AWG | 8 | — |
+| Ckt | Load | Breaker | Wire | Serves | Devices |
+|---|---|---|---|---|---|
+| 1-2 | Range, 48" electric | 240V 50A 2P | #6 Cu | kitchen, left wall | 1 |
+| 3-4 | Dryer | 240V 30A 2P | #10 Cu | laundry | 1 |
+| 5-6 | Mini-split CU-1, 24k (master, dining, living heads) | 240V 25A 2P | #10 Cu | front porch, west end, against the mechanical room wall; heads fed from the unit (MCA ~20A) | 1 |
+| 7-8 | Mini-split CU-2, 24k (bedrooms 1-3 heads) | 240V 25A 2P | #10 Cu | right side yard, bedroom 3 closet wall; heads fed from the unit (MCA ~20A) | 1 |
+| 9-10 | EV-ready receptacle (NEMA 14-50) | 240V 50A 2P | #6 Cu | garage, front wall | 1 |
+| 11 | Kitchen small appliance 1 | 20A GFCI/AFCI | #12 | left counter run | 4 |
+| 12 | Kitchen small appliance 2 | 20A GFCI/AFCI | #12 | island, front counter | 3 |
+| 13 | Small appliance 3: dining + pantry | 20A GFCI/AFCI | #12 | dining walls, pantry counter | 7 |
+| 14 | Refrigerator | 20A AFCI | #12 | kitchen, front wall | 1 |
+| 15 | Dishwasher | 20A GFCI/AFCI | #12 | island | 1 |
+| 16 | Disposal | 20A GFCI/AFCI | #12 | island sink base | 1 |
+| 17 | Range hood | 15A AFCI | #14 | over the range | 1 |
+| 18 | Laundry: washer + counter | 20A GFCI/AFCI | #12 | laundry | 3 |
+| 19 | Bath receptacles west | 20A GFCI | #12 | master bath, powder | 2 |
+| 20 | Bath receptacles east | 20A GFCI | #12 | bath 1, bath 2 | 2 |
+| 21 | Master suite receptacles | 15A AFCI | #14 | master bedroom, master closet | 7 |
+| 22 | Living receptacles | 15A AFCI | #14 | living, TV wall, floor box, fireplace blower | 13 |
+| 23 | Entry + office receptacles | 15A AFCI | #14 | entry, office | 6 |
+| 24 | Bedroom 1 + hall receptacles | 15A AFCI | #14 | bedroom 1, bedroom hall | 7 |
+| 25 | Bedroom 2 receptacles | 15A AFCI | #14 | bedroom 2 | 5 |
+| 26 | Bedroom 3 receptacles | 15A AFCI | #14 | bedroom 3 | 5 |
+| 27 | Mud room receptacles | 20A GFCI/AFCI | #12 | mud room | 4 |
+| 28 | Garage receptacles | 20A GFCI | #12 | garage walls, one per bay | 6 |
+| 29 | Garage door openers | 20A GFCI | #12 | two ceiling receptacles | 2 |
+| 30 | Exterior receptacles | 20A GFCI | #12 | porch, patio, both mini-split units | 6 |
+| 31 | Boiler, circulators, zone controls | 15A AFCI | #14 | mechanical room, the three manifold stations (MF-1 laundry, MF-2/MF-G garage, MF-3 hall) | 5 |
+| 32 | Water heater (power vent) | 15A AFCI | #14 | mechanical room | 1 |
+| 33 | Lighting A | 15A AFCI | #14 | master suite, master hall, laundry, powder, mud room (~419 W LED at design wattages) | 33 |
+| 34 | Lighting B | 15A AFCI | #14 | kitchen, dining, pantry, mech, living, entry, coat closet, porch, patio (~564 W LED at design wattages) | 45 |
+| 35 | Lighting C + alarms | 15A AFCI | #14 | office, bedroom wing, baths, closets, every smoke and CO alarm (~490 W LED at design wattages) | 36 |
+| 36 | Garage + garage exterior lights | 15A | #14 | garage, garage door and service door lights (~156 W LED at design wattages) | 12 |
+| 37 | Media panel + low voltage | 15A AFCI | #14 | media panel in the pantry, doorbell transformer | 3 |
+| 38-40 | Spare | — | — | three spaces | 0 |
+
+### Switch plan
+
+One row per switch leg. Pick a row to light up its switch and lights on the drawing.
+
+| Leg | What | Room | Switch(es) | Lights | Control | Notes |
+|---|---|---|---|---|---|---|
+| mbed-cans | Master bedroom cans | Master Bed | S1 dimmer | L1, L2, L3, L4 | dimmer at the bedroom door, rocker 1 of 3 |  |
+| mbed-fan | Master bedroom fan box | Master Bed | S1 dimmer | L5 | rocker 2 at the bedroom door; fan speed on the fan remote | fan-rated box for a ceiling fan with light kit |
+| mhall | Master hall | Master Hall | S1 dimmer; S2 3-way switch; S3 3-way switch | L6 | 3-way: kitchen opening and the bedroom door (rocker 3 of the bedroom bank is its partner on the hall side) |  |
+| mbath-light | Master bath lights | Master Bath | S4 dimmer | L7, L8, L9, L10, L11, L14, L15 | dimmer at the bath opening, rocker 1 of 3 | cans, vanity lights and the fan units' lights dim together |
+| mbath-fan | Master bath fans | Master Bath | S4 dimmer | L14, L15 | rocker 2 with a 60-minute timer; humidity sensing runs them anyway |  |
+| mbath-shower | Master shower and tub cans | Master Bath | S4 dimmer | L12, L13 | rocker 3 at the bath opening | wet-rated |
+| mcloset | Master closet | Master Closet | S5 occupancy-sensor switch | L16, L17 | occupancy-sensor switch at the bath opening | closet-rated fixtures, 12" from shelves (410.16) |
+| laundry | Laundry | Laundry | S6 switch | L18, L19 | switch at the laundry door, latch side |  |
+| powder-light | Powder lights | Powder | S7 switch | L20, L21 | rocker 1 at the powder door | vanity light and the fan unit's light |
+| powder-fan | Powder fan | Powder | S7 switch | L21 | rocker 2 with a 20-minute timer |  |
+| mud | Mud room cans | Mud Room | S8 3-way switch; S9 3-way switch | L22, L23, L24 | 3-way: garage door and the kitchen opening |  |
+| kit-cans | Kitchen cans | Kitchen | S10 dimmer; S11 dimmer | L26, L27, L28, L29, L30, L31, L32, L33 | 3-way dimmer: mud room opening and the master hall opening | sloped-ceiling trims under the 4:12 vault |
+| kit-pend | Island pendants | Kitchen | S10 dimmer | L34, L35, L36 | dimmer at the mud room opening, rocker 2 |  |
+| kit-ucl | Under-cabinet lights | Kitchen | S10 dimmer | L37, L38 | rocker 3 at the mud room opening | LED tape with a driver in the upper cabinet |
+| dining | Dining chandelier | Dining | S12 dimmer | L39 | dimmer on the dining wall at the kitchen end |  |
+| pantry | Pantry | Pantry | S13 switch | L40, L41 | switch inside the pantry opening |  |
+| mech | Mechanical room | Mechanical | S14 switch | L42 | switch inside the door |  |
+| living-cans | Living cans | Living | S15 4-way switch; S16 3-way switch; S17 dimmer | L43, L44, L45, L46, L47, L48 | 3 places: dimmer at the entry, 4-way at the patio doors, 3-way at the bedroom hall | sloped-ceiling trims under the 4:12 vault |
+| living-fan | Living fan box | Living | S15 4-way switch | L49 | rocker 2 at the patio doors; fan speed on the fan remote | downrod sized for the 4:12 vault |
+| entry | Entry light | Entry | S17 dimmer | L50 | rocker at the front door |  |
+| coat | Coat closet | Coat Closet | — | L51 | integral occupancy sensor, no switch | no wall space for a switch inside a 2 ft closet |
+| porch | Porch cans and front door lights | Front Porch | S17 dimmer | L78, L79, L80, L81, L82, L83 | rocker at the front door; photocell or timer optional | wet-rated, dark-sky |
+| patio-lights | Patio cans and door lights | Covered Patio | S15 4-way switch | L84, L85, L87, L88 | rocker 3 at the patio doors | wet-rated |
+| patio-fan | Patio fan | Covered Patio | S15 4-way switch | L86 | rocker 4 at the patio doors | wet-rated fan |
+| office | Office cans | Office | S18 dimmer | L52, L53, L54, L55 | dimmer at the office doors |  |
+| bhall | Bedroom hall cans | Bedroom Hall | S19 3-way switch; S20 3-way switch | L56, L57, L58 | 3-way: living end and bedroom 3 end |  |
+| bed1-light | Bedroom 1 light | Bedroom 1 | S21 switch | L59 | rocker 1 at the bedroom door (light kit on the fan) |  |
+| bed1-fan | Bedroom 1 fan | Bedroom 1 | S21 switch | L59 | rocker 2 at the bedroom door | fan-rated box |
+| bed1-closet | Bedroom 1 closet | Bedroom 1 Closet | — | L60 | integral occupancy sensor, no switch | closet-rated, 12" from shelves (410.16) |
+| bed2-light | Bedroom 2 light | Bedroom 2 | S23 switch | L64 | rocker 1 at the bedroom door (light kit on the fan) |  |
+| bed2-fan | Bedroom 2 fan | Bedroom 2 | S23 switch | L64 | rocker 2 at the bedroom door | fan-rated box |
+| bed2-closet | Bedroom 2 closet | Closet (Bedroom 2) | — | L65 | integral occupancy sensor, no switch | closet-rated, 12" from shelves (410.16) |
+| bed3-light | Bedroom 3 light | Bedroom 3 | S25 switch | L70 | rocker 1 at the bedroom door (light kit on the fan) |  |
+| bed3-fan | Bedroom 3 fan | Bedroom 3 | S25 switch | L70 | rocker 2 at the bedroom door | fan-rated box |
+| bed3-closet | Bedroom 3 closet | Closet (Bedroom 3) | — | L71 | integral occupancy sensor, no switch | closet-rated, 12" from shelves (410.16) |
+| bath1-light | Bath 1 lights | Bath 1 | S22 switch | L61, L62, L63 | rocker 1 at the bath door | vanity light, shower can and the fan unit's light |
+| bath1-fan | Bath 1 fan | Bath 1 | S22 switch | L62 | rocker 2 with a 60-minute timer |  |
+| bath2-light | Bath 2 lights | Bath 2 | S24 switch | L66, L67, L68, L69 | rocker 1 at the bath door | vanity lights, tub can and the fan unit's light |
+| bath2-fan | Bath 2 fan | Bath 2 | S24 switch | L68 | rocker 2 with a 60-minute timer |  |
+| garage | Garage lights | Garage | S26 3-way switch; S27 3-way switch | L72, L73, L74, L75, L76, L77 | 3-way: service door and mud room door |  |
+| garage-ext | Garage door and service door lights | Outside | S27 3-way switch | L89, L90, L91, L92 | rocker 2 at the mud room door; photocell optional | dark-sky |
 
 ### Device schedule
 
-| Tag | Device | Room | Height | Ckt |
-|---|---|---|---|---|
-| R1 | Receptacle, tamper-resistant, AFCI | Master Bed | 1'-4" | 19 |
-| R2 | Receptacle, tamper-resistant, AFCI | Master Bed | 1'-4" | 19 |
-| R3 | Receptacle, tamper-resistant, AFCI | Master Bed | 1'-4" | 19 |
-| R4 | Receptacle, tamper-resistant, AFCI | Master Bed | 1'-4" | 19 |
-| R5 | Receptacle, tamper-resistant, AFCI | Master Bed | 1'-4" | 19 |
-| R6 | Receptacle, tamper-resistant, AFCI | Master Bed | 1'-4" | 19 |
-| R7 | Receptacle, tamper-resistant, AFCI | Master Bed | 1'-4" | 19 |
-| R8 | Vanity receptacle, GFCI, 20 A bath circuit | Master Bath | 3'-4" | 15 |
-| R9 | Vanity receptacle, GFCI, 20 A bath circuit | Master Bath | 3'-4" | 15 |
-| R10 | Washer receptacle, 20 A dedicated | Laundry | 3'-6" | 12 |
-| R11 | Dryer receptacle, 30 A 240 V (NEMA 14-30) | Laundry | 3'-0" | 13 |
-| R12 | Counter receptacle, GFCI | Laundry | 3'-8" | 14 |
-| R13 | Vanity receptacle, GFCI, 20 A bath circuit | Powder | 3'-4" | 15 |
-| R14 | Receptacle | Mud Room | 1'-4" | 20 |
-| R15 | Receptacle | Mud Room | 1'-4" | 20 |
-| R16 | Receptacle, tamper-resistant, AFCI/GFCI dual function | Dining | 1'-4" | 20 |
-| R17 | Receptacle, tamper-resistant, AFCI/GFCI dual function | Dining | 1'-4" | 20 |
-| R18 | Receptacle, tamper-resistant, AFCI/GFCI dual function | Dining | 1'-4" | 20 |
-| R19 | Receptacle, tamper-resistant, AFCI/GFCI dual function | Dining | 1'-4" | 20 |
-| R20 | Counter receptacle, GFCI, 20 A | Kitchen | 3'-8" | 10 |
-| R21 | Counter receptacle, GFCI, 20 A | Kitchen | 3'-8" | 10 |
-| R22 | Counter receptacle, GFCI, 20 A | Kitchen | 3'-8" | 10 |
-| R23 | Counter receptacle, GFCI, 20 A | Kitchen | 3'-8" | 10 |
-| R24 | Island receptacle, GFCI (side of island) | Kitchen | 1'-0" | 11 |
-| R25 | Island receptacle, GFCI (side of island) | Kitchen | 1'-0" | 11 |
-| R26 | Counter receptacle, GFCI | Kitchen | 3'-8" | 11 |
-| R27 | Receptacle, tamper-resistant, AFCI | Living | 1'-4" | 21 |
-| R28 | Receptacle, tamper-resistant, AFCI | Living | 1'-4" | 21 |
-| R29 | Receptacle, tamper-resistant, AFCI | Living | 1'-4" | 21 |
-| R30 | Receptacle, tamper-resistant, AFCI | Living | 1'-4" | 21 |
-| R31 | Receptacle, tamper-resistant, AFCI | Living | 1'-4" | 21 |
-| R32 | Receptacle, tamper-resistant, AFCI | Living | 1'-4" | 21 |
-| R33 | Receptacle, tamper-resistant, AFCI | Living | 1'-4" | 21 |
-| R34 | Receptacle, tamper-resistant, AFCI | Office | 1'-4" | 22 |
-| R35 | Receptacle, tamper-resistant, AFCI | Office | 1'-4" | 22 |
-| R36 | Receptacle, tamper-resistant, AFCI | Office | 1'-4" | 22 |
-| R37 | Receptacle, tamper-resistant, AFCI | Office | 1'-4" | 22 |
-| R38 | Receptacle, tamper-resistant, AFCI | Office | 1'-4" | 22 |
-| R39 | Receptacle, tamper-resistant, AFCI | Office | 1'-4" | 22 |
-| R40 | Receptacle, tamper-resistant, AFCI | Office | 1'-4" | 22 |
-| R41 | Hall receptacle (hall over 10 ft) | Bedroom Hall | 1'-4" | 24 |
-| R42 | Receptacle, tamper-resistant, AFCI | Bedroom 1 | 1'-4" | 23 |
-| R43 | Receptacle, tamper-resistant, AFCI | Bedroom 1 | 1'-4" | 23 |
-| R44 | Receptacle, tamper-resistant, AFCI | Bedroom 1 | 1'-4" | 23 |
-| R45 | Receptacle, tamper-resistant, AFCI | Bedroom 1 | 1'-4" | 23 |
-| R46 | Receptacle, tamper-resistant, AFCI | Bedroom 1 | 1'-4" | 23 |
-| R47 | Receptacle, tamper-resistant, AFCI | Bedroom 1 | 1'-4" | 23 |
-| R48 | Vanity receptacle, GFCI, 20 A bath circuit | Bath 1 | 3'-4" | 15 |
-| R49 | Receptacle, tamper-resistant, AFCI | Bedroom 2 | 1'-4" | 24 |
-| R50 | Receptacle, tamper-resistant, AFCI | Bedroom 2 | 1'-4" | 24 |
-| R51 | Receptacle, tamper-resistant, AFCI | Bedroom 2 | 1'-4" | 24 |
-| R52 | Receptacle, tamper-resistant, AFCI | Bedroom 2 | 1'-4" | 24 |
-| R53 | Receptacle, tamper-resistant, AFCI | Bedroom 2 | 1'-4" | 24 |
-| R54 | Receptacle, tamper-resistant, AFCI | Bedroom 2 | 1'-4" | 24 |
-| R55 | Vanity receptacle, GFCI, 20 A bath circuit | Bath 2 | 3'-4" | 15 |
-| R56 | Vanity receptacle, GFCI, 20 A bath circuit | Bath 2 | 3'-4" | 15 |
-| R57 | Receptacle, tamper-resistant, AFCI | Bedroom 3 | 1'-4" | 25 |
-| R58 | Receptacle, tamper-resistant, AFCI | Bedroom 3 | 1'-4" | 25 |
-| R59 | Receptacle, tamper-resistant, AFCI | Bedroom 3 | 1'-4" | 25 |
-| R60 | Receptacle, tamper-resistant, AFCI | Bedroom 3 | 1'-4" | 25 |
-| R61 | Receptacle, tamper-resistant, AFCI | Bedroom 3 | 1'-4" | 25 |
-| R62 | Receptacle, tamper-resistant, AFCI | Bedroom 3 | 1'-4" | 25 |
-| R63 | Garage receptacle, GFCI | Garage | 3'-6" | 16 |
-| R64 | Garage receptacle, GFCI | Garage | 3'-6" | 16 |
-| R65 | Garage receptacle, GFCI | Garage | 3'-6" | 16 |
-| R66 | Garage receptacle, GFCI | Garage | 3'-6" | 16 |
-| R67 | Garage receptacle, GFCI | Garage | 3'-6" | 16 |
-| R68 | Garage receptacle, GFCI | Garage | 3'-6" | 16 |
-| R69 | Garage receptacle, GFCI | Garage | 3'-6" | 16 |
-| R70 | Garage receptacle, GFCI | Garage | 3'-6" | 16 |
-| R71 | Ceiling receptacle for door opener 1, GFCI | Garage | ceiling | 17 |
-| R72 | Ceiling receptacle for door opener 2, GFCI | Garage | ceiling | 17 |
-| R73 | Exterior receptacle, GFCI, weather-resistant in-use cover | Front Porch | 1'-6" | 18 |
-| R74 | Exterior receptacle, GFCI, weather-resistant in-use cover | Front Porch | 1'-6" | 18 |
-| R75 | Exterior receptacle, GFCI, weather-resistant in-use cover | Covered Patio | 1'-6" | 18 |
-| R76 | Exterior receptacle, GFCI, weather-resistant in-use cover | Covered Patio | 1'-6" | 18 |
-| A1 | 48" range: 50 A 240 V range receptacle if electric (confirm fuel; a dual-fuel range needs gas + 120 V) | Kitchen | 6" | 1 |
-| A2 | Dishwasher, 20 A (island) | Kitchen | 1'-0" | 2 |
-| A3 | Disposal, 20 A, switched at the island | Kitchen | 1'-0" | 3 |
-| A4 | Refrigerator, 20 A dedicated | Kitchen | 4'-0" | 4 |
-| A5 | Range hood, 15 A (over the range) | Kitchen | 6'-6" | 5 |
-| A6 | Air handler / furnace: dedicated circuit per the equipment picked | Mechanical | 5'-0" | 6 |
-| A7 | Water heater: 30 A 240 V if electric or heat-pump (confirm) | Mechanical | 5'-0" | 7 |
-| A8 | Heat pump / AC condenser, disconnect within sight, 240 V (size per equipment) | Outside | 3'-0" | 8 |
-| A9 | Fireplace insert blower, 15 A receptacle in the surround | Living | 1'-0" | 9 |
-| A10 | Pedestal tub: none needed unless an air or heated tub is picked | Master Bath | — | — |
-| F1 | Ceiling fan with light, fan-rated box | Master Bed | — | 26 |
-| L1 | Ceiling light | Master Bath | — | 26 |
-| L2 | Recessed wet-rated, shower | Master Bath | — | 26 |
-| L3 | Pendant over tub (check clearance) | Master Bath | — | 26 |
-| L4 | Ceiling light | Master Closet | — | 26 |
-| L5 | Ceiling light | Master Hall | — | 26 |
-| L6 | Ceiling light | Laundry | — | 26 |
-| L7 | Ceiling light | Powder | — | 26 |
-| L8 | Ceiling light | Mud Room | — | 26 |
-| L9 | Chandelier over the table, dimmer | Dining | — | 27 |
-| L10 | Recessed 6" LED, vaulted ceiling (sloped trim) | Kitchen | — | 27 |
-| L11 | Recessed 6" LED, vaulted ceiling (sloped trim) | Kitchen | — | 27 |
-| L12 | Recessed 6" LED, vaulted ceiling (sloped trim) | Kitchen | — | 27 |
-| L13 | Recessed 6" LED, vaulted ceiling (sloped trim) | Kitchen | — | 27 |
-| L14 | Recessed 6" LED, vaulted ceiling (sloped trim) | Kitchen | — | 27 |
-| L15 | Recessed 6" LED, vaulted ceiling (sloped trim) | Kitchen | — | 27 |
-| L16 | Recessed 6" LED, vaulted ceiling (sloped trim) | Kitchen | — | 27 |
-| L17 | Recessed 6" LED, vaulted ceiling (sloped trim) | Kitchen | — | 27 |
-| L18 | Island pendant | Kitchen | — | 27 |
-| L19 | Island pendant | Kitchen | — | 27 |
-| L20 | Island pendant | Kitchen | — | 27 |
-| L21 | Under-cabinet LED strip, left wall | Kitchen | — | 27 |
-| L22 | Ceiling light | Pantry | — | 27 |
-| L23 | Ceiling light | Mechanical | — | 27 |
-| L24 | Recessed 6" LED, vaulted ceiling (sloped trim) | Living | — | 28 |
-| L25 | Recessed 6" LED, vaulted ceiling (sloped trim) | Living | — | 28 |
-| L26 | Recessed 6" LED, vaulted ceiling (sloped trim) | Living | — | 28 |
-| L27 | Recessed 6" LED, vaulted ceiling (sloped trim) | Living | — | 28 |
-| L28 | Recessed 6" LED, vaulted ceiling (sloped trim) | Living | — | 28 |
-| L29 | Recessed 6" LED, vaulted ceiling (sloped trim) | Living | — | 28 |
-| F2 | Ceiling fan with light, fan-rated box (vault: downrod) | Living | — | 28 |
-| L30 | Ceiling light | Entry | — | 28 |
-| L31 | Ceiling light | Coat Closet | — | 28 |
-| F3 | Ceiling fan with light, fan-rated box | Office | — | 28 |
-| L32 | Ceiling light | Bedroom Hall | — | 29 |
-| L33 | Ceiling light | Bedroom Hall | — | 29 |
-| L34 | Ceiling light | Bedroom Hall | — | 29 |
-| F4 | Ceiling fan with light, fan-rated box | Bedroom 1 | — | 29 |
-| L35 | Ceiling light | Bedroom 1 Closet | — | 29 |
-| L36 | Ceiling light | Bath 1 | — | 29 |
-| L37 | Recessed wet-rated, shower/tub | Bath 1 | — | 29 |
-| L38 | Ceiling light | Closet (Bedroom 2) | — | 29 |
-| F5 | Ceiling fan with light, fan-rated box | Bedroom 2 | — | 29 |
-| L39 | Ceiling light | Bath 2 | — | 29 |
-| L40 | Recessed wet-rated, shower/tub | Bath 2 | — | 29 |
-| F6 | Ceiling fan with light, fan-rated box | Bedroom 3 | — | 29 |
-| L41 | Ceiling light | Closet (Bedroom 3) | — | 29 |
-| L42 | 4 ft LED shop fixture | Garage | — | 30 |
-| L43 | 4 ft LED shop fixture | Garage | — | 30 |
-| L44 | 4 ft LED shop fixture | Garage | — | 30 |
-| L45 | 4 ft LED shop fixture | Garage | — | 30 |
-| L46 | Recessed porch light, wet-rated | Front Porch | — | 28 |
-| L47 | Recessed porch light, wet-rated | Front Porch | — | 28 |
-| L48 | Recessed porch light, wet-rated | Front Porch | — | 28 |
-| L49 | Recessed porch light, wet-rated | Front Porch | — | 28 |
-| F7 | Ceiling fan with light, wet-rated, vaulted patio | Covered Patio | — | 28 |
-| L50 | Recessed wet-rated | Covered Patio | — | 28 |
-| L51 | Recessed wet-rated | Covered Patio | — | 28 |
-| L52 | Front door sconce, dark-sky | Outside | 6'-6" | 28 |
-| L53 | Front door sconce, dark-sky | Outside | 6'-6" | 28 |
-| L54 | Patio door sconce, dark-sky | Outside | 6'-6" | 28 |
-| L55 | Patio door sconce, dark-sky | Outside | 6'-6" | 28 |
-| L56 | Service door light, dark-sky | Outside | 6'-6" | 28 |
-| L57 | Garage door light, dark-sky | Outside | 6'-6" | 28 |
-| L58 | Garage door light, dark-sky | Outside | 6'-6" | 28 |
-| L59 | Garage door light, dark-sky | Outside | 6'-6" | 28 |
-| F8 | Exhaust fan, ducted outside, 80 CFM (humidity control on full baths) | Master Bath | — | 26 |
-| F9 | Exhaust fan, ducted outside, 80 CFM (humidity control on full baths) | Master Bath | — | 26 |
-| F10 | Exhaust fan, ducted outside, 80 CFM (humidity control on full baths) | Bath 1 | — | 29 |
-| F11 | Exhaust fan, ducted outside, 80 CFM (humidity control on full baths) | Bath 2 | — | 29 |
-| F12 | Exhaust fan, ducted outside, 80 CFM (humidity control on full baths) | Powder | — | 26 |
-| F13 | Exhaust fan, ducted outside, 80 CFM (humidity control on full baths) | Laundry | — | 26 |
-| D1 | Smoke alarm, interconnected, hardwired with battery backup | Bedroom 1 | — | 31 |
-| D2 | Smoke alarm, interconnected, hardwired with battery backup | Bedroom 2 | — | 31 |
-| D3 | Smoke alarm, interconnected, hardwired with battery backup | Bedroom 3 | — | 31 |
-| D4 | Smoke alarm, interconnected, hardwired with battery backup | Master Bed | — | 31 |
-| D5 | Smoke alarm, interconnected, hardwired with battery backup | Office | — | 31 |
-| D6 | Combination smoke / CO alarm, interconnected, hardwired | Bedroom Hall | — | 31 |
-| D7 | Combination smoke / CO alarm, interconnected, hardwired | Master Hall | — | 31 |
-| D8 | Combination smoke / CO alarm, interconnected, hardwired | Living | — | 31 |
-| S1 | Switch at Front entry (D1): room lights, 3-way | Entry | 4'-0" | 28 |
-| S2 | Switch at Patio French doors (D2): room lights, 3-way | Living | 4'-0" | 28 |
-| S3 | Switch at Garage service door (D3): room lights, 3-way | Garage | 4'-0" | 30 |
-| S4 | Switch at Garage to mud room (D6): room lights, 3-way | Garage | 4'-0" | 30 |
-| S5 | Switch at Garage to mud room (D6): room lights, 3-way | Mud Room | 4'-0" | 26 |
-| S6 | Switch at Master bedroom (D8): room lights, 3-way | Master Hall | 4'-0" | 26 |
-| S7 | Switch at Master bedroom (D8): room lights | Master Bed | 4'-0" | 26 |
-| S8 | Switch at Master bed to bath (D9): room lights | Master Bed | 4'-0" | 26 |
-| S9 | Switch at Master bed to bath (D9): room lights | Master Bath | 4'-0" | 26 |
-| S10 | Switch at Master bath to closet (D10): room lights | Master Bath | 4'-0" | 26 |
-| S11 | Switch at Master closet to laundry (D11): room lights | Laundry | 4'-0" | 26 |
-| S12 | Switch at Laundry (D12): room lights, 3-way | Mud Room | 4'-0" | 26 |
-| S13 | Switch at Laundry (D12): room lights | Laundry | 4'-0" | 26 |
-| S14 | Switch at Powder (D13): room lights, 3-way | Mud Room | 4'-0" | 26 |
-| S15 | Switch at Powder (D13): room lights | Powder | 4'-0" | 26 |
-| S16 | Switch at Pantry (D14): room lights, 3-way | Kitchen | 4'-0" | 27 |
-| S17 | Switch at Pantry (D14): room lights | Pantry | 4'-0" | 27 |
-| S18 | Switch at Coat closet (D15): room lights, 3-way | Entry | 4'-0" | 28 |
-| S19 | Switch at Coat closet (D15): room lights | Coat Closet | 4'-0" | 28 |
-| S20 | Switch at Office French doors (D16): room lights, 3-way | Entry | 4'-0" | 28 |
-| S21 | Switch at Office French doors (D16): room lights | Office | 4'-0" | 28 |
-| S22 | Switch at Bedroom 1 (D17): room lights, 3-way | Bedroom Hall | 4'-0" | 29 |
-| S23 | Switch at Bedroom 1 (D17): room lights | Bedroom 1 | 4'-0" | 29 |
-| S24 | Switch at Bath 1 (D19): room lights | Bedroom 1 | 4'-0" | 29 |
-| S25 | Switch at Bath 1 (D19): room lights | Bath 1 | 4'-0" | 29 |
-| S26 | Switch at Bedroom 2 closet (D20): room lights | Bedroom 2 | 4'-0" | 29 |
-| S27 | Switch at Bedroom 2 closet (D20): room lights | Closet (Bedroom 2) | 4'-0" | 29 |
-| S28 | Switch at Bedroom 2 (D21): room lights, 3-way | Bedroom Hall | 4'-0" | 29 |
-| S29 | Switch at Bedroom 2 (D21): room lights | Bedroom 2 | 4'-0" | 29 |
-| S30 | Switch at Bath 2 (D22): room lights, 3-way | Bedroom Hall | 4'-0" | 29 |
-| S31 | Switch at Bath 2 (D22): room lights | Bath 2 | 4'-0" | 29 |
-| S32 | Switch at Bedroom 3 (D23): room lights, 3-way | Bedroom Hall | 4'-0" | 29 |
-| S33 | Switch at Bedroom 3 (D23): room lights | Bedroom 3 | 4'-0" | 29 |
-| S34 | Switch at Bedroom 3 closet (D24): room lights | Bedroom 3 | 4'-0" | 29 |
-| S35 | Switch at Bedroom 3 closet (D24): room lights | Closet (Bedroom 3) | 4'-0" | 29 |
-| S36 | Switch at Kitchen to master hall (O1): room lights, 3-way | Kitchen | 4'-0" | 27 |
-| S37 | Switch at Kitchen to master hall (O1): room lights, 3-way | Master Hall | 4'-0" | 26 |
-| S38 | Switch at Kitchen to mud room (O2): room lights, 3-way | Kitchen | 4'-0" | 27 |
-| S39 | Switch at Kitchen to mud room (O2): room lights, 3-way | Mud Room | 4'-0" | 26 |
-| S40 | Switch at Living to bedroom hall (O3): room lights, 3-way | Living | 4'-0" | 28 |
-| S41 | Switch at Living to bedroom hall (O3): room lights, 3-way | Bedroom Hall | 4'-0" | 29 |
-| S42 | Switches at the front door: entry light, porch lights, front sconces | Entry | 4'-0" | 28 |
-| S43 | Switches at the patio doors: patio fan/light, sconces | Living | 4'-0" | 28 |
+| Tag | Device | Position | AFF | Circuit | Notes |
+|---|---|---|---|---|---|
+| R1 | duplex receptacle, 15A, tamper-resistant | Master Bed: on the rear wall, 6'-9 1/2" from the left wall | 16" | 21 |  |
+| R2 | duplex receptacle with USB-C, 15A | Master Bed: on the right wall, 3'-10" from the rear wall | 16" | 21 | nightstand |
+| R3 | duplex receptacle with USB-C, 15A | Master Bed: on the right wall, 4'-10" from the front wall | 16" | 21 | nightstand |
+| R4 | duplex receptacle, 15A, tamper-resistant | Master Bed: on the front wall, 4'-6 1/2" from the left wall | 16" | 21 |  |
+| R5 | duplex receptacle, 15A, tamper-resistant | Master Bed: on the left wall, 3'-1 1/2" from the rear wall | 16" | 21 |  |
+| R6 | recessed TV box: power + 2 x Cat6 | Master Bed: on the left wall, 8'-1/2" from the rear wall | 60" | 21 | TV facing the bed |
+| S1 | dimmer, rocker | Master Bed: on the front wall, 4'-10" from the right wall | 48" | 33 | 3-gang at the bedroom door, latch side of D8: cans (dimmer), fan box, master hall 3-way; legs mbed-cans, mbed-fan, mhall |
+| L1 | 4" recessed LED, 2700K, IC, dimmable | Master Bed: ceiling, 3'-1/2" from the left wall, 3'-11 1/2" from the rear wall | ceiling | 33 |  |
+| L2 | 4" recessed LED, 2700K, IC, dimmable | Master Bed: ceiling, 3'-1/2" from the right wall, 3'-11 1/2" from the rear wall | ceiling | 33 |  |
+| L3 | 4" recessed LED, 2700K, IC, dimmable | Master Bed: ceiling, 3'-1/2" from the left wall, 4'-1 1/2" from the front wall | ceiling | 33 |  |
+| L4 | 4" recessed LED, 2700K, IC, dimmable | Master Bed: ceiling, 3'-1/2" from the right wall, 4'-1 1/2" from the front wall | ceiling | 33 |  |
+| L5 | fan-rated ceiling box, switched | Master Bed: ceiling, 7'-1/2" from the left wall, 7'-11 1/2" from the front wall | ceiling | 33 | room centre, below the label |
+| A1 | smoke alarm, 120V interconnected w/ battery | Master Bed: ceiling, 4'-1 1/2" from the left wall, 1'-11 1/2" from the front wall | ceiling | 35 | over 3 ft from the fan blades |
+| S2 | 3-way switch, rocker | Master Hall: on the rear wall, 7 1/2" from the left wall | 48" | 33 | hall side of the bedroom door; legs mhall |
+| S3 | 3-way switch, rocker | Master Hall: on the front wall, 7" from the right wall | 48" | 33 | at the kitchen opening; legs mhall |
+| L6 | 4" recessed LED, 2700K, IC, dimmable | Master Hall: ceiling, 1'-11 1/2" from the right wall, 1'-11 1/2" from the rear wall | ceiling | 33 |  |
+| A2 | smoke + CO alarm, 120V interconnected w/ battery | Master Hall: ceiling, 1'-3" from the left wall, 1'-11 1/2" from the rear wall | ceiling | 35 | outside the master suite |
+| R7 | GFCI receptacle, 20A | Master Bath: on the right wall, 4'-1/2" from the rear wall | 40" | 19 | between the two vanity sinks |
+| L7 | wall sconce / vanity light | Master Bath: on the right wall, 2'-1/2" from the rear wall | 84" | 33 | over the mirror at sink 1 |
+| L8 | wall sconce / vanity light | Master Bath: on the right wall, 6'-1/2" from the rear wall | 84" | 33 | over the mirror at sink 2 |
+| S4 | dimmer, rocker | Master Bath: on the right wall, 6'-4" from the front wall | 48" | 33 | 3-gang just inside the opening from the bedroom: lights (dimmer), fans, shower and tub cans; legs mbath-light, mbath-fan, mbath-shower |
+| L9 | 4" recessed LED, 2700K, IC, dimmable | Master Bath: ceiling, 4'-2" from the right wall, 2'-8" from the rear wall | ceiling | 33 |  |
+| L10 | 4" recessed LED, 2700K, IC, dimmable | Master Bath: ceiling, 4'-2" from the right wall, 8'-11 1/2" from the front wall | ceiling | 33 |  |
+| L11 | 4" recessed LED, 2700K, IC, dimmable | Master Bath: ceiling, 3'-2" from the right wall, 3'-2" from the front wall | ceiling | 33 |  |
+| L12 | 4" recessed LED, wet location | Master Bath: ceiling, 1'-8" from the left wall, 8'-3" from the rear wall | ceiling | 33 | over the tub |
+| L13 | 4" recessed LED, wet location | Master Bath: ceiling, 1'-11 1/2" from the left wall, 2'-7" from the front wall | ceiling | 33 | in the shower |
+| L14 | exhaust fan with integrated LED light, 110 CFM, humidity sensing | Master Bath: ceiling, 2'-7" from the left wall, 4'-1/2" from the rear wall | ceiling | 33 | toilet; the light dims with the room, the fan on rocker 2 |
+| L15 | exhaust fan with integrated LED light, 110 CFM, humidity sensing | Master Bath: ceiling, 4'-9" from the left wall, 5'-7" from the front wall | ceiling | 33 | between the tub and the shower |
+| S5 | occupancy-sensor switch | Master Closet: on the rear wall, 1'-1" from the right wall | 48" | 33 | inside the opening from the bath; legs mcloset |
+| L16 | surface LED, closet-rated (410.16), integral occupancy sensor | Master Closet: ceiling, 2'-9" from the left wall, 4'-5 1/2" from the front wall | ceiling | 33 |  |
+| L17 | surface LED, closet-rated (410.16), integral occupancy sensor | Master Closet: ceiling, 2'-9 1/2" from the right wall, 4'-5 1/2" from the front wall | ceiling | 33 |  |
+| R8 | duplex receptacle, 15A, tamper-resistant | Master Closet: on the front wall, 5'-1" from the right wall | 16" | 21 | steamer, vacuum |
+| R9 | receptacle, 20A dedicated | Laundry: on the right wall, 5'-3 1/2" from the rear wall | 42" | 18 | washer, behind the machine |
+| R10 | 240V receptacle or junction | Laundry: on the right wall, 2'-7" from the rear wall | 30" | 3-4 | dryer, NEMA 14-30R |
+| R11 | GFCI receptacle, 20A | Laundry: on the left wall, 5'-5" from the front wall | 44" | 18 | laundry counter |
+| R12 | GFCI receptacle, 20A | Laundry: on the left wall, 1'-9 1/2" from the front wall | 44" | 18 | laundry counter |
+| S6 | switch, rocker | Laundry: on the front wall, 2'-0" from the right wall | 48" | 33 | latch side of D12; legs laundry |
+| L18 | surface LED ceiling fixture | Laundry: ceiling, 4'-0" from the right wall, 3'-0" from the rear wall | ceiling | 33 |  |
+| L19 | surface LED ceiling fixture | Laundry: ceiling, 4'-0" from the right wall, 2'-9 1/2" from the front wall | ceiling | 33 |  |
+| R13 | GFCI receptacle, 20A | Powder: on the left wall, 1'-1" from the rear wall | 40" | 19 | beside the lav |
+| L20 | wall sconce / vanity light | Powder: on the left wall, 2'-8" from the front wall | 84" | 33 | over the mirror |
+| S7 | switch, rocker | Powder: on the front wall, 1'-5 1/2" from the right wall | 48" | 33 | 2-gang, latch side of D13: light, fan; legs powder-light, powder-fan |
+| L21 | exhaust fan with integrated LED light, 110 CFM, humidity sensing | Powder: ceiling, 2'-3" from the right wall, 2'-6 1/2" from the front wall | ceiling | 33 |  |
+| R14 | duplex receptacle, 15A, tamper-resistant | Mud Room: on the left wall, 5'-7" from the rear wall | 16" | 27 | bench |
+| R15 | duplex receptacle, 15A, tamper-resistant | Mud Room: on the front wall, 4'-6 1/2" from the left wall | 16" | 27 |  |
+| R16 | duplex receptacle, 15A, tamper-resistant | Mud Room: on the left wall, 2'-7 1/2" from the front wall | 16" | 27 |  |
+| R17 | duplex receptacle, 15A, tamper-resistant | Mud Room: on the right wall, 4'-1" from the rear wall | 16" | 27 |  |
+| S8 | 3-way switch, rocker | Mud Room: on the front wall, 6" from the right wall | 48" | 33 | at the garage door, latch side of D6; legs mud |
+| S9 | 3-way switch, rocker | Mud Room: on the right wall, 4'-8" from the front wall | 48" | 33 | at the kitchen opening; legs mud |
+| L22 | 4" recessed LED, 2700K, IC, dimmable | Mud Room: ceiling, 3'-2 1/2" from the left wall, 5'-8" from the rear wall | ceiling | 33 |  |
+| L23 | 4" recessed LED, 2700K, IC, dimmable | Mud Room: ceiling, 2'-9" from the right wall, 3'-5 1/2" from the rear wall | ceiling | 33 |  |
+| L24 | 4" recessed LED, 2700K, IC, dimmable | Mud Room: ceiling, 2'-9" from the right wall, 3'-7 1/2" from the front wall | ceiling | 33 |  |
+| R18 | GFCI receptacle, 20A | Kitchen: on the left wall, 8'-1" from the rear wall | 44" | 11 | counter, 4 ft spacing |
+| R19 | GFCI receptacle, 20A | Kitchen: on the left wall, 10'-6" from the rear wall | 44" | 11 | counter, 4 ft spacing |
+| R20 | GFCI receptacle, 20A | Kitchen: on the left wall, 12'-1" from the front wall | 44" | 11 | counter, 4 ft spacing |
+| R21 | GFCI receptacle, 20A | Kitchen: on the left wall, 8'-6" from the front wall | 44" | 11 | counter, 4 ft spacing |
+| R22 | GFCI receptacle, 20A | Kitchen: on the front wall, 3'-9" from the left wall | 44" | 12 | front counter |
+| R23 | GFCI receptacle, 20A | Kitchen: on the left wall, 12'-1" from the rear wall | 27" | 12 | island end panel, living side, below the counter edge |
+| R24 | GFCI receptacle, 20A | Kitchen: on the left wall, 11'-6" from the front wall | 27" | 12 | island, living side, below the counter edge |
+| R25 | 240V receptacle or junction | Kitchen: on the left wall, 13'-6" from the rear wall | 6" | 1-2 | range receptacle behind the range, NEMA 14-50R |
+| L25 | range hood, ducted outside | Kitchen: on the left wall, 13'-6" from the rear wall | 72" | 17 | hood over the range, ducted outside |
+| R26 | receptacle, 20A dedicated | Kitchen: on the front wall, 5'-9 1/2" from the right wall | 48" | 14 | refrigerator, above the floor in the fridge recess |
+| R27 | receptacle, 20A dedicated | Kitchen: ceiling, 5'-1/2" from the right wall, 9'-6" from the rear wall | 12" | 15 | dishwasher, junction in the island sink base |
+| R28 | receptacle, 20A dedicated | Kitchen: ceiling, 5'-1/2" from the right wall, 11'-6" from the rear wall | 12" | 16 | disposal, switched receptacle in the sink base; air switch on the sink deck |
+| S10 | dimmer, rocker | Kitchen: on the left wall, 2'-6" from the front wall | 48" | 34 | 3-gang beside the mud room opening: cans (3-way dimmer), pendants, under-cabinet; legs kit-cans, kit-pend, kit-ucl |
+| S11 | dimmer, rocker | Kitchen: on the left wall, 6'-1 1/2" from the rear wall | 48" | 34 | 3-way dimmer at the master hall opening; legs kit-cans |
+| L26 | 4" recessed LED, 2700K, IC, dimmable | Kitchen: ceiling, 3'-5 1/2" from the left wall, 3'-6" from the rear wall | ceiling | 34 |  |
+| L27 | 4" recessed LED, 2700K, IC, dimmable | Kitchen: ceiling, 3'-5 1/2" from the left wall, 8'-6" from the rear wall | ceiling | 34 |  |
+| L28 | 4" recessed LED, 2700K, IC, dimmable | Kitchen: ceiling, 3'-5 1/2" from the left wall, 10'-3 1/2" from the front wall | ceiling | 34 |  |
+| L29 | 4" recessed LED, 2700K, IC, dimmable | Kitchen: ceiling, 3'-5 1/2" from the left wall, 5'-1" from the front wall | ceiling | 34 |  |
+| L30 | 4" recessed LED, 2700K, IC, dimmable | Kitchen: ceiling, 1'-11" from the right wall, 3'-6" from the rear wall | ceiling | 34 |  |
+| L31 | 4" recessed LED, 2700K, IC, dimmable | Kitchen: ceiling, 1'-11" from the right wall, 8'-6" from the rear wall | ceiling | 34 |  |
+| L32 | 4" recessed LED, 2700K, IC, dimmable | Kitchen: ceiling, 1'-11" from the right wall, 8'-3 1/2" from the front wall | ceiling | 34 |  |
+| L33 | 4" recessed LED, 2700K, IC, dimmable | Kitchen: ceiling, 1'-11" from the right wall, 3'-3 1/2" from the front wall | ceiling | 34 |  |
+| L34 | pendant | Kitchen: ceiling, 5'-1/2" from the right wall, 10'-6" from the rear wall | 72" | 34 | over the island |
+| L35 | pendant | Kitchen: ceiling, 5'-1/2" from the right wall, 14'-3 1/2" from the front wall | 72" | 34 | over the island |
+| L36 | pendant | Kitchen: ceiling, 5'-1/2" from the right wall, 10'-3 1/2" from the front wall | 72" | 34 | over the island |
+| L37 | linear LED under cabinet | Kitchen: on the left wall, 9'-2" from the rear wall | 54" | 34 | under the uppers, left of the range |
+| L38 | linear LED under cabinet | Kitchen: on the left wall, 10'-1/2" from the front wall | 54" | 34 | under the uppers, right of the range |
+| R29 | GFCI receptacle, 20A | Dining: on the left wall, 2'-10 1/2" from the rear wall | 16" | 13 |  |
+| R30 | GFCI receptacle, 20A | Dining: on the left wall, 2'-6" from the front wall | 16" | 13 |  |
+| R31 | GFCI receptacle, 20A | Dining: on the rear wall, 4'-5" from the left wall | 16" | 13 | between the windows |
+| R32 | GFCI receptacle, 20A | Dining: on the rear wall, 4'-7 1/2" from the right wall | 16" | 13 | between the windows |
+| R33 | GFCI receptacle, 20A | Dining: on the right wall, 4'-10" from the rear wall | 16" | 13 | between the windows |
+| S12 | dimmer, rocker | Dining: on the left wall, 9" from the front wall | 48" | 34 | kitchen end of the dining wall; legs dining |
+| L39 | pendant | Dining: ceiling, 6'-5" from the right wall, 4'-6" from the front wall | 78" | 34 | chandelier over the table; 30" over the top |
+| R34 | GFCI receptacle, 20A | Pantry: on the right wall, 4'-0" from the rear wall | 44" | 13 | pantry counter |
+| R35 | GFCI receptacle, 20A | Pantry: on the left wall, 2'-2 1/2" from the rear wall | 44" | 13 | pantry counter |
+| S13 | switch, rocker | Pantry: on the rear wall, 1'-10 1/2" from the right wall | 48" | 34 | inside the opening; legs pantry |
+| L40 | surface LED, closet-rated (410.16) | Pantry: ceiling, 2'-9 1/2" from the left wall, 4'-0" from the rear wall | ceiling | 34 |  |
+| L41 | surface LED, closet-rated (410.16) | Pantry: ceiling, 2'-8 1/2" from the right wall, 4'-0" from the rear wall | ceiling | 34 |  |
+| X1 | media panel: Cat6 home runs, network switch | Pantry: on the left wall, 2'-1" from the front wall | 54" | 37 | media panel on the mech room wall; every Cat6 home-runs here |
+| R36 | boiler: 120V service switch + receptacle | Mechanical: on the right wall, 2'-5" from the rear wall | 54" | 31 | heat source for the radiant slab (R-1) |
+| R37 | duplex receptacle, 15A | Mechanical: on the right wall, 1'-9 1/2" from the front wall | 54" | 31 | circulators and zone control panel |
+| R38 | water heater: 120V receptacle (power vent) | Mechanical: on the right wall, 7" from the front wall | 54" | 32 |  |
+| S14 | switch, rocker | Mechanical: on the rear wall, 6" from the left wall | 48" | 34 | inside the double doors; legs mech |
+| L42 | surface LED ceiling fixture | Mechanical: ceiling, 1'-6 1/2" from the left wall, 1'-8 1/2" from the rear wall | ceiling | 34 |  |
+| R39 | duplex receptacle, 15A | Laundry: on the rear wall, 2'-2" from the right wall | 24" | 31 | radiant manifold MF-1 actuator module (R-1) |
+| R40 | GFCI receptacle, 15A | Garage: on the rear wall, 10'-1 1/2" from the right wall | 48" | 31 | radiant manifolds MF-2 / MF-G actuator module and the garage circulator P-RG (R-1) |
+| R41 | duplex receptacle, 15A | Bedroom Hall: on the left wall, 8'-5 1/2" from the rear wall | 24" | 31 | radiant manifold MF-3 actuator module (R-1) |
+| R42 | duplex receptacle, 15A, tamper-resistant | Living: on the rear wall, 1'-2 1/2" from the left wall | 16" | 22 |  |
+| R43 | duplex receptacle, 15A, tamper-resistant | Living: on the rear wall, 6'-1" from the left wall | 16" | 22 |  |
+| R44 | duplex receptacle, 15A, tamper-resistant | Living: on the rear wall, 5'-11 1/2" from the right wall | 16" | 22 |  |
+| R45 | duplex receptacle, 15A, tamper-resistant | Living: on the rear wall, 1'-2" from the right wall | 16" | 22 |  |
+| R46 | duplex receptacle, 15A, tamper-resistant | Living: on the right wall, 1'-8" from the rear wall | 16" | 22 |  |
+| R47 | duplex receptacle, 15A, tamper-resistant | Living: on the right wall, 8'-9" from the rear wall | 16" | 22 |  |
+| R48 | duplex receptacle, 15A, tamper-resistant | Living: on the right wall, 7'-3 1/2" from the front wall | 16" | 22 |  |
+| R49 | duplex receptacle, 15A, tamper-resistant | Living: on the right wall, 1'-10 1/2" from the front wall | 16" | 22 |  |
+| R50 | recessed TV box: power + 2 x Cat6 | Living: on the right wall, 12'-9" from the rear wall | 66" | 22 | over the fireplace mantel |
+| R51 | duplex receptacle, 15A | Living: on the right wall, 10'-3 1/2" from the front wall | 8" | 22 | fireplace insert blower, beside the insert |
+| R52 | duplex receptacle, 15A, tamper-resistant | Living: on the front wall, 8'-2" from the right wall | 16" | 22 |  |
+| R53 | duplex receptacle, 15A, tamper-resistant | Living: on the front wall, 2'-2" from the right wall | 16" | 22 |  |
+| R54 | floor box receptacle | Living: ceiling, 8'-8 1/2" from the left wall, 8'-6" from the front wall | floor | 22 | floor box under the sofa (confirm the furniture layout) |
+| S15 | 4-way switch, rocker | Living: on the rear wall, 6'-7" from the left wall | 48" | 34 | 4-gang beside the patio doors: living cans 4-way, living fan, patio lights, patio fan; legs living-cans, living-fan, patio-lights, patio-fan |
+| S16 | 3-way switch, rocker | Living: on the right wall, 7'-5" from the rear wall | 48" | 34 | at the bedroom hall opening; legs living-cans |
+| L43 | 4" recessed LED, 2700K, IC, dimmable | Living: ceiling, 4'-1" from the left wall, 5'-6 1/2" from the rear wall | ceiling | 34 |  |
+| L44 | 4" recessed LED, 2700K, IC, dimmable | Living: ceiling, 4'-1" from the left wall, 5'-6" from the front wall | ceiling | 34 |  |
+| L45 | 4" recessed LED, 2700K, IC, dimmable | Living: ceiling, 10'-2" from the right wall, 5'-6 1/2" from the rear wall | ceiling | 34 |  |
+| L46 | 4" recessed LED, 2700K, IC, dimmable | Living: ceiling, 10'-2" from the right wall, 5'-6" from the front wall | ceiling | 34 |  |
+| L47 | 4" recessed LED, 2700K, IC, dimmable | Living: ceiling, 3'-11 1/2" from the right wall, 5'-6 1/2" from the rear wall | ceiling | 34 |  |
+| L48 | 4" recessed LED, 2700K, IC, dimmable | Living: ceiling, 3'-11 1/2" from the right wall, 5'-6" from the front wall | ceiling | 34 |  |
+| L49 | fan-rated ceiling box, switched | Living: ceiling, 10'-2" from the right wall, 11'-1" from the front wall | ceiling | 34 | room centre, below the label |
+| R55 | duplex receptacle, 15A, tamper-resistant | Entry: on the left wall, 3'-8" from the front wall | 16" | 23 |  |
+| S17 | dimmer, rocker | Entry: on the right wall, 1'-2" from the front wall | 48" | 34 | 3-gang at the front door: living cans 3-way dimmer, entry light, porch lights; legs living-cans, entry, porch |
+| L50 | surface LED ceiling fixture | Entry: ceiling, 3'-6 1/2" from the right wall, 3'-10 1/2" from the front wall | ceiling | 34 |  |
+| A3 | smoke + CO alarm, 120V interconnected w/ battery | Entry: ceiling, 2'-3 1/2" from the right wall, 2'-1 1/2" from the rear wall | ceiling | 35 | outside the office (a possible bedroom) |
+| L51 | surface LED, closet-rated (410.16), integral occupancy sensor | Coat Closet: ceiling, 1'-0" from the left wall, 1'-5 1/2" from the front wall | ceiling | 34 |  |
+| R56 | duplex receptacle, 15A, tamper-resistant | Office: on the rear wall, 3'-2 1/2" from the left wall | 16" | 23 |  |
+| R57 | duplex receptacle, 15A, tamper-resistant | Office: on the rear wall, 3'-9" from the right wall | 16" | 23 |  |
+| R58 | duplex receptacle, 15A, tamper-resistant | Office: on the right wall, 4'-2 1/2" from the rear wall | 16" | 23 |  |
+| R59 | data outlet, 2 x Cat6 | Office: on the right wall, 3'-11 1/2" from the front wall | 16" | 37 | desk |
+| R60 | duplex receptacle, 15A, tamper-resistant | Office: on the front wall, 2'-10" from the left wall | 16" | 23 |  |
+| R61 | duplex receptacle, 15A, tamper-resistant | Office: on the front wall, 1'-7" from the right wall | 16" | 23 |  |
+| S18 | dimmer, rocker | Office: on the left wall, 1'-8" from the front wall | 48" | 35 | inside the French doors; legs office |
+| L52 | 4" recessed LED, 2700K, IC, dimmable | Office: ceiling, 3'-2 1/2" from the left wall, 2'-10" from the rear wall | ceiling | 35 |  |
+| L53 | 4" recessed LED, 2700K, IC, dimmable | Office: ceiling, 3'-2 1/2" from the left wall, 2'-10 1/2" from the front wall | ceiling | 35 |  |
+| L54 | 4" recessed LED, 2700K, IC, dimmable | Office: ceiling, 3'-2" from the right wall, 2'-10" from the rear wall | ceiling | 35 |  |
+| L55 | 4" recessed LED, 2700K, IC, dimmable | Office: ceiling, 3'-2" from the right wall, 2'-10 1/2" from the front wall | ceiling | 35 |  |
+| A4 | smoke alarm, 120V interconnected w/ battery | Office: ceiling, 6'-4 1/2" from the right wall, 2'-8" from the front wall | ceiling | 35 |  |
+| R62 | duplex receptacle, 15A, tamper-resistant | Bedroom Hall: on the left wall, 9'-0" from the front wall | 16" | 24 | hall over 10 ft (210.52(H)) |
+| S19 | 3-way switch, rocker | Bedroom Hall: on the left wall, 6'-0" from the rear wall | 48" | 35 | living end, just past the opening; legs bhall |
+| S20 | 3-way switch, rocker | Bedroom Hall: on the left wall, 1'-3 1/2" from the front wall | 48" | 35 | bedroom 3 end; legs bhall |
+| L56 | 4" recessed LED, 2700K, IC, dimmable | Bedroom Hall: ceiling, 2'-1/2" from the left wall, 3'-1/2" from the rear wall | ceiling | 35 |  |
+| L57 | 4" recessed LED, 2700K, IC, dimmable | Bedroom Hall: ceiling, 2'-1/2" from the left wall, 10'-0" from the front wall | ceiling | 35 |  |
+| L58 | 4" recessed LED, 2700K, IC, dimmable | Bedroom Hall: ceiling, 2'-1/2" from the left wall, 3'-7" from the front wall | ceiling | 35 |  |
+| A5 | smoke + CO alarm, 120V interconnected w/ battery | Bedroom Hall: ceiling, 2'-1/2" from the left wall, 7'-5 1/2" from the rear wall | ceiling | 35 | outside the bedrooms |
+| R63 | duplex receptacle, 15A, tamper-resistant | Bedroom 1: on the rear wall, 5'-6" from the right wall | 16" | 24 | between the windows |
+| R64 | duplex receptacle, 15A, tamper-resistant | Bedroom 1: on the front wall, 5'-1/2" from the left wall | 16" | 24 | 2 ft wall space between the door and the closet (210.52(A)(2)) |
+| R65 | duplex receptacle, 15A, tamper-resistant | Bedroom 1: on the left wall, 3'-5 1/2" from the rear wall | 16" | 24 |  |
+| R66 | duplex receptacle, 15A, tamper-resistant | Bedroom 1: on the left wall, 3'-6 1/2" from the front wall | 16" | 24 |  |
+| R67 | duplex receptacle, 15A, tamper-resistant | Bedroom 1: on the right wall, 6'-1/2" from the rear wall | 16" | 24 |  |
+| R68 | duplex receptacle, 15A, tamper-resistant | Bedroom 1: on the right wall, 2'-4" from the front wall | 16" | 24 |  |
+| S21 | switch, rocker | Bedroom 1: on the front wall, 4'-3 1/2" from the left wall | 48" | 35 | 2-gang, latch side of D17: light, fan; legs bed1-light, bed1-fan |
+| L59 | fan-rated ceiling box, switched | Bedroom 1: ceiling, 6'-6 1/2" from the left wall, 5'-8" from the rear wall | ceiling | 35 |  |
+| A6 | smoke alarm, 120V interconnected w/ battery | Bedroom 1: ceiling, 2'-9 1/2" from the right wall, 3'-4" from the front wall | ceiling | 35 |  |
+| L60 | surface LED, closet-rated (410.16), integral occupancy sensor | Bedroom 1 Closet: ceiling, 4'-4 1/2" from the left wall, 1'-0" from the rear wall | ceiling | 35 |  |
+| R69 | GFCI receptacle, 20A | Bath 1: on the right wall, 3'-5" from the rear wall | 40" | 20 | between the lav and the toilet |
+| L61 | wall sconce / vanity light | Bath 1: on the right wall, 1'-6 1/2" from the rear wall | 84" | 35 | over the mirror |
+| S22 | switch, rocker | Bath 1: on the left wall, 3'-9" from the rear wall | 48" | 35 | 2-gang, latch side of D19: lights, fan; legs bath1-light, bath1-fan |
+| L62 | exhaust fan with integrated LED light, 110 CFM, humidity sensing | Bath 1: ceiling, 2'-1 1/2" from the left wall, 4'-8" from the rear wall | ceiling | 35 |  |
+| L63 | 4" recessed LED, wet location | Bath 1: ceiling, 2'-6 1/2" from the left wall, 1'-7 1/2" from the front wall | ceiling | 35 | in the shower |
+| R70 | duplex receptacle, 15A, tamper-resistant | Bedroom 2: on the rear wall, 4'-2" from the left wall | 16" | 25 |  |
+| R71 | duplex receptacle, 15A, tamper-resistant | Bedroom 2: on the right wall, 4'-8" from the rear wall | 16" | 25 | between the windows |
+| R72 | duplex receptacle, 15A, tamper-resistant | Bedroom 2: on the front wall, 5'-4 1/2" from the left wall | 16" | 25 |  |
+| R73 | duplex receptacle, 15A, tamper-resistant | Bedroom 2: on the front wall, 3'-0" from the right wall | 16" | 25 |  |
+| R74 | duplex receptacle, 15A, tamper-resistant | Bedroom 2: on the left wall, 4'-1" from the rear wall | 16" | 25 |  |
+| S23 | switch, rocker | Bedroom 2: on the front wall, 7 1/2" from the left wall | 48" | 35 | 2-gang in the corner, latch side of D21: light, fan; legs bed2-light, bed2-fan |
+| L64 | fan-rated ceiling box, switched | Bedroom 2: ceiling, 7'-1" from the left wall, 5'-8" from the rear wall | ceiling | 35 |  |
+| A7 | smoke alarm, 120V interconnected w/ battery | Bedroom 2: ceiling, 2'-9 1/2" from the right wall, 2'-6" from the front wall | ceiling | 35 |  |
+| L65 | surface LED, closet-rated (410.16), integral occupancy sensor | Closet (Bedroom 2): ceiling, 2'-6 1/2" from the left wall, 2'-3 1/2" from the rear wall | ceiling | 35 |  |
+| R75 | GFCI receptacle, 20A | Bath 2: on the front wall, 4'-0" from the left wall | 40" | 20 | between the two sinks |
+| L66 | wall sconce / vanity light | Bath 2: on the front wall, 2'-5 1/2" from the left wall | 84" | 35 | over the mirror at sink 1 |
+| L67 | wall sconce / vanity light | Bath 2: on the front wall, 5'-7" from the left wall | 84" | 35 | over the mirror at sink 2 |
+| S24 | switch, rocker | Bath 2: on the left wall, 2'-1 1/2" from the front wall | 48" | 35 | 2-gang, latch side of D22: lights, fan; legs bath2-light, bath2-fan |
+| L68 | exhaust fan with integrated LED light, 110 CFM, humidity sensing | Bath 2: ceiling, 6'-4 1/2" from the right wall, 2'-0" from the rear wall | ceiling | 35 |  |
+| L69 | 4" recessed LED, wet location | Bath 2: ceiling, 1'-4 1/2" from the right wall, 2'-9 1/2" from the front wall | ceiling | 35 | over the tub |
+| R76 | duplex receptacle, 15A, tamper-resistant | Bedroom 3: on the rear wall, 4'-11 1/2" from the right wall | 16" | 26 |  |
+| R77 | duplex receptacle, 15A, tamper-resistant | Bedroom 3: on the left wall, 5'-2 1/2" from the rear wall | 16" | 26 |  |
+| R78 | duplex receptacle, 15A, tamper-resistant | Bedroom 3: on the front wall, 2'-6 1/2" from the left wall | 16" | 26 |  |
+| R79 | duplex receptacle, 15A, tamper-resistant | Bedroom 3: on the front wall, 1'-11 1/2" from the right wall | 16" | 26 |  |
+| R80 | duplex receptacle, 15A, tamper-resistant | Bedroom 3: on the right wall, 4'-3 1/2" from the front wall | 16" | 26 |  |
+| S25 | switch, rocker | Bedroom 3: on the rear wall, 4'-1/2" from the left wall | 48" | 35 | 2-gang, latch side of D23: light, fan; legs bed3-light, bed3-fan |
+| L70 | fan-rated ceiling box, switched | Bedroom 3: ceiling, 6'-6" from the left wall, 5'-8" from the front wall | ceiling | 35 |  |
+| A8 | smoke alarm, 120V interconnected w/ battery | Bedroom 3: ceiling, 2'-3" from the right wall, 2'-1" from the front wall | ceiling | 35 |  |
+| L71 | surface LED, closet-rated (410.16), integral occupancy sensor | Closet (Bedroom 3): ceiling, 2'-7" from the right wall, 2'-5 1/2" from the front wall | ceiling | 35 |  |
+| X2 | panel P1, 200A main breaker, 40 space | Garage: on the right wall, 10'-5 1/2" from the rear wall | 60" | P1 | beside the mud room door, 36" clear in front; fed from the meter-main outside |
+| R81 | GFCI receptacle, 20A | Garage: on the left wall, 17'-6 1/2" from the front wall | 48" | 28 | between the garage doors |
+| R82 | GFCI receptacle, 20A | Garage: on the front wall, 4'-6 1/2" from the left wall | 48" | 28 |  |
+| R83 | GFCI receptacle, 20A | Garage: on the front wall, 7'-9" from the right wall | 48" | 28 |  |
+| R84 | GFCI receptacle, 20A | Garage: on the right wall, 10'-7 1/2" from the front wall | 48" | 28 |  |
+| R85 | GFCI receptacle, 20A | Garage: on the rear wall, 10'-6 1/2" from the left wall | 48" | 28 |  |
+| R86 | GFCI receptacle, 20A | Garage: on the right wall, 5'-8" from the rear wall | 48" | 28 | workbench |
+| R87 | 240V receptacle, NEMA 14-50R | Garage: on the right wall, 3'-3" from the front wall | 48" | 9-10 | EV-ready; swap for a hardwired charger if wanted |
+| R88 | GFCI receptacle, 20A | Garage: ceiling, 11'-1/2" from the left wall, 11'-6" from the rear wall | ceiling | 29 | door opener 1, ceiling |
+| R89 | GFCI receptacle, 20A | Garage: ceiling, 11'-1/2" from the left wall, 11'-0" from the front wall | ceiling | 29 | door opener 2, ceiling |
+| S26 | 3-way switch, rocker | Garage: on the rear wall, 4'-8 1/2" from the left wall | 48" | 36 | inside the service door, latch side of D3; legs garage |
+| S27 | 3-way switch, rocker | Garage: on the rear wall, 7" from the right wall | 48" | 36 | 2-gang at the mud room door: garage lights 3-way, garage door lights; legs garage, garage-ext |
+| L72 | 4 ft LED shop fixture | Garage: ceiling, 6'-1/2" from the left wall, 10'-10 1/2" from the rear wall | ceiling | 36 |  |
+| L73 | 4 ft LED shop fixture | Garage: ceiling, 6'-1/2" from the left wall, 9'-7 1/2" from the front wall | ceiling | 36 |  |
+| L74 | 4 ft LED shop fixture | Garage: ceiling, 12'-6 1/2" from the right wall, 10'-10 1/2" from the rear wall | ceiling | 36 |  |
+| L75 | 4 ft LED shop fixture | Garage: ceiling, 12'-6 1/2" from the right wall, 9'-7 1/2" from the front wall | ceiling | 36 |  |
+| L76 | 4 ft LED shop fixture | Garage: ceiling, 5'-1/2" from the right wall, 10'-10 1/2" from the rear wall | ceiling | 36 |  |
+| L77 | 4 ft LED shop fixture | Garage: ceiling, 5'-1/2" from the right wall, 9'-7 1/2" from the front wall | ceiling | 36 |  |
+| X3 | meter-main: utility meter + 200A service disconnect (230.85) | Outside: outside, on the house wall, 31'-0" from the garage-door wall, 66'-5" from the master bedroom's rear wall | 60" | P1 | on the garage wall outside, beside the EV receptacle; utility service route to confirm |
+| L78 | 4" recessed LED, wet location | Front Porch: porch/patio ceiling, 36'-0" from the garage-door wall, 58'-0" from the master bedroom's rear wall | ceiling | 34 |  |
+| L79 | 4" recessed LED, wet location | Front Porch: porch/patio ceiling, 47'-6 1/2" from the garage-door wall, 58'-0" from the master bedroom's rear wall | ceiling | 34 |  |
+| L80 | 4" recessed LED, wet location | Front Porch: porch/patio ceiling, 58'-0" from the garage-door wall, 58'-0" from the master bedroom's rear wall | ceiling | 34 |  |
+| L81 | 4" recessed LED, wet location | Front Porch: porch/patio ceiling, 70'-0" from the garage-door wall, 58'-0" from the master bedroom's rear wall | ceiling | 34 |  |
+| L82 | exterior LED, wet location, dark-sky | Front Porch: outside, on the house wall, 44'-11 1/2" from the garage-door wall, 53'-9" from the master bedroom's rear wall | 72" | 34 | front door, left |
+| L83 | exterior LED, wet location, dark-sky | Front Porch: outside, on the house wall, 50'-2" from the garage-door wall, 53'-9" from the master bedroom's rear wall | 72" | 34 | front door, right |
+| R90 | weatherproof GFCI receptacle, in-use cover | Front Porch: outside, on the house wall, 39'-9 1/2" from the garage-door wall, 53'-9" from the master bedroom's rear wall | 24" | 30 |  |
+| R91 | weatherproof GFCI receptacle, in-use cover | Front Porch: outside, on the house wall, 63'-0" from the garage-door wall, 53'-9" from the master bedroom's rear wall | 24" | 30 |  |
+| L84 | 4" recessed LED, wet location | Covered Patio: porch/patio ceiling, 48'-6" from the garage-door wall, 5'-2 1/2" from the master bedroom's rear wall | ceiling | 34 |  |
+| L85 | 4" recessed LED, wet location | Covered Patio: porch/patio ceiling, 59'-8 1/2" from the garage-door wall, 5'-2 1/2" from the master bedroom's rear wall | ceiling | 34 |  |
+| L86 | fan-rated ceiling box, wet location | Covered Patio: porch/patio ceiling, 54'-1" from the garage-door wall, 9'-0" from the master bedroom's rear wall | ceiling | 34 |  |
+| L87 | exterior LED, wet location, dark-sky | Covered Patio: outside, on the house wall, 50'-4" from the garage-door wall, 16'-4 1/2" from the master bedroom's rear wall | 72" | 34 | patio doors, left |
+| L88 | exterior LED, wet location, dark-sky | Covered Patio: outside, on the house wall, 57'-8" from the garage-door wall, 16'-4 1/2" from the master bedroom's rear wall | 72" | 34 | patio doors, right |
+| R92 | weatherproof GFCI receptacle, in-use cover | Covered Patio: outside, on the house wall, 45'-2 1/2" from the garage-door wall, 16'-4 1/2" from the master bedroom's rear wall | 24" | 30 |  |
+| R93 | weatherproof GFCI receptacle, in-use cover | Covered Patio: outside, on the house wall, 63'-0" from the garage-door wall, 16'-4 1/2" from the master bedroom's rear wall | 24" | 30 |  |
+| L89 | exterior LED, wet location, dark-sky | Outside: outside, on the house wall, 5'-2" from the garage-door wall, 36'-8" from the master bedroom's rear wall | 78" | 36 | service door |
+| L90 | exterior LED, wet location, dark-sky | Outside: outside, on the house wall, 0" from the garage-door wall, 39'-1" from the master bedroom's rear wall | 84" | 36 | garage door coach light |
+| L91 | exterior LED, wet location, dark-sky | Outside: outside, on the house wall, 0" from the garage-door wall, 52'-1" from the master bedroom's rear wall | 84" | 36 | garage door coach light |
+| L92 | exterior LED, wet location, dark-sky | Outside: outside, on the house wall, 0" from the garage-door wall, 65'-1" from the master bedroom's rear wall | 84" | 36 | garage door coach light |
+| X4 | fused disconnect DS1, CU-1 | Outside: outside, on the house wall, 31'-0" from the garage-door wall, 54'-7" from the master bedroom's rear wall | 54" | 5-6 | front porch, on the garage wall beside the unit (M-1) |
+| R94 | weatherproof GFCI receptacle, in-use cover | Outside: outside, on the house wall, 31'-0" from the garage-door wall, 57'-7" from the master bedroom's rear wall | 24" | 30 | porch; service receptacle within 25 ft of CU-1 (210.63) |
+| X5 | fused disconnect DS2, CU-2 | Outside: outside, on the house wall, 83'-5 1/2" from the garage-door wall, 45'-0" from the master bedroom's rear wall | 48" | 7-8 | right side yard, on the bedroom 3 closet wall beside the unit (M-1) |
+| R95 | weatherproof GFCI receptacle, in-use cover | Outside: outside, on the house wall, 83'-5 1/2" from the garage-door wall, 40'-11" from the master bedroom's rear wall | 24" | 30 | service receptacle within 25 ft of CU-2 (210.63) |
+| X6 | low-voltage drop: Cat6 for a video doorbell | Outside: outside, on the house wall, 50'-11" from the garage-door wall, 53'-9" from the master bedroom's rear wall | 48" | 37 | right of the front door |
 
 ### Service load calculation (NEC 220.82)
 
 | Item | Basis | Load |
 |---|---|---|
-| General lighting & receptacles | 3 VA × 3,185 sf | 9,555 VA |
-| Small-appliance circuits | 2 × 1,500 VA | 3,000 VA |
-| Laundry circuit | 1 × 1,500 VA | 1,500 VA |
-| Fixed appliances | range, DW, disposal, fridge, hood, water heater, dryer, blower, openers | 26,200 VA |
-| All other load, demand | first 10 kVA at 100 %, rest at 40 % (220.82(B)) | 22,102 VA |
-| Heating / cooling | heat pump with 5 kW backup, at 100 % (assumed) | 10,000 VA |
-| Calculated load | 32,102 VA ÷ 240 V | 134 A → 200 A service |
+| General lighting and receptacles | 3 VA x 3,185 sf | 9,555 VA |
+| Small-appliance circuits | 3 x 1,500 VA (11, 12, 13) | 4,500 VA |
+| Laundry circuit | 1 x 1,500 VA (18) | 1,500 VA |
+| Fixed appliances, nameplate | range, dryer, EV-ready, fridge, DW, disposal, hood, openers, boiler, water heater, media | 32,500 VA |
+| All other load, demand | first 10 kVA at 100%, rest at 40% (220.82(B)) | 25,222 VA |
+| Heating / cooling | two mini-split outdoor units at 100% (220.82(C)); radiant boiler and water heater are gas or propane (owner, 2026-10-13) | 9,600 VA |
+| Calculated load | 34,822 VA / 240 V | 145 A on a 200 A service |
 
 ### Bill of materials
 
@@ -561,16 +637,24 @@ Rough-order quantities from the device layout, for pricing. The electrician take
 
 | Item | Qty | Notes |
 |---|---|---|
-| Duplex receptacles, TR | 46 | 15 A, plus boxes |
-| GFCI receptacles | 28 | 20 A, weather-resistant outside with in-use covers |
-| Dedicated receptacles | 2 | washer 20 A, dryer 14-30R |
-| Switches | 43 | single-pole and 3-way, dimmers in living, dining, master |
-| Light fixtures | 59 | including recessed and exterior |
-| Ceiling fans | 7 | fan-rated boxes |
-| Exhaust fans | 6 | 80 CFM, ducted to outside |
-| Smoke and smoke/CO alarms | 8 | hardwired, interconnected |
-| Panel | 1 | 200 A main breaker, 40 spaces, AFCI/GFCI breakers per schedule |
-| NM-B 14/2 and 12/2 | ~4,500 ft | rough order from device count (about 22 ft per device) |
+| Duplex receptacles, TR | 45 | 15A, with boxes |
+| Duplex + USB-C receptacles | 2 | nightstands |
+| GFCI receptacles, 20A | 29 | kitchen, dining, baths, laundry, pantry, garage |
+| Weatherproof GFCI receptacles | 6 | in-use covers |
+| Dedicated / 240V receptacles | 9 | washer, fridge, DW, disposal, boiler, water heater, range 14-50, dryer 14-30, EV 14-50 |
+| Floor box | 1 | living |
+| Switches and dimmers | 27 | single-pole, 3-way, 4-way, dimmers, one occupancy sensor; gangs per the switch plan |
+| Recessed LED cans | 42 | 4", 2700K; sloped trims in the kitchen and living, wet-rated in showers, tubs, porch and patio |
+| Surface / closet fixtures | 18 | closet-rated with occupancy sensors in the small closets; 4 ft LED shop fixtures in the garage |
+| Pendants and chandelier | 4 | island and dining |
+| Vanity lights and exterior lights | 14 | exterior dark-sky |
+| Fan-rated boxes | 6 | master, living, three bedrooms, patio |
+| Bath exhaust fans | 5 | 110 CFM, humidity sensing, integrated light |
+| Smoke and smoke + CO alarms | 8 | hardwired, interconnected |
+| Panel and meter-main | 1 + 1 | 200A, 40 spaces, AFCI/GFCI breakers per the schedule; meter-main with the 230.85 disconnect |
+| Fused disconnects | 2 | one per mini-split outdoor unit |
+| Media panel, Cat6 | 1 | 4 drops, ~220 ft of Cat6 (2 per TV box and desk) |
+| NM-B 14/2, 14/3, 12/2, 10/3, 6/3 | ~5,500 ft | rough order from the device count (about 24 ft per device) |
 
 ## P-1 Plumbing
 

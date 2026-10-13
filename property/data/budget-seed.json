@@ -205,10 +205,10 @@
    "id": "b23",
    "group": "Electrical",
    "name": "Rough and finish wiring",
-   "qty": 209,
+   "qty": 228,
    "unit": "device",
    "price": 115,
-   "basis": "209 devices on 31 circuits (E-1)"
+   "basis": "228 devices on 32 circuits (E-1)"
   },
   {
    "id": "b24",
@@ -217,13 +217,13 @@
    "qty": 1,
    "unit": "lot",
    "price": 6500,
-   "basis": "load calc about 134 A"
+   "basis": "load calc about 145 A"
   },
   {
    "id": "b25",
    "group": "Electrical",
    "name": "Light fixtures",
-   "qty": 59,
+   "qty": 91,
    "unit": "each",
    "price": 85,
    "basis": ""

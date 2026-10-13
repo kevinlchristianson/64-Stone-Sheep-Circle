@@ -583,13 +583,13 @@
    "trusses": 67
   },
   "e1": {
-   "devices": 209,
-   "circuits": 31,
-   "spaces": 36,
-   "amps": 134,
-   "receptacles": 76,
-   "lights": 59,
-   "switches": 43
+   "devices": 228,
+   "circuits": 32,
+   "spaces": 40,
+   "amps": 145,
+   "receptacles": 94,
+   "lights": 91,
+   "switches": 27
   },
   "p1": {
    "fixtures": 21,
@@ -635,12 +635,13 @@
    "Foundation (slab assumed: the garage and mechanical floor drains, the radiant slab), thickened footings under G1's end posts and the patio and porch posts, anchor schedule."
   ],
   "E-1": [
-   "Range fuel: the 48\" range (BS655Z-48) could be gas, dual-fuel or electric. Electric is assumed (50 A 240 V); a gas or dual-fuel range drops that circuit and adds a gas line.",
-   "Heating and water heating fuel (heat pump / gas furnace / electric) set the mechanical circuits and the service load.",
-   "Meter and service entrance location (overhead or underground, which side of the house) is not on the site plan.",
-   "EV charger in the garage: yes or no.",
-   "Lighting choices (cans vs. surface fixtures, pendants, fan locations) for the owner's walk-through.",
-   "Low-voltage: network drops, TV at the fireplace wall, doorbell, security."
+   "Range fuel: the 48\" range is drawn electric on a 50A circuit. A gas or dual-fuel range drops that to a 120V receptacle and adds a gas line.",
+   "Mini-split breakers are sized from M-1's nominal units (two 24k 3-port units, MCA about 20A, on 25A/#10); set them to the nameplate MCA/MOCP of the units bought.",
+   "Utility service: overhead or underground, and which side of the house the meter goes on. The meter-main is drawn on the garage wall facing the porch end.",
+   "EV-ready: a 50A NEMA 14-50 receptacle is drawn in the garage. Keep, swap for a hardwired charger, or drop?",
+   "Mounting heights: standard heights are drawn. Zero Rd used 30\" receptacles and 42\" switches for accessibility; say if this house should match.",
+   "Ceiling fans in the master, living, three bedrooms and the patio: keep the fan-rated boxes, or cans instead?",
+   "Low voltage: TVs in the bedrooms, ceiling Wi-Fi access points, cameras, and whether the media panel should move out of the pantry."
   ],
   "P-1": [
    "Where the house connects: city sewer or septic, and which side of the lot. The drain is drawn leaving under the front porch.",

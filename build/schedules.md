@@ -753,7 +753,7 @@ PEX loops in the slab, four thermostat zones, manifolds and flows at Powell, WY 
 ### Open items
 
 - L14 (Closet (Bedroom 2), Bath 1): the floor carries all but about 135 Btu/h of the room at -11°F with 110°F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.
-- Heat source: condensing boiler (recommended; it can also make the domestic hot water and replace P-1's 50 gal heater), an air-to-water heat pump, or an electric boiler. HS-1 is drawn as a natural gas boiler, wall-hung on the mechanical closet's east wall, matching E-1's gas assumption; all-electric changes E-1's service size.
+- Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.
 - Garage: kept at 50°F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.
 - Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10°F warmer water for that loop, or 9" spacing there.
 - Mechanical closet: HS-1, pump P-R1 and the zone controller share it with P-1's water manifold and water heater; that is why no manifold is drawn there (O5 in the options shows the fourth manifold saves little tube). A combi boiler removes the water heater and makes room.

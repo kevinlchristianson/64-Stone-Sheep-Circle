@@ -325,11 +325,11 @@ def build():
                                                          ('Loops', ', '.join(loops_on)), ('Flow', f"{sum(l['gpm'] for l in L if l['mf'] == k):.1f} gpm with all loops calling"),
                                                          ('Where', st['detail'])])
     x, y = HS
-    sh.open_group('HS-1', 'HS-1, heat source for the slab (type to confirm), with the system pump, mixing and the zone controller', hit=(x, y, 1.2))
+    sh.open_group('HS-1', 'HS-1, condensing boiler for the slab, with the system pump, mixing and the zone controller', hit=(x, y, 1.2))
     sh.rect(x - 1.1, y - 0.6, x + 1.1, y + 0.6, '#fff', '#6a1b9a', 1.6); sh.text(x, y, 'HS-1', 6, '#6a1b9a', '700', layer='disc')
     sh.close_group()
     picks['HS-1'] = dict(tag='HS-1', sub='Mechanical closet', fields=[
-        ('Equipment', 'Drawn as a wall-hung natural gas condensing boiler with outdoor reset (the fuel E-1 assumes). To confirm: gas, an air-to-water heat pump or an electric boiler'),
+        ('Equipment', 'Wall-hung condensing boiler with outdoor reset, on natural gas or propane (owner\'s picks, 2026-10-13; matches E-1)'),
         ('Output', f"{sum(l['q'] for l in L):,.0f} Btu/h with every zone calling, {sum(l['q'] for l in L if l['zone'] != 'ZG'):,.0f} Btu/h for the house alone"),
         ('Water', f"{t_supply:.0f}°F supply at {CLIMATE['heat_design_f']:.0f}°F outside, reset down to about 80°F at 50°F outside; garage loops mix down to about 70°F"),
         ('Pumps', 'P-R1: ECM circulator on constant ΔP for MF-1, MF-2 and MF-3; P-RG for MF-G on its own mixing valve'),
@@ -385,7 +385,7 @@ def build():
         'Pressure test every loop at 100 psi water or 60 psi air for 24 hours before the pour and keep it under pressure through the pour. Photograph the layout with a tape in frame before concrete.',
     ]
     open_items = [f"{l['id']} ({', '.join(l['rooms'])}): the floor carries all but about {l['short']:,.0f} Btu/h of the room at {CLIMATE['heat_design_f']:.0f}°F with {T_SUP:.0f}°F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days." for l in shorts] + [
-        'Heat source: condensing boiler (recommended; it can also make the domestic hot water and replace P-1\'s 50 gal heater), an air-to-water heat pump, or an electric boiler. HS-1 is drawn as a natural gas boiler, wall-hung on the mechanical closet\'s east wall, matching E-1\'s gas assumption; all-electric changes E-1\'s service size.',
+        'Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1\'s 50 gal heater; propane needs the boiler\'s LP conversion kit.',
         'Garage: kept at 50°F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.',
         'Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10°F warmer water for that loop, or 9" spacing there.',
         'Mechanical closet: HS-1, pump P-R1 and the zone controller share it with P-1\'s water manifold and water heater; that is why no manifold is drawn there (O5 in the options shows the fourth manifold saves little tube). A combi boiler removes the water heater and makes room.',
@@ -427,7 +427,7 @@ def build():
     for f in feeds:
         lines.append(dict(layer='radiant', name=f"{f['id']} · 1\" feed pair to {f['mf']}", text=f"about {f['lf']:.0f}' each way, insulated (R-1)", pts=f['pts'], h=0.06, r=0.09, color='#6a1b9a'))
     items = [dict(layer='radiant', x=st['at'][0], y=st['at'][1], h=2.6, size=1.2, name=f"{k} · radiant manifold", text=st['detail']) for k, st in STATIONS.items()]
-    items.append(dict(layer='radiant', x=HS[0], y=HS[1], h=3.5, size=1.4, name='HS-1 · heat source (to confirm)', text='Boiler or heat pump for the slab, with the pumps and zone controller (R-1)'))
+    items.append(dict(layer='radiant', x=HS[0], y=HS[1], h=3.5, size=1.4, name='HS-1 · condensing boiler', text='Gas or propane condensing boiler for the slab, with the pumps and zone controller (R-1)'))
     return dict(sheet=sh, picks=picks, tables=tables, notes=notes, open=open_items, summary=summary, legend=legend, lines=lines, items=items, loops=L)
 
 

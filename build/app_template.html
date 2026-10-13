@@ -358,7 +358,7 @@ tbody tr:last-child td { border-bottom: 0; }
           <label class="toggle"><input type="checkbox" id="ly-hvac" checked><span class="sw" style="background:#e3a05a"></span> HVAC: mini-split heads, outdoor units and line sets (M-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-trusses"><span class="sw" style="background:#a98a5c"></span> Roof trusses: 6:12 at 24" o.c., scissors over the kitchen and living vault, girder G1 (S-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-roof"><span class="sw" style="background:#3b3d40"></span> Roof: massing from A-2</label>
-          <label class="toggle"><input type="checkbox" id="ly-radiant" checked><span class="sw" style="background:#c62828"></span> Radiant floor heat: PEX loops in the slab and manifolds (R-1); red zone 1, orange 2, blue 3, green garage</label>
+          <label class="toggle"><input type="checkbox" id="ly-radiant" checked><span class="sw" style="background:#c62828"></span> Radiant floor heat: PEX loops in the slab, manifolds and the boiler (R-1); red zone 1, orange 2, blue 3, green garage. Turn the plan drawing off to see the slab</label>
           <label class="toggle"><input type="checkbox" id="ly-furn" checked><span class="sw" style="background:#dfe8df"></span> Fixtures, cabinets and appliances (A-5)</label>
           <label class="toggle"><input type="checkbox" id="ly-floor" checked><span class="sw" style="background:#ffffff"></span> Plan drawing on the floor and the slab (A-1); turn it off to see everything under the slab</label>
           <div class="cut">
@@ -369,7 +369,7 @@ tbody tr:last-child td { border-bottom: 0; }
         </section>
         <section>
           <p class="eyebrow">Reading it</p>
-          <p class="lede">Plan view puts the rear (patio) at the top and the front porch at the bottom, like the drawings; the garage is on the left. Click anything to read what it is: windows and doors carry their A-1 tag, devices their E-1 tag, fixtures and pipes their P-1 tag. The exterior walls show the siding outside and drywall inside, so turning them off leaves the finished interior.</p>
+          <p class="lede">Plan view puts the rear (patio) at the top and the front porch at the bottom, like the drawings; the garage is on the left. Click anything to read what it is: windows and doors carry their A-1 tag, devices their E-1 tag, fixtures and pipes their P-1 tag, radiant loops their R-1 tag. The exterior walls show the siding outside and drywall inside, so turning them off leaves the finished interior. The radiant loops in the slab and the plumbing under it sit below the plan drawing: turn the drawing off to see them.</p>
           <p class="lede">To point a comment at one thing, pick it and press Comment, or name the sheet and the tag in the chat (A-1 W12, E-1 R12, P-1 WC1, M-1 S3).</p>
         </section>
         <section>
@@ -835,7 +835,7 @@ function setCut(h) { const on = h < CUT_MAX - 0.01; cutPlane.constant = h; for (
 // ---------------------------------------------------------------- groups (layers)
 const LAYERS = ['floor', 'walls', 'ext', 'framing', 'furn', 'trusses', 'roof', 'elec', 'plumb', 'hvac', 'radiant'];
 const G = {}; for (const k of ['ground', ...LAYERS]) { G[k] = new THREE.Group(); scene.add(G[k]); }
-const pickables = [];
+const pickables = [], PICK_FX = [];   // PICK_FX: layer hooks run after a pick (mesh) and on clear (null)
 function box(x0, y0, x1, y1, bottom, top, material, data, group) {
   // a box over the plan rectangle [x0,x1] × [y0,y1] from height bottom to top (feet)
   const a = M(Math.min(x0, x1), Math.min(y0, y1)), b = M(Math.max(x0, x1), Math.max(y0, y1));
@@ -1121,9 +1121,72 @@ const HI_FREE = new THREE.MeshStandardMaterial({ color: 0xe08a00, emissive: 0x4a
   for (const l of hv.lines) for (let i = 1; i < l.pts.length; i++) pipe(l.pts[i - 1], l.pts[i], l.kind === 'ls' ? 0.1 : 0.035, M3[l.kind], { kind: 'hvac', name: l.name, ref: ref(l.name), text: l.text });
 })();
 
+// ---------------------------------------------------------------- radiant floor heat (R-1), as Zero Rd's buildRadiant(): one tube per loop in the slab, the
+// manifold cabinets with their leader bundles rising out of the slab, the 1" feed pairs under the slab in the foam, HS-1 and the thermostats (build/radiant.py)
+(function radiant() {
+  const R = DATA.radiant3d; if (!R) return;
+  const RM = { manifold: mat(0xb8b4ad, { roughness: 0.35, metalness: 0.4 }), feed: mat(0x6a1b9a, { roughness: 0.4 }), boiler: mat(0xe8e6e1, { roughness: 0.5, metalness: 0.2 }),
+               dim: mat(0x9a9a9a, { transparent: true, opacity: 0.25 }) };
+  const zone = c => (MAT[c] ??= mat(parseInt(c.slice(1), 16), { roughness: 0.4 }));
+  const r = 0.07, up = new THREE.Vector3(0, 1, 0);   // drawn fatter than 1/2" PEX so it reads from above, as Zero Rd
+  // one geometry for a whole run of pipe: a cylinder per segment, each stretched r past its ends so the corners close
+  function tubes(segs, rad) {
+    const pos = [], nor = [];
+    for (const [a, b] of segs) {
+      const va = new THREE.Vector3(a.x, a.h, a.z), vb = new THREE.Vector3(b.x, b.h, b.z), dir = vb.clone().sub(va), len = dir.length();
+      if (len < 1e-3) continue;
+      const g = new THREE.CylinderGeometry(rad, rad, len + 2 * rad, 8, 1, true);
+      g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(up, dir.normalize())); g.translate((va.x + vb.x) / 2, (va.y + vb.y) / 2, (va.z + vb.z) / 2);
+      const ng = g.toNonIndexed(); pos.push(...ng.attributes.position.array); nor.push(...ng.attributes.normal.array); g.dispose(); ng.dispose();
+    }
+    const out = new THREE.BufferGeometry();
+    out.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    return out;
+  }
+  const P = (x, y, h) => { const m = M(x, y); return { x: m.x, z: m.z, h }; };
+  const flat = (pts, h) => pts.slice(1).map((p, i) => [P(pts[i][0], pts[i][1], h), P(p[0], p[1], h)]);
+  const add = (geo, material, data) => { const m = new THREE.Mesh(geo, material); m.castShadow = true; m.userData = data; pickables.push(m); G.radiant.add(m); return m; };
+  const padMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false });
+  const loops = [];
+  for (const l of R.loops) {
+    const d = { kind: 'radiant', name: l.name, ref: l.id, text: l.text };
+    const m = add(tubes(l.paths.flatMap(pts => flat(pts, R.slab_h)), r), zone(l.color), d); m.userData.mat0 = m.material; loops.push(m);
+    // the loop's floor area as an invisible pad under the tube, so a tap anywhere on it picks the loop (the pad hands the pick to the tube)
+    for (const [x0, y0, x1, y1] of l.panels) { const pad = box(x0, y0, x1, y1, R.slab_h - 0.08, R.slab_h + 0.02, padMat, { ...d, proxyFor: m }, G.radiant); if (pad) { pad.castShadow = false; pad.receiveShadow = false; } }
+  }
+  for (const s of R.stations) {
+    const d = { kind: 'radiant', name: s.name, ref: s.id, text: s.text }, [x0, y0, x1, y1] = s.box, [lo, hi] = s.z;
+    box(x0, y0, x1, y1, lo, hi, RM.manifold, d, G.radiant);
+    add(tubes([[P(s.at[0], s.at[1], R.slab_h), P(s.at[0], s.at[1], lo)]], 0.2), RM.manifold, d);   // the leaders bundled up out of the slab into the cabinet
+  }
+  for (const f of R.feeds) {
+    const d = { kind: 'radiant', name: f.name, ref: f.id, text: f.text }, st = R.stations.find(s => s.id === f.mf), a = f.pts[0], b = f.pts[f.pts.length - 1];
+    const segs = flat(f.pts, R.feed_h);
+    segs.push([P(a[0], a[1], R.feed_h), P(a[0], a[1], R.hs.z[0])]);                 // up into HS-1
+    if (st) segs.push([P(b[0], b[1], R.feed_h), P(b[0], b[1], st.z[0])]);           // up into the manifold cabinet
+    add(tubes(segs, 0.1), RM.feed, d);
+  }
+  { const h = R.hs; box(h.box[0], h.box[1], h.box[2], h.box[3], h.z[0], h.z[1], RM.boiler, { kind: 'radiant', name: h.name, ref: h.id, text: h.text }, G.radiant); }
+  // the foam under the slab, the rooms' own outlines, as a ghost so the loops read as tied down on it before the pour while the drains
+  // and PEX below (P-1) still show through and can be picked
+  if (R.foam) {
+    const pos = [], [lo, hi] = R.foam.z;
+    for (const rm of H.rooms) {
+      if (rm.kind === 'outdoor') continue;
+      const pts = rm.poly.map(([x, y]) => new THREE.Vector2(x, y));
+      for (const [a, b, c] of THREE.ShapeUtils.triangulateShape(pts, [])) for (const i of [a, c, b]) { const m = M(rm.poly[i][0], rm.poly[i][1]); pos.push(m.x, hi, m.z); }
+    }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.computeVertexNormals();
+    G.radiant.add(new THREE.Mesh(g, mat(0xe4e0d8, { roughness: 0.95, transparent: true, opacity: 0.35, depthWrite: false })));
+  }
+  for (const t of R.stats) box(t.at[0] - 0.18, t.at[1] - 0.18, t.at[0] + 0.18, t.at[1] + 0.18, 4.6, 5.05, zone(t.color), { kind: 'radiant', name: t.name, ref: t.id, text: t.text }, G.radiant);
+  // picking a loop dims the others, as the R-1 sheet does
+  PICK_FX.push(mesh => { const on = mesh && loops.includes(mesh); for (const m of loops) if (m !== mesh) m.material = on ? RM.dim : m.userData.mat0; });
+})();
+
 // ---------------------------------------------------------------- picking
 const raycaster = new THREE.Raycaster(); let picked = null, downAt = null;
-function clearPick() { if (!picked) return; picked.mesh.material = picked.mat; picked = null; $('sel').hidden = true; $('selpop').hidden = true; $('selcomment').setAttribute('aria-expanded', 'false'); }
+function clearPick() { if (!picked) return; picked.mesh.material = picked.mat; picked = null; for (const f of PICK_FX) f(null); $('sel').hidden = true; $('selpop').hidden = true; $('selcomment').setAttribute('aria-expanded', 'false'); }
 // a picked item's comments are open items on its trade's sheet, under the same tag the sheet's card uses, so both show the same comments
 const SHEET_OF = { elec: 'e1', plumb: 'p1', hvac: 'm1', radiant: 'r1', framing: 's1', truss: 's1', roof: 's1', wall: 's1', window: 'a1', door: 'a1', room: 'a1', post: 'a1' };
 function refOf3d({ kind, name, ref, text }) {
@@ -1134,6 +1197,7 @@ function pick(mesh) {
   clearPick(); picked = { mesh, mat: mesh.material }; mesh.material = cutMats.includes(mesh.material) ? MAT.hi : HI_FREE;
   const u = mesh.userData; $('seltext').textContent = u.text ? `${u.name}: ${u.text}` : u.name; $('sel').hidden = false;
   const { sheet, ref } = refOf3d(u); $('sel').dataset.sheet = sheet; $('selref').textContent = ref;
+  for (const f of PICK_FX) f(mesh);
 }
 $('selclear').addEventListener('click', clearPick);
 renderer.domElement.addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY]; });
@@ -1142,8 +1206,16 @@ renderer.domElement.addEventListener('pointerup', e => {
   const r = renderer.domElement.getBoundingClientRect();
   raycaster.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
   const shown = m => { for (let o = m; o; o = o.parent) if (!o.visible) return false; return true; };
-  const hit = raycaster.intersectObjects([...pickables, ...occluders].filter(shown), false).find(h => h.point.y <= cutPlane.constant + 0.02 || !h.object.material.clippingPlanes);
-  if (hit && !hit.object.userData.occluder) pick(hit.object); else clearPick();
+  // nearest hit wins, except that a loop's invisible pad only catches what nothing else claims: a pipe or a tube seen through the pad
+  // is picked first, and an occluder (the slab, the ground) ends the search
+  let hit = null, pad = null;
+  for (const h of raycaster.intersectObjects([...pickables, ...occluders].filter(shown), false)) {
+    if (!(h.point.y <= cutPlane.constant + 0.02 || !h.object.material.clippingPlanes)) continue;
+    if (h.object.userData.occluder) break;
+    if (h.object.userData.proxyFor) { pad ??= h.object.userData.proxyFor; continue; }
+    hit = h.object; break;
+  }
+  if (hit || pad) pick(hit || pad); else clearPick();
 });
 
 // ---------------------------------------------------------------- start view, layers, loop

@@ -1,5 +1,5 @@
 {
- "version": "v17",
+ "version": "v18",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -596,7 +596,10 @@
    "dfu": 41,
    "wsfu": 35.7,
    "stacks": 5,
-   "peak_gpm": 11.3
+   "peak_gpm": 11.3,
+   "drain_ft": 229,
+   "pex_ft": 721,
+   "exit_invert": 2.19
   },
   "m1": {
    "heat": 40299,
@@ -644,8 +647,9 @@
    "Low voltage: TVs in the bedrooms, ceiling Wi-Fi access points, cameras, and whether the media panel should move out of the pantry."
   ],
   "P-1": [
-   "Where the house connects: city sewer or septic, and which side of the lot. The drain is drawn leaving under the front porch.",
-   "Water source (city or well) and where it enters; the manifold is drawn in the mechanical closet.",
+   "Confirm the drain leaves at 25,0 (assumed): city sewer or septic, and the invert there. The house needs about 2'-2 1/2\" of cover at the wall plus the fall to the main or tank.",
+   "Water source (city or well) and where it enters; the main manifold is drawn in the mechanical closet.",
+   "A demand recirculation pump (button or motion sensor at each bath) on the hot side would cut the wait at the far baths to a few seconds; it needs a 1/2\" return or the cold line as the return.",
    "Water heater fuel and type. A heat-pump water heater needs about 700 cu ft of air or a ducted kit; the 3' x 8' mechanical closet is too small without one. A gas unit needs venting and combustion air.",
    "Powder room sink is not drawn on A-5 (one is shown here, assumed).",
    "Garage floor drain: sanitary with an interceptor, or to daylight (lot grading).",

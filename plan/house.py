@@ -57,7 +57,9 @@ ROOMS = [
     dict(id='master_bath', name='Master Bath', rect=(5.833, 5.54, 16.167, 24.167), label="10'-3\" x 18'-7\"", label_sf=189, kind='bath'),
     dict(id='master_closet', name='Master Closet', rect=(5.833, 24.46, 16.08, 33.84), label="10'-2\" x 9'-4\"", label_sf=107, kind='closet'),
     dict(id='master_hall', name='Master Hall', rect=(25.04, 17.833, 30.54, 21.833), label=None, label_sf=None, kind='hall'),
-    dict(id='laundry', name='Laundry', rect=(16.46, 17.833, 24.747, 29.967), label="8'-4\" x 12'-1\"", label_sf=100, kind='laundry'),
+    # the laundry's faces sit 2" in from the A-1 drawing: its walls are staggered-stud (STAGGERED below), grown into the
+    # room; the master bath's linen alcove (top left) is not laundry
+    dict(id='laundry', name='Laundry', poly=[(18.294, 18.0), (24.58, 18.0), (24.58, 29.8), (16.54, 29.8), (16.54, 22.434), (18.294, 22.434)], label="8'-4\" x 12'-1\"", label_sf=100, kind='laundry'),
     dict(id='powder', name='Powder', rect=(25.04, 22.127, 30.54, 27.647), label="5'-5\" x 5'-5\"", label_sf=34, kind='bath'),
     dict(id='mud', name='Mud Room', poly=[(16.373, 30.26), (25.04, 30.26), (25.04, 27.933), (30.54, 27.933), (30.54, 42.213),
                                           (25.44, 42.213), (25.44, 36.84), (16.373, 36.84)], label="14'-1\" x 6'-6\"", label_sf=145, kind='hall'),
@@ -167,7 +169,7 @@ FIXTURES = [
     dict(id='PR-LAV', room='powder', kind='lav', name='Lavatory (not drawn on A-5; assumed)', at=(26.0, 25.0), size=(1.5, 1.6)),
     dict(id='LA-WASH', room='laundry', kind='washer', name='Washer (curved front loading)', at=(23.6, 23.3), size=(2.25, 2.5)),
     dict(id='LA-DRY', room='laundry', kind='dryer', name='Dryer (curved)', at=(23.6, 20.6), size=(2.25, 2.5)),
-    dict(id='LA-CAB', room='laundry', kind='cabinet', name='Laundry cabinets / counter', at=(17.5, 23.9), size=(2.0, 12.0)),
+    dict(id='LA-CAB', room='laundry', kind='cabinet', name='Laundry cabinets / counter', at=(17.54, 26.117), size=(2.0, 7.366)),
     dict(id='K-RANGE', room='kitchen', kind='range', name='48" range BS655Z-48 (GEM-FPF tag)', at=(32.0, 29.6), size=(2.3, 4.0)),
     dict(id='K-BASE', room='kitchen', kind='cabinet', name='Wall cabinets and counter, left wall', at=(32.02, 30.49), size=(2.3, 14.93)),
     dict(id='K-ISL', room='kitchen', kind='island', name='Island 4\'-5" x 11\'-11"', at=(38.68, 30.6), size=(4.38, 11.92)),
@@ -306,6 +308,55 @@ WALLS = [
     ('E', 27.253, 69.633, 30.54, 70.093),
 ]
 
+# Staggered-stud sound walls around the laundry (owner, 2026-10-13): 2x6 plates with 2x4 studs alternating faces.
+# Each is a wall rectangle above (or the part of it between lo and hi), grown 2" into the laundry so the rooms
+# on the other side keep their A-1 sizes: (x0, y0, x1, y1), (lo, hi) or None, the face that moves.
+STAGGER_GROW = 2 / 12
+STAGGERED = [
+    ((16.46, 17.54, 26.38, 17.833), (17.833, 25.04), 'y1'),   # master bed / laundry
+    ((17.833, 17.833, 18.127, 21.98), None, 'x1'),            # master bath linen alcove / laundry
+    ((16.08, 21.98, 18.127, 22.267), None, 'y1'),
+    ((16.08, 22.267, 16.373, 25.307), None, 'x1'),            # master closet / laundry, either side of the pocket door D11
+    ((16.08, 27.933, 16.373, 36.84), (27.933, 30.26), 'x1'),
+    ((16.373, 29.967, 19.167, 30.26), None, 'y0'),            # mud room / laundry, either side of D12
+    ((21.96, 29.967, 24.747, 30.26), None, 'y0'),
+    ((24.747, 17.833, 25.04, 21.98), None, 'x0'),             # master hall and powder / laundry
+    ((24.747, 21.98, 25.04, 30.26), None, 'x0'),
+]
+
+
+def walls_out():
+    """WALLS as dicts, with the staggered walls split out, grown and marked frame='S'."""
+    out = []
+    for k, x0, y0, x1, y1 in WALLS:
+        st = next((s for s in STAGGERED if all(abs(a - b) < 1e-6 for a, b in zip(s[0], (x0, y0, x1, y1)))), None)
+        if not st:
+            out.append({'kind': k, 'x0': x0, 'y0': y0, 'x1': x1, 'y1': y1}); continue
+        _, rng, face = st
+        horiz = (x1 - x0) >= (y1 - y0)
+        a0, a1 = (x0, x1) if horiz else (y0, y1)
+        lo, hi = rng or (a0, a1)
+        for p, q, s in ((a0, lo, False), (lo, hi, True), (hi, a1, False)):
+            if q - p < 1e-6: continue
+            w = {'kind': k, 'x0': p, 'y0': y0, 'x1': q, 'y1': y1} if horiz else {'kind': k, 'x0': x0, 'y0': p, 'x1': x1, 'y1': q}
+            if s:
+                w[face] = round(w[face] + (STAGGER_GROW if face.endswith('1') else -STAGGER_GROW), 3)
+                w['frame'] = 'S'
+            out.append(w)
+    return out
+
+
+def doors_out():
+    """Doors in a staggered wall take its thickness."""
+    out = []
+    for d in DOORS:
+        d = dict(d, span=list(d['span']), between=list(d['between']))
+        if 'laundry' in d['between'] and d['kind'] != 'glass':
+            d['t'] = round(0.293 + STAGGER_GROW, 3)
+            if d['axis'] == 'y' and d['at'] > 25: d['at'] = round(d['at'] - STAGGER_GROW, 3)   # D12: the wall grew up into the laundry
+        out.append(d)
+    return out
+
 
 def shoelace(p):
     return abs(sum(p[i][0] * p[(i + 1) % len(p)][1] - p[(i + 1) % len(p)][0] * p[i][1] for i in range(len(p)))) / 2
@@ -345,12 +396,12 @@ def build():
         'meta': META,
         'rooms': rooms,
         'windows': windows,
-        'doors': [dict(d, span=list(d['span']), between=list(d['between'])) for d in DOORS],
+        'doors': doors_out(),
         'fixtures': [dict(f, at=list(f['at']), size=list(f['size'])) for f in FIXTURES],
         'posts': [list(p) for p in POSTS],
         'envelope': [list(p) for p in ENVELOPE],
         'garage_outline': [list(p) for p in GARAGE_OUTLINE],
-        'walls': [{'kind': k, 'x0': x0, 'y0': y0, 'x1': x1, 'y1': y1} for k, x0, y0, x1, y1 in WALLS],
+        'walls': walls_out(),
         'totals': {
             'heated_gross_sf': round(shoelace(ENVELOPE)),
             'garage_gross_sf': round(shoelace(GARAGE_OUTLINE)),

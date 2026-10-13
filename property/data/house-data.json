@@ -1,5 +1,5 @@
 {
- "version": "v3",
+ "version": "v4",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -46,7 +46,7 @@
  "totals": {
   "heated_gross_sf": 3185,
   "garage_gross_sf": 982,
-  "conditioned_room_sf": 2975,
+  "conditioned_room_sf": 2962,
   "garage_sf": 942,
   "patio_sf": 325,
   "porch_sf": 399
@@ -76,14 +76,14 @@
   "ach_nat": 0.25
  },
  "envelope": {
-  "walls": 1775.9,
+  "walls": 1831.6,
   "windows": 224.0,
   "doors": 96.0,
-  "ceiling": 2080.1,
+  "ceiling": 2066.6,
   "vault": 943.3,
-  "slab_ft": 230.2,
+  "slab_ft": 236.4,
   "garage_wall": 268.5,
-  "volume": 29013.4
+  "volume": 28891.9
  },
  "rooms": [
   {
@@ -124,7 +124,7 @@
    "kind": "laundry",
    "label": "8'-4\" x 12'-1\"",
    "label_sf": 100,
-   "area_sf": 100.6
+   "area_sf": 87.1
   },
   {
    "id": "powder",
@@ -437,7 +437,7 @@
    "name": "Master Bath",
    "heat": 3455,
    "cool": 960,
-   "cfm": 117
+   "cfm": 116
   },
   {
    "name": "Master Closet",
@@ -453,9 +453,9 @@
   },
   {
    "name": "Laundry",
-   "heat": 495,
-   "cool": 556,
-   "cfm": 36
+   "heat": 904,
+   "cool": 587,
+   "cfm": 39
   },
   {
    "name": "Powder",
@@ -473,19 +473,19 @@
    "name": "Dining",
    "heat": 3771,
    "cool": 3031,
-   "cfm": 198
+   "cfm": 199
   },
   {
    "name": "Kitchen",
    "heat": 2280,
    "cool": 2370,
-   "cfm": 155
+   "cfm": 156
   },
   {
    "name": "Pantry",
    "heat": 1441,
    "cool": 694,
-   "cfm": 49
+   "cfm": 48
   },
   {
    "name": "Mechanical",
@@ -527,7 +527,7 @@
    "name": "Bedroom 1",
    "heat": 3424,
    "cool": 1729,
-   "cfm": 116
+   "cfm": 115
   },
   {
    "name": "Bedroom 1 Closet",
@@ -539,7 +539,7 @@
    "name": "Bath 1",
    "heat": 1443,
    "cool": 211,
-   "cfm": 49
+   "cfm": 48
   },
   {
    "name": "Closet (Bedroom 2)",
@@ -557,13 +557,13 @@
    "name": "Bath 2",
    "heat": 817,
    "cool": 170,
-   "cfm": 28
+   "cfm": 27
   },
   {
    "name": "Bedroom 3",
    "heat": 3163,
    "cool": 1436,
-   "cfm": 107
+   "cfm": 106
   },
   {
    "name": "Closet (Bedroom 3)",
@@ -576,10 +576,11 @@
   "s1": {
    "ext_lf": 328,
    "int_lf": 375,
-   "studs": 973,
+   "studs": 1001,
    "wall_board": 7580,
-   "ceiling_board": 3024,
-   "runs": 54
+   "ceiling_board": 3010,
+   "runs": 57,
+   "trusses": 67
   },
   "e1": {
    "devices": 209,
@@ -598,8 +599,8 @@
    "peak_gpm": 11.3
   },
   "m1": {
-   "heat": 39889,
-   "cool": 20606,
+   "heat": 40299,
+   "cool": 20637,
    "tons": 4.0,
    "cfm": 1600.0,
    "registers": 18,
@@ -614,13 +615,15 @@
    "Powder room sink, fireplace chimney route, bedroom 3 egress window."
   ],
   "S-1": [
+   "Datum: confirm the 0,0 layout corner with the surveyor's pins before the forms go in.",
    "Window sizes and heights are scaled from the elevations; confirm the window schedule with the supplier before framing.",
    "Bedroom 3's only window (W17, 4'x4') scales with a 4'-0\" sill: above the 44\" egress limit. Lower it or use a casement sized for egress.",
    "Interior door heights are not on the plans (8'-0\" assumed to match the exterior doors on the elevations).",
-   "Roof: truss layout, vault framing over kitchen/living and the patio's 6:12 vaulted ceiling.",
+   "Roof trusses: the layout here is a draft from A-2. The truss maker designs the trusses, the hip and valley sets, the G1 girder and its end posts, and the over-framed 8:12 gables at the entry and office.",
+   "Heel: 12\" energy heel assumed (full R-49 to the wall line); it sets the eave height on the elevations.",
    "Fireplace insert: chimney chase framing through the vaulted living ceiling and roof; clearances per the insert's manual.",
    "Living room label on A-1 says 17'-4\" wide; the walls measure about 20'-5\". Framing follows the walls.",
-   "Foundation type (slab assumed: the garage and mechanical floor drains) and anchor schedule."
+   "Foundation (slab assumed: the garage and mechanical floor drains, the radiant slab), thickened footings under G1's end posts and the patio and porch posts, anchor schedule."
   ],
   "E-1": [
    "Range fuel: the 48\" range (BS655Z-48) could be gas, dual-fuel or electric. Electric is assumed (50 A 240 V); a gas or dual-fuel range drops that circuit and adds a gas line.",

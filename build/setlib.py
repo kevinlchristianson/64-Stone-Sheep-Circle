@@ -141,6 +141,7 @@ class Sheet:
                 self.line(x, -1.2, x, 71, '#d3dbe4', 0.5, '2,3', layer='grid'); self.text(x, -2.2, str(x), 6.5, '#7b93ad', layer='grid')
             for y in range(0, 71, 5):
                 self.line(-1.2, y, 84, y, '#d3dbe4', 0.5, '2,3', layer='grid'); self.text(-2.6, y, str(y), 6.5, '#7b93ad', layer='grid')
+            self.datum()
         for w in HOUSE['walls']:
             ext = w['kind'] == 'E'
             self.rect(w['x0'], w['y0'], w['x1'], w['y1'], WALL_EXT if ext else WALL_INT, WALL_LINE if ext else WALL_INT, 0.6, layer='walls')
@@ -164,6 +165,16 @@ class Sheet:
         self.text(PW / 2, -4.6, 'REAR · PATIO', 8, '#6f685d', '600', layer='base-lab')
         self.text(PW / 2, PH + 3.6, 'FRONT · PORCH', 8, '#6f685d', '600', layer='base-lab')
 
+    def datum(self):
+        """The 0,0 datum every grid line is measured from: where the outside face of the garage-door wall (X = 0) meets
+        the line of the outside face of the master bedroom's rear wall (Y = 0), the rear-left corner of the slab's
+        layout lines. Grid lines every 5 ft from it, X to the right, Y toward the front."""
+        c = '#2c6aa0'
+        self.circle(0, 0, 0.55, '#fff', c, 1.1, layer='grid')
+        self.line(-0.9, 0, 0.9, 0, c, 0.9, layer='grid'); self.line(0, -0.9, 0, 0.9, c, 0.9, layer='grid')
+        self.add(f'<path d="M{px(0):.1f},{py(0):.1f} m-6.05,0 a6.05,6.05 0 0 1 6.05,-6.05 v6.05 z M{px(0):.1f},{py(0):.1f} m6.05,0 a6.05,6.05 0 0 1 -6.05,6.05 v-6.05 z" fill="{c}"/>', 'grid')
+        self.text(1.1, -1.1, '0,0 datum', 6.5, c, '700', anchor='start', layer='grid')
+
     def openings(self, colour):
         for w in HOUSE['windows']:
             a, (s0, s1) = w['at'], w['span']; t = 0.46
@@ -178,7 +189,7 @@ class Sheet:
 
     def door(self, d, color):
         a, (s0, s1) = d['at'], d['span']; k = d['kind']
-        t = 0.46 if d.get('ext') else 0.293
+        t = d.get('t') or (0.46 if d.get('ext') else 0.293)
         if k == 'glass':
             self.line(a, s0, a, s1, '#6aa6c8', 1.4, layer='openings'); return
         # clear the wall

@@ -1,8 +1,7 @@
-"""The 3D model's structure layers, built from the S-1 wall runs and the roof truss layout:
+"""The 3D model's structure layers, built from the S-1 wall runs and the roof truss layout (the 5' grid lives on the sheets only):
 
   framing  plates, studs, kings, jacks, headers, sills and cripples for every wall run (S-1), stud by stud
   truss    the roof trusses, girder, rafters and beams (build/roof.py)
-  grid     the 5' x 5' layout grid from the 0,0 datum
 
 Boxes are [x0, y0, x1, y1, bottom, top, material] in plan feet (heights above the slab); one list per wall run
 so the page can merge each run into a mesh and pick it as a whole.
@@ -98,6 +97,4 @@ def build(s1):
                          boxes=[[round(v, 3) if isinstance(v, float) else v for v in bx] for bx in boxes]))
     trusses = [dict(axis=t['axis'], s=t['s'], m=t['members'], k=t['kind'], ref=t['mark'], name=f"Roof truss {t['mark']}" if t['kind'] not in ('rafter',) else ('Patio rafter' if t['area'] == 'PR' else 'Porch rafter'), text=t['text'])
                for t in T['trusses']]
-    grid = dict(x=list(range(0, 90, 5)), y=list(range(0, 75, 5)), extent=[-2.0, -2.0, 87.0, 72.0],
-                note="0,0 datum: the outside face of the garage-door wall (X) and the line of the master bedroom's rear wall (Y). Grid 5'-0\" each way; X to the right, Y toward the porch. Same grid as every sheet.")
-    return dict(mats=MATS, runs=runs, trusses=trusses, beams=T['beams'], grid=grid)
+    return dict(mats=MATS, runs=runs, trusses=trusses, beams=T['beams'])

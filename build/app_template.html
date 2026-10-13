@@ -361,7 +361,6 @@ tbody tr:last-child td { border-bottom: 0; }
           <label class="toggle"><input type="checkbox" id="ly-radiant" checked><span class="sw" style="background:#c62828"></span> Radiant floor heat: PEX loops in the slab and manifolds (R-1); red zone 1, orange 2, blue 3, green garage</label>
           <label class="toggle"><input type="checkbox" id="ly-furn" checked><span class="sw" style="background:#dfe8df"></span> Fixtures, cabinets and appliances (A-5)</label>
           <label class="toggle"><input type="checkbox" id="ly-floor" checked><span class="sw" style="background:#ffffff"></span> Plan drawing on the floor (A-1)</label>
-          <label class="toggle"><input type="checkbox" id="ly-grid" checked><span class="sw" style="background:#2c6aa0"></span> 5' grid from the 0,0 datum (rear-left layout corner, as every sheet)</label>
           <div class="cut">
             <label for="cut">Cut the walls at</label>
             <input type="range" id="cut" min="1" max="{{CUTMAX}}" step="0.25" value="{{CUTMAX}}">
@@ -834,7 +833,7 @@ const MAT = {
 function setCut(h) { const on = h < CUT_MAX - 0.01; cutPlane.constant = h; for (const m of cutMats) { m.clippingPlanes = on ? [cutPlane] : null; m.needsUpdate = true; } }
 
 // ---------------------------------------------------------------- groups (layers)
-const LAYERS = ['floor', 'walls', 'ext', 'framing', 'furn', 'trusses', 'roof', 'elec', 'plumb', 'hvac', 'grid', 'radiant'];
+const LAYERS = ['floor', 'walls', 'ext', 'framing', 'furn', 'trusses', 'roof', 'elec', 'plumb', 'hvac', 'radiant'];
 const G = {}; for (const k of ['ground', ...LAYERS]) { G[k] = new THREE.Group(); scene.add(G[k]); }
 const pickables = [];
 function box(x0, y0, x1, y1, bottom, top, material, data, group) {
@@ -1009,7 +1008,7 @@ for (const line of DATA.lines3d) {
     box(Math.min(x0, x1) - r, Math.min(y0, y1) - r, Math.max(x0, x1) + r, Math.max(y0, y1) + r, line.h - r, line.h + r, material, { kind: line.layer, name: line.name, ref: line.ref, text: line.text || '' }, g);
   }
 }
-// ---------------------------------------------------------------- structure layers: framing, roof trusses, the datum grid (build/structure3d.py)
+// ---------------------------------------------------------------- structure layers: framing and roof trusses (build/structure3d.py)
 (function structure() {
   const ST = DATA.struct3d; if (!ST) return;
   const SM = { wood: mat(0xc9a46a, { roughness: 0.8 }), sound: mat(0xa8c49a, { roughness: 0.8 }), header: mat(0xa9824a, { roughness: 0.8 }), pt: mat(0x8f9f7a, { roughness: 0.8 }), block: mat(0xc2369a, { roughness: 0.7 }), wood6: mat(0x9fb6c9, { roughness: 0.8 }),
@@ -1049,27 +1048,6 @@ for (const line of DATA.lines3d) {
     add(merged(parts), SM[t.k === 'girder' ? 'girder' : t.k === 'rafter' ? 'rafter' : 'truss'], G.trusses, { kind: 'truss', name: t.name, text: t.text, ref: t.ref });
   }
   for (const b of ST.beams) { const [x0, y0, x1, y1, lo, hi] = b.box; box(x0, y0, x1, y1, lo, hi, SM.beam, { kind: 'truss', name: b.name, text: b.text }, G.trusses); }
-  // the grid: string lines on the slab every 5', labels at both ends, the datum target at 0,0
-  const g = ST.grid, [gx0, gy0, gx1, gy1] = g.extent, pts = [];
-  for (const x of g.x) { const a = M(x, gy0), b = M(x, gy1); pts.push(a.x, 0.05, a.z, b.x, 0.05, b.z); }
-  for (const y of g.y) { const a = M(gx0, y), b = M(gx1, y); pts.push(a.x, 0.05, a.z, b.x, 0.05, b.z); }
-  const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-  G.grid.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x2c6aa0, transparent: true, opacity: 0.55 })));
-  function label(text, x, y, size = 1.1, color = '#2c6aa0') {
-    const cv = document.createElement('canvas'), ctx = cv.getContext('2d'), fs = 64;
-    ctx.font = `700 ${fs}px IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif`;
-    cv.width = Math.ceil(ctx.measureText(text).width + 24); cv.height = fs + 20;
-    ctx.font = `700 ${fs}px IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif`; ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.fillStyle = color; ctx.textBaseline = 'middle'; ctx.fillText(text, 12, cv.height / 2);
-    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthWrite: false }));
-    const p = M(x, y); sp.position.set(p.x, 0.6, p.z); sp.scale.set(size * cv.width / cv.height, size, 1); G.grid.add(sp); return sp;
-  }
-  for (const x of g.x) { label(String(x), x, gy0 - 1.2); label(String(x), x, gy1 + 1.2); }
-  for (const y of g.y) { label(String(y), gx0 - 1.6, y); label(String(y), gx1 + 1.6, y); }
-  label('0,0 datum', 4.2, -3.6, 1.3);
-  const tgt = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.12, 32), new THREE.MeshBasicMaterial({ color: 0x2c6aa0 }));
-  const d0 = M(0, 0); tgt.position.set(d0.x, 0.08, d0.z); tgt.userData = { kind: 'grid', name: '0,0 datum', text: g.note }; pickables.push(tgt); G.grid.add(tgt);
 })();
 
 // ---------------------------------------------------------------- HVAC (M-1): ductless mini-splits

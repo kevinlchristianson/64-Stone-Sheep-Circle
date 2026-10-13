@@ -98,17 +98,33 @@ HEAD_W, HEAD_H, HEAD_D = 2.75, 0.95, 0.75
 SIZES = [6000, 9000, 12000, 15000, 18000]
 MULTI = {2: 18000, 3: 24000, 4: 36000, 5: 42000}  # smallest common cold-climate multi-zone for a port count
 AT_5F, AT_DESIGN = 1.0, 0.75   # share of rated heat a cold-climate (Hyper-Heat / XLTH class) multi-zone keeps at 5 °F and at about -11 °F
-# Which outdoor unit feeds the living head: 'CU-2' (short attic run, recommended) or 'CU-1' (as first asked; ~95 ft run)
-LIVING_ON = 'CU-2'
+# Which outdoor unit feeds the living head. The owner kept it on CU-1 and moved CU-1 to the porch (2026-10-13); 'CU-2' is the bedroom unit.
+LIVING_ON = 'CU-1'
 
 UNITS = {
+    # CU-1 under the west end of the front porch (the owner's pick, 2026-10-13): out of the snow under the porch roof, the
+    # garage wall screening it from the driveway side, and the mechanical-room attic right above it, so every head is under 70 ft
+    'CU-1': dict(at=(33.05, 55.3), axis='y', wall=53.733, stand=1.0, sub='Front porch, west end, against the mechanical room wall',
+                 why='Under the porch roof, so no roof snow lands on it and it needs only a low stand; the garage\'s side wall screens it from the driveway; the mechanical room behind it has no living space, and its attic connects to the garage, mud-room and office attics, so the master, dining and living line sets all stay under about 70 ft. It is at the front of the house: a slatted screen at the porch end hides it from the street.'),
     # on a 24" stand, its back 2'-6" off the wall so it sits outside the 1'-6" eave drip line of the metal roof
-    'CU-1': dict(at=(2.29, 28.8), along='y', wall_x=5.373, sub='Left side yard, on the master closet wall',
-                 why='The left wall of the master bath and closet is blank (no windows) and has only a closet behind it, so no bedroom or living room hears the unit; it is out of sight from the front and the patio, and the master-wing attic is right above it.'),
-    'CU-2': dict(at=(86.52, 42.8), along='y', wall_x=83.44, sub='Right side yard, on the Bedroom 3 closet wall',
+    'CU-2': dict(at=(86.52, 42.8), axis='x', wall=83.44, stand=2.0, sub='Right side yard, on the Bedroom 3 closet wall',
                  why='Behind the Bedroom 3 closet, so the bedrooms beside it have a closet or bath between them and the unit; out of sight from the front and the patio; the bedroom-wing attic is right above it.'),
 }
-CU_W, CU_D, CU_H, STAND = 3.1, 1.17, 2.75, 2.0
+CU_W, CU_D, CU_H = 3.1, 1.17, 2.75
+
+
+def unit_geo(u):
+    """footprint, the back-face point, the wall point and a point just inside the wall, for a unit against a wall"""
+    x, y = u['at']
+    if u['axis'] == 'x':
+        sg = 1 if u['wall'] > x else -1
+        return dict(rect=(x - CU_D / 2, y - CU_W / 2, x + CU_D / 2, y + CU_W / 2), back=(x + sg * CU_D / 2, y), wallpt=(u['wall'], y),
+                    inside=lambda o: (u['wall'] + sg * 0.23, y + o), out=lambda o: (u['wall'], y + o), backo=lambda o: (x + sg * CU_D / 2, y + o),
+                    ds=(u['wall'] - sg * 0.25, y + 2.6), ds3=(u['wall'] - sg * 0.08, y + 2.6), sg=sg, dist=abs(x - u['wall']))
+    sg = 1 if u['wall'] > y else -1
+    return dict(rect=(x - CU_W / 2, y - CU_D / 2, x + CU_W / 2, y + CU_D / 2), back=(x, y + sg * CU_D / 2), wallpt=(x, u['wall']),
+                inside=lambda o: (x + o, u['wall'] + sg * 0.23), out=lambda o: (x + o, u['wall']), backo=lambda o: (x + o, y + sg * CU_D / 2),
+                ds=(x - CU_W / 2 - 0.6, u['wall'] - sg * 0.25), ds3=(x - CU_W / 2 - 0.6, u['wall'] - sg * 0.08), sg=sg, dist=abs(y - u['wall']))
 
 # (id, room, wall face side, centre along the wall, unit, rooms it serves, condensate, controller spot)
 HEADS = [
@@ -129,16 +145,17 @@ WHY = {
 }
 # attic routes (plan points at ATTIC height), from the unit's riser to the drop over each head
 ROUTES = {
-    'IU-1': [(5.6, 28.8), (20.0, 28.8), (20.0, 1.3), (23.5, 1.3)],
-    'IU-2': [(5.6, 28.8), (20.0, 28.8), (30.2, 28.8), (30.2, 12.6), (30.69, 12.6)],
+    # from CU-1's riser in the mechanical room's front wall, through the garage attic (along the mud-room side) to the master wing
+    'IU-1': [(33.05, 53.5), (33.05, 48.0), (29.0, 48.0), (29.0, 1.3), (23.5, 1.3)],
+    'IU-2': [(33.05, 53.5), (33.05, 48.0), (29.0, 48.0), (29.0, 12.6), (30.69, 12.6)],
     'IU-4': [(83.2, 42.8), (82.4, 42.8), (82.4, 20.0), (71.02, 20.0), (71.02, 5.3)],
     'IU-5': [(83.2, 42.8), (82.4, 42.8), (82.4, 27.81), (83.21, 27.81)],
     'IU-6': [(83.2, 42.8), (78.6, 42.8), (78.6, 49.5), (77.69, 49.5)],
 }
 LIVING_ROUTES = {
     'CU-2': [(83.2, 42.8), (78.6, 42.8), (66.5, 42.8), (66.5, 37.0), (64.31, 37.0)],
-    # around through the front attics: master closet, laundry/mud, garage, mechanical, pantry, entry, office, bedroom hall
-    'CU-1': [(5.6, 28.8), (20.0, 28.8), (29.0, 28.8), (29.0, 47.5), (63.0, 47.5), (66.5, 47.5), (66.5, 37.0), (64.31, 37.0)],
+    # from the porch unit east through the pantry, entry and office attics, then up the bedroom-hall attic
+    'CU-1': [(33.05, 53.5), (33.05, 48.0), (66.5, 48.0), (66.5, 37.0), (64.31, 37.0)],
 }
 ROUTES['IU-3'] = LIVING_ROUTES[LIVING_ON]
 
@@ -191,7 +208,7 @@ def build():
         route = ROUTES[hid]
         u = UNITS[cu]
         riser = 9.6 - 1.5                                           # wall penetration ~18" up, rising in the wall to the attic
-        stub = abs(u['at'][0] - u['wall_x']) + 0.5                  # unit to wall in the line-hide
+        stub = unit_geo(u)['dist'] + 0.5                           # unit to wall in the line-hide
         drop = ATTIC - (HEAD_TOP - 0.5)
         length = stub + riser + plen(route) + drop
         heads.append(dict(id=hid, room=room, side=side, c=c, cu=cu, serves=serves, cond=cond, tstat=tstat, size=size, cool=cool, heat=heat,
@@ -211,9 +228,9 @@ def build():
             sh.add(f'<polygon points="{pts}" fill="{ZONE[h["cu"]]}" fill-opacity="{0.22 if rid == h["room"] else 0.1}"/>', 'rooms')
     # line sets: attic runs, and the outdoor stub from each unit to its wall
     for cu, u in units.items():
-        x, y = u['at']
-        sh.path([(x + (CU_D / 2 if u['wall_x'] > x else -CU_D / 2), y), (u['wall_x'], y)], LS, 2.6)
-        sh.circle(u['wall_x'], y, 0.35, '#fff', LS, 1.2)
+        g = unit_geo(u)
+        sh.path([g['back'], g['wallpt']], LS, 2.6)
+        sh.circle(*g['wallpt'], 0.35, '#fff', LS, 1.2)
     for h in heads:
         sh.path(h['route'], LS, 1.6)
         sh.circle(*h['route'][-1], 0.22, LS, LS, 0.8)
@@ -267,15 +284,16 @@ def build():
     for cu, u in units.items():
         x, y = u['at']
         sh.open_group(cu, f"{cu} · {u['nominal'] // 1000}k {u['ports']}-port outdoor unit · {u['sub']}", hit=(x, y, 1.8))
-        sh.rect(x - CU_D / 2, y - CU_W / 2, x + CU_D / 2, y + CU_W / 2, '#fff', EQ, 1.6)
+        g = unit_geo(u); rx0, ry0, rx1, ry1 = g['rect']
+        sh.rect(rx0, ry0, rx1, ry1, '#fff', EQ, 1.6)
         sh.circle(x, y, 0.45, 'none', EQ, 0.8)
         sh.close_group()
-        sh.text(x, y + CU_W / 2 + 1.0, cu, 7.5, EQ, '700')
-        sh.text(x, y + CU_W / 2 + 2.0, f"{u['nominal'] // 1000}k · {u['ports']} ports", 6, '#555')
-        dx = u['wall_x'] + (0.25 if u['wall_x'] > 40 else -0.25)
+        sh.text(x, ry1 + 1.0, cu, 7.5, EQ, '700')
+        sh.text(x, ry1 + 2.0, f"{u['nominal'] // 1000}k · {u['ports']} ports", 6, '#555')
+        dx, dy = g['ds']
         did = 'DS' + cu[-1]
-        sh.open_group(did, f"Disconnect {did} for {cu}", hit=(dx, y + 2.6, 0.7))
-        sh.rect(dx - 0.3, y + 2.3, dx + 0.3, y + 2.9, '#fff', EQ, 1.0)
+        sh.open_group(did, f"Disconnect {did} for {cu}", hit=(dx, dy, 0.7))
+        sh.rect(dx - 0.3, dy - 0.3, dx + 0.3, dy + 0.3, '#fff', EQ, 1.0)
         sh.close_group()
         picks[did] = dict(tag=did, sub=u['sub'], fields=[('Item', f'240 V fused disconnect for {cu}, on the wall within sight of the unit'), ('Circuit', 'dedicated 240 V circuit sized to the unit\'s nameplate MCA/MOCP (E-1)')])
         heat5 = u['nominal'] * AT_5F; heatd = u['nominal'] * AT_DESIGN
@@ -326,21 +344,18 @@ def build():
         f"Sizing: each head carries the cooling load of the rooms it serves plus 15 % for latent and margin, with 6k the smallest head; the living head is held at 9k for the vault, the open kitchen and cooking. Each outdoor unit is the smallest common cold-climate multi-zone with enough ports, with the heads at no more than 130 % of its rating.",
         'Heads mount high on the wall, top 6" below the ceiling, on a wall that lets them throw across the room. Exterior-wall heads drain condensate by gravity straight out the wall to a splash block; interior-wall heads (IU-2, IU-3) get a mini condensate pump behind the head that discharges outside with the line set.',
         'Line sets: from the unit in a painted line-hide to the wall, through a sealed sleeve about 18" up, inside the wall in their own stud bay to the attic, on the ceiling framing under the attic insulation, then down the wall to the head. The kitchen and living vault has no attic, so nothing crosses it. Pressure test, evacuate and pull a micron vacuum per the maker.',
-        'Outdoor units on 24" stands above the snow, backs 2\'-6" off the wall so they sit outside the drip line of the metal roof (1\'-6" eaves); add snow guards on the roof above each unit. Keep 12" behind and 24" in front clear; a wind baffle on the left unit if the yard funnels wind.',
+        'CU-2 on a 24" stand above the snow, its back 2\'-6" off the wall so it sits outside the drip line of the metal roof (1\'-6" eaves), with snow guards on the roof above. CU-1 is under the porch roof on a 12" stand with its back 12" off the mechanical-room wall, discharging toward the open front of the porch; a slatted screen at the porch end hides it, with at least 12" clear around and nothing closing the front.',
         'Each outdoor unit has a dedicated 240 V circuit and a fused disconnect on the wall within sight (DS1, DS2), sized to the nameplate MCA/MOCP once the units are picked (E-1). The heads are powered from their outdoor unit through the 14/4 interconnect run with the line set.',
         'Wired wall controllers T1-T6 at 48" by each door; set the heads to cool and to heat only below the slab\'s setpoint so they don\'t fight the radiant.',
         'Ventilation: with no ducts, the draft assumes continuous low-speed bath fans (exhaust-only, E-1) for the IRC whole-house rate; paired through-wall ERVs are the upgrade (see open items).',
     ]
-    u1 = UNITS['CU-1']
-    long_run = abs(u1['at'][0] - u1['wall_x']) + 0.5 + (9.6 - 1.5) + plen(LIVING_ROUTES['CU-1']) + ATTIC - (HEAD_TOP - 0.5)
     open_items = [
-        f'Living room head: which outdoor unit feeds it. Drawn on CU-2 (the bedroom unit) because the patio and the vault split the attic: from CU-1 the line set runs about {long_run:.0f} ft around through the front attics, past the 82 ft per-head limit most multi-zone units have.' if LIVING_ON == 'CU-2' else
-        f'Living room head on CU-1 as asked: its line set runs about {long_run:.0f} ft around through the front attics. Pick a unit whose per-head limit covers it, or move it to CU-2.',
+        'CU-1 on the front porch (owner\'s pick, 2026-10-13): confirm the maker\'s clearances for a unit under a roof, pick the screen, and check the porch slab can take the stand and the condensate/defrost water (drain it off the slab edge).',
         'Office: no head as drawn (the ask was the right-side bedrooms). A 6k head on the office\'s right wall would make CU-2 a 5-port.',
-        'Exact models: pick the brand, then confirm the heads are an allowed combination for the outdoor unit and the line lengths are inside its limits.',
+        f"Exact models: pick the brand, then confirm the heads are an allowed combination and the line lengths are inside the unit's limits. CU-1's three sets total about {units['CU-1']['total']:.0f} ft (longest {units['CU-1']['longest']:.0f}): some 24k 3-port units cap the total near 164 ft, so check it, or step up to the next size, which usually allows more.",
         'Bed walls: the master and Bedroom 1 heads sit on the rear wall between the windows, where a headboard may go. A head over a headboard works with its vanes set level; otherwise it moves to a side wall. Confirm furniture walls before rough-in.',
         f"Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about {0.03 * HOUSE['totals']['heated_gross_sf'] + 7.5 * 5:.0f} CFM continuous under the IRC).",
-        'Mechanical closet: no air handler now, so it is free for the radiant boiler or heat pump and manifold (R-1).',
+        'Mechanical room: no air handler now; CU-1\'s line sets rise in its front wall, so keep that stud bay clear, so it is free for the radiant boiler or heat pump and manifold (R-1).',
     ]
     tables = [
         dict(key='heads', title='Indoor heads', cols=['Tag', 'Room', 'Unit', 'Size', 'Position', 'Cool Btu/h', 'Line set', 'Condensate', 'Serves'], rows=head_rows),
@@ -367,18 +382,18 @@ def build():
         l['cfm'] = l['cool'] / (1.08 * 20)       # air a head must move to cool the room at a 20 °F split
     hv3d = dict(units=[], heads=[], lines=[], parts=[])
     for cu, u in units.items():
-        x, y = u['at']
-        hv3d['units'].append(dict(x0=x - CU_D / 2, y0=y - CU_W / 2, x1=x + CU_D / 2, y1=y + CU_W / 2, stand=STAND, top=STAND + CU_H,
+        g = unit_geo(u); rx0, ry0, rx1, ry1 = g['rect']; st = u['stand']
+        hv3d['units'].append(dict(x0=rx0, y0=ry0, x1=rx1, y1=ry1, stand=st, top=st + CU_H,
                                   name=f"{cu} · {u['nominal'] // 1000}k {u['ports']}-port outdoor unit",
-                                  text=f"{u['sub']}. Heads: " + ', '.join(f"{h['id']} {h['size'] // 1000}k" for h in u['heads']) + '. 24" stand, clear of the roof drip line.'))
-        dx = u['wall_x'] + (0.08 if u['wall_x'] > 40 else -0.08)
-        hv3d['parts'].append(dict(x0=dx - 0.1, y0=y + 2.3, x1=dx + 0.1, y1=y + 2.9, b=4.0, t=5.0, name=f"DS{cu[-1]} · disconnect for {cu}", text='240 V fused disconnect within sight of the unit (E-1)'))
-        wx, sgn = u['wall_x'], (1 if u['wall_x'] > x else -1)
+                                  text=f"{u['sub']}. Heads: " + ', '.join(f"{h['id']} {h['size'] // 1000}k" for h in u['heads']) + f'. {st * 12:.0f}" stand.'))
+        dx, dy = g['ds3']
+        hv3d['parts'].append(dict(x0=dx - (0.1 if u['axis'] == 'x' else 0.3), y0=dy - (0.3 if u['axis'] == 'x' else 0.1), x1=dx + (0.1 if u['axis'] == 'x' else 0.3), y1=dy + (0.3 if u['axis'] == 'x' else 0.1),
+                                  b=4.0, t=5.0, name=f"DS{cu[-1]} · disconnect for {cu}", text='240 V fused disconnect within sight of the unit (E-1)'))
         for k, h in enumerate(u['heads']):
             off = (k - (len(u['heads']) - 1) / 2) * 0.25
-            px0 = x + sgn * CU_D / 2
+            a, b, c = g['backo'](off), g['out'](off), g['inside'](off)
             hv3d['lines'].append(dict(kind='ls', name=f"LS-{h['id'][-1]} · line set to {h['id']}", text=f"{h['line']}, about {h['length']:.0f} ft; in the line-hide to the wall, then up inside the wall to the attic",
-                                      pts=[[px0, y + off, STAND + 1.0], [wx, y + off, 1.5], [wx - sgn * 0.23, y + off, 1.5], [wx - sgn * 0.23, y + off, ATTIC]]))
+                                      pts=[[*a, st + 1.0], [*b, 1.5], [*c, 1.5], [*c, ATTIC]]))
     for h in heads:
         (bx0, by0, bx1, by1) = h['box']
         hv3d['heads'].append(dict(x0=bx0, y0=by0, x1=bx1, y1=by1, b=HEAD_TOP - HEAD_H, t=HEAD_TOP, name=f"{h['id']} · {h['size'] // 1000}k wall head ({h['cu']})",

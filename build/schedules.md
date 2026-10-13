@@ -665,27 +665,27 @@ Ductless: two cold-climate multi-zone mini-split heat pumps with wall heads; the
 3. Sizing: each head carries the cooling load of the rooms it serves plus 15 % for latent and margin, with 6k the smallest head; the living head is held at 9k for the vault, the open kitchen and cooking. Each outdoor unit is the smallest common cold-climate multi-zone with enough ports, with the heads at no more than 130 % of its rating.
 4. Heads mount high on the wall, top 6" below the ceiling, on a wall that lets them throw across the room. Exterior-wall heads drain condensate by gravity straight out the wall to a splash block; interior-wall heads (IU-2, IU-3) get a mini condensate pump behind the head that discharges outside with the line set.
 5. Line sets: from the unit in a painted line-hide to the wall, through a sealed sleeve about 18" up, inside the wall in their own stud bay to the attic, on the ceiling framing under the attic insulation, then down the wall to the head. The kitchen and living vault has no attic, so nothing crosses it. Pressure test, evacuate and pull a micron vacuum per the maker.
-6. Outdoor units on 24" stands above the snow, backs 2'-6" off the wall so they sit outside the drip line of the metal roof (1'-6" eaves); add snow guards on the roof above each unit. Keep 12" behind and 24" in front clear; a wind baffle on the left unit if the yard funnels wind.
+6. CU-2 on a 24" stand above the snow, its back 2'-6" off the wall so it sits outside the drip line of the metal roof (1'-6" eaves), with snow guards on the roof above. CU-1 is under the porch roof on a 12" stand with its back 12" off the mechanical-room wall, discharging toward the open front of the porch; a slatted screen at the porch end hides it, with at least 12" clear around and nothing closing the front.
 7. Each outdoor unit has a dedicated 240 V circuit and a fused disconnect on the wall within sight (DS1, DS2), sized to the nameplate MCA/MOCP once the units are picked (E-1). The heads are powered from their outdoor unit through the 14/4 interconnect run with the line set.
 8. Wired wall controllers T1-T6 at 48" by each door; set the heads to cool and to heat only below the slab's setpoint so they don't fight the radiant.
 9. Ventilation: with no ducts, the draft assumes continuous low-speed bath fans (exhaust-only, E-1) for the IRC whole-house rate; paired through-wall ERVs are the upgrade (see open items).
 
 ### Open items
 
-- Living room head: which outdoor unit feeds it. Drawn on CU-2 (the bedroom unit) because the patio and the vault split the attic: from CU-1 the line set runs about 106 ft around through the front attics, past the 82 ft per-head limit most multi-zone units have.
+- CU-1 on the front porch (owner's pick, 2026-10-13): confirm the maker's clearances for a unit under a roof, pick the screen, and check the porch slab can take the stand and the condensate/defrost water (drain it off the slab edge).
 - Office: no head as drawn (the ask was the right-side bedrooms). A 6k head on the office's right wall would make CU-2 a 5-port.
-- Exact models: pick the brand, then confirm the heads are an allowed combination for the outdoor unit and the line lengths are inside its limits.
+- Exact models: pick the brand, then confirm the heads are an allowed combination and the line lengths are inside the unit's limits. CU-1's three sets total about 196 ft (longest 74): some 24k 3-port units cap the total near 164 ft, so check it, or step up to the next size, which usually allows more.
 - Bed walls: the master and Bedroom 1 heads sit on the rear wall between the windows, where a headboard may go. A head over a headboard works with its vanes set level; otherwise it moves to a side wall. Confirm furniture walls before rough-in.
 - Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about 133 CFM continuous under the IRC).
-- Mechanical closet: no air handler now, so it is free for the radiant boiler or heat pump and manifold (R-1).
+- Mechanical room: no air handler now; CU-1's line sets rise in its front wall, so keep that stud bay clear, so it is free for the radiant boiler or heat pump and manifold (R-1).
 
 ### Indoor heads
 
 | Tag | Room | Unit | Size | Position | Cool Btu/h | Line set | Condensate | Serves |
 |---|---|---|---|---|---|---|---|---|
-| IU-1 | Master Bed | CU-1 | 6k | on the rear wall, centred 7'-1/2" from the left wall; top at 8'-6" (6" below the ceiling) | 3,439 | 1/4" x 3/8" · 59 ft | gravity | Master Bed, Master Bath, Master Closet, Master Hall |
-| IU-2 | Dining | CU-1 | 6k | on the left wall, centred 7'-1/2" from the rear wall; top at 8'-6" (6" below the ceiling) | 3,485 | 1/4" x 3/8" · 55 ft | pump | Dining |
-| IU-3 | Living | CU-2 | 9k | on the right wall, centred 20'-2" from the rear wall; top at 8'-6" (6" below the ceiling) | 7,377 | 1/4" x 3/8" · 38 ft | pump | Living, Kitchen, Entry, Pantry |
+| IU-1 | Master Bed | CU-1 | 6k | on the rear wall, centred 7'-1/2" from the left wall; top at 8'-6" (6" below the ceiling) | 3,439 | 1/4" x 3/8" · 74 ft | gravity | Master Bed, Master Bath, Master Closet, Master Hall |
+| IU-2 | Dining | CU-1 | 6k | on the left wall, centred 7'-1/2" from the rear wall; top at 8'-6" (6" below the ceiling) | 3,485 | 1/4" x 3/8" · 58 ft | pump | Dining |
+| IU-3 | Living | CU-1 | 9k | on the right wall, centred 20'-2" from the rear wall; top at 8'-6" (6" below the ceiling) | 7,377 | 1/4" x 3/8" · 64 ft | pump | Living, Kitchen, Entry, Pantry |
 | IU-4 | Bedroom 1 | CU-2 | 6k | on the rear wall, centred 6'-6 1/2" from the left wall; top at 8'-6" (6" below the ceiling) | 2,263 | 1/4" x 3/8" · 63 ft | gravity | Bedroom 1, Bedroom 1 Closet, Bath 1 |
 | IU-5 | Bedroom 2 | CU-2 | 6k | on the right wall, centred 6'-3 1/2" from the rear wall; top at 8'-6" (6" below the ceiling) | 2,149 | 1/4" x 3/8" · 30 ft | gravity | Bedroom 2, Closet (Bedroom 2), Bath 2 |
 | IU-6 | Bedroom 3 | CU-2 | 6k | on the right wall, centred 4'-3" from the closet wall; top at 8'-6" (6" below the ceiling) | 1,797 | 1/4" x 3/8" · 25 ft | gravity | Bedroom 3, Closet (Bedroom 3) |
@@ -694,16 +694,16 @@ Ductless: two cold-climate multi-zone mini-split heat pumps with wall heads; the
 
 | Tag | Location | Size | Heads connected | Cool block Btu/h | Heat at 5°F / design | Line sets |
 |---|---|---|---|---|---|---|
-| CU-1 | Left side yard, on the master closet wall | 18k, 2 ports | 12k (67 %) | 6,232 | 18,000 / 13,500 | 113 ft, longest 59 |
-| CU-2 | Right side yard, on the Bedroom 3 closet wall | 36k, 4 ports | 27k (75 %) | 12,227 | 36,000 / 27,000 | 156 ft, longest 63 |
+| CU-1 | Front porch, west end, against the mechanical room wall | 24k, 3 ports | 21k (88 %) | 12,871 | 24,000 / 18,000 | 196 ft, longest 74 |
+| CU-2 | Right side yard, on the Bedroom 3 closet wall | 24k, 3 ports | 18k (75 %) | 5,588 | 24,000 / 18,000 | 118 ft, longest 63 |
 
 ### Line sets
 
 | Set | Run | Size | Length | Route |
 |---|---|---|---|---|
-| LS-1 | CU-1 → IU-1 | 1/4" x 3/8" | 59 ft | line-hide to the wall, up inside the wall to the attic, across the attic, down the wall to the head |
-| LS-2 | CU-1 → IU-2 | 1/4" x 3/8" | 55 ft | line-hide to the wall, up inside the wall to the attic, across the attic, down the wall to the head |
-| LS-3 | CU-2 → IU-3 | 1/4" x 3/8" | 38 ft | line-hide to the wall, up inside the wall to the attic, across the attic, down the wall to the head |
+| LS-1 | CU-1 → IU-1 | 1/4" x 3/8" | 74 ft | line-hide to the wall, up inside the wall to the attic, across the attic, down the wall to the head |
+| LS-2 | CU-1 → IU-2 | 1/4" x 3/8" | 58 ft | line-hide to the wall, up inside the wall to the attic, across the attic, down the wall to the head |
+| LS-3 | CU-1 → IU-3 | 1/4" x 3/8" | 64 ft | line-hide to the wall, up inside the wall to the attic, around through the front attics, down the wall to the head |
 | LS-4 | CU-2 → IU-4 | 1/4" x 3/8" | 63 ft | line-hide to the wall, up inside the wall to the attic, across the attic, down the wall to the head |
 | LS-5 | CU-2 → IU-5 | 1/4" x 3/8" | 30 ft | line-hide to the wall, up inside the wall to the attic, across the attic, down the wall to the head |
 | LS-6 | CU-2 → IU-6 | 1/4" x 3/8" | 25 ft | line-hide to the wall, up inside the wall to the attic, across the attic, down the wall to the head |
@@ -743,8 +743,8 @@ Ductless: two cold-climate multi-zone mini-split heat pumps with wall heads; the
 |---|---|---|
 | Heating load | 40,299 Btu/h | 70°F inside, -11.4°F outside; carried by the radiant slab (R-1) |
 | Cooling load | 20,637 Btu/h sensible | 75°F inside, 87.8°F outside |
-| Outdoor units | CU-1 18k + CU-2 36k | cold-climate multi-zone, sized on cooling and the head count |
-| Mini-split heat | 40,500 Btu/h at -11°F | backup to the slab in the rooms with heads |
+| Outdoor units | CU-1 24k + CU-2 24k | cold-climate multi-zone, sized on cooling and the head count |
+| Mini-split heat | 36,000 Btu/h at -11°F | backup to the slab in the rooms with heads |
 | Indoor heads | 6 | high-wall, 6" below the ceiling |
 
 ### Bill of materials
@@ -753,12 +753,12 @@ Rough-order quantities from the layout, for pricing. The HVAC contractor takes o
 
 | Item | Qty | Notes |
 |---|---|---|
-| Outdoor unit, 18k 2-port | 1 | CU-1, cold-climate multi-zone |
-| Outdoor unit, 36k 4-port | 1 | CU-2, cold-climate multi-zone |
+| Outdoor unit, 24k 3-port | 1 | CU-1, cold-climate multi-zone |
+| Outdoor unit, 24k 3-port | 1 | CU-2, cold-climate multi-zone |
 | Wall head, 6k | 5 |  |
 | Wall head, 9k | 1 |  |
-| Line set, insulated | 297 ft | all sets + 10 %; sizes per the line-set table |
-| Interconnect cable 14/4 | 297 ft | with the line sets |
+| Line set, insulated | 346 ft | all sets + 10 %; sizes per the line-set table |
+| Interconnect cable 14/4 | 346 ft | with the line sets |
 | Line-hide cover and wall sleeves | 2 runs + 6 sleeves | painted to the siding |
 | Condensate pump | 2 | IU-2, IU-3 |
 | Wired wall controller | 6 | T1-T6 |

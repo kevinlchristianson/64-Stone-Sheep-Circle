@@ -601,7 +601,7 @@
   "m1": {
    "heat": 40299,
    "cool": 20637,
-   "tons": 4.5,
+   "tons": 4.0,
    "units": 2,
    "heads": 6,
    "backup_kw": 0
@@ -643,12 +643,12 @@
    "Fixture models: A-5 tags the drains K-9135 and K-9136; tub, toilet, faucet and valve models still to pick."
   ],
   "M-1": [
-   "Living room head: which outdoor unit feeds it. Drawn on CU-2 (the bedroom unit) because the patio and the vault split the attic: from CU-1 the line set runs about 106 ft around through the front attics, past the 82 ft per-head limit most multi-zone units have.",
+   "CU-1 on the front porch (owner's pick, 2026-10-13): confirm the maker's clearances for a unit under a roof, pick the screen, and check the porch slab can take the stand and the condensate/defrost water (drain it off the slab edge).",
    "Office: no head as drawn (the ask was the right-side bedrooms). A 6k head on the office's right wall would make CU-2 a 5-port.",
-   "Exact models: pick the brand, then confirm the heads are an allowed combination for the outdoor unit and the line lengths are inside its limits.",
+   "Exact models: pick the brand, then confirm the heads are an allowed combination and the line lengths are inside the unit's limits. CU-1's three sets total about 196 ft (longest 74): some 24k 3-port units cap the total near 164 ft, so check it, or step up to the next size, which usually allows more.",
    "Bed walls: the master and Bedroom 1 heads sit on the rear wall between the windows, where a headboard may go. A head over a headboard works with its vanes set level; otherwise it moves to a side wall. Confirm furniture walls before rough-in.",
    "Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about 133 CFM continuous under the IRC).",
-   "Mechanical closet: no air handler now, so it is free for the radiant boiler or heat pump and manifold (R-1)."
+   "Mechanical room: no air handler now; CU-1's line sets rise in its front wall, so keep that stud bay clear, so it is free for the radiant boiler or heat pump and manifold (R-1)."
   ]
  }
 }

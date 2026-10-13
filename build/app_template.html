@@ -358,6 +358,7 @@ tbody tr:last-child td { border-bottom: 0; }
           <label class="toggle"><input type="checkbox" id="ly-hvac" checked><span class="sw" style="background:#e3a05a"></span> HVAC (M-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-trusses"><span class="sw" style="background:#a98a5c"></span> Roof trusses: 6:12 at 24" o.c., scissors over the kitchen and living vault, girder G1 (S-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-roof"><span class="sw" style="background:#3b3d40"></span> Roof: massing from A-2</label>
+          <label class="toggle"><input type="checkbox" id="ly-radiant" checked><span class="sw" style="background:#c62828"></span> Radiant floor heat: PEX loops in the slab and manifolds (R-1); red zone 1, orange 2, blue 3, green garage</label>
           <label class="toggle"><input type="checkbox" id="ly-furn" checked><span class="sw" style="background:#dfe8df"></span> Fixtures, cabinets and appliances (A-5)</label>
           <label class="toggle"><input type="checkbox" id="ly-floor" checked><span class="sw" style="background:#ffffff"></span> Plan drawing on the floor (A-1)</label>
           <label class="toggle"><input type="checkbox" id="ly-grid" checked><span class="sw" style="background:#2c6aa0"></span> 5' grid from the 0,0 datum (rear-left layout corner, as every sheet)</label>
@@ -824,13 +825,13 @@ const MAT = {
   door: mat(0xb07a45), garageDoor: mat(0xe6e1d8), post: mat(0x9a6a3c), porch: mat(0xb9b2a6), ground: mat(0x9fae8a),
   fix: mat(0xf7f5f1, { roughness: 0.5 }), counter: mat(0xe8e2d6), stone: mat(0x8f8576),
   roof: new THREE.MeshStandardMaterial({ color: 0x34373b, roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }),
-  elec: mat(0xc8650a), plumb: mat(0x3c3a36), cold: mat(0x2c6aa0, { roughness: 0.4 }), hvac: mat(0xe3a05a, { roughness: 0.6, transparent: true, opacity: 0.85 }),
+  radiant: mat(0x6a1b9a), elec: mat(0xc8650a), plumb: mat(0x3c3a36), cold: mat(0x2c6aa0, { roughness: 0.4 }), hvac: mat(0xe3a05a, { roughness: 0.6, transparent: true, opacity: 0.85 }),
   hi: mat(0xe08a00, { emissive: 0x4a2a00 }),
 };
 function setCut(h) { const on = h < CUT_MAX - 0.01; cutPlane.constant = h; for (const m of cutMats) { m.clippingPlanes = on ? [cutPlane] : null; m.needsUpdate = true; } }
 
 // ---------------------------------------------------------------- groups (layers)
-const LAYERS = ['floor', 'walls', 'ext', 'framing', 'furn', 'trusses', 'roof', 'elec', 'plumb', 'hvac', 'grid'];
+const LAYERS = ['floor', 'walls', 'ext', 'framing', 'furn', 'trusses', 'roof', 'elec', 'plumb', 'hvac', 'grid', 'radiant'];
 const G = {}; for (const k of ['ground', ...LAYERS]) { G[k] = new THREE.Group(); scene.add(G[k]); }
 const pickables = [];
 function box(x0, y0, x1, y1, bottom, top, material, data, group) {
@@ -968,11 +969,11 @@ for (const t of T3) {
   box(t.x - s / 2, t.y - s / 2, t.x + s / 2, t.y + s / 2, h - s / 2, h + s / 2, MAT[t.layer === 'plumb' ? (t.cold ? 'cold' : 'plumb') : t.layer], { kind: t.layer, name: t.name, ref: t.ref || name, text: t.text }, g);
 }
 for (const line of DATA.lines3d) {
-  const g = G[line.layer], material = line.layer === 'plumb' ? MAT.plumb : MAT.hvac, r = line.r || 0.2;
+  const g = G[line.layer], material = line.color ? (MAT[line.color] ??= mat(parseInt(line.color.slice(1), 16))) : line.layer === 'plumb' ? MAT.plumb : MAT.hvac, r = line.r || 0.2;
   if (!g) continue;
   for (let i = 1; i < line.pts.length; i++) {
     const [x0, y0] = line.pts[i - 1], [x1, y1] = line.pts[i];
-    box(Math.min(x0, x1) - r, Math.min(y0, y1) - r, Math.max(x0, x1) + r, Math.max(y0, y1) + r, line.h - r, line.h + r, material, { kind: line.layer, name: line.name, text: '' }, g);
+    box(Math.min(x0, x1) - r, Math.min(y0, y1) - r, Math.max(x0, x1) + r, Math.max(y0, y1) + r, line.h - r, line.h + r, material, { kind: line.layer, name: line.name, ref: line.ref, text: line.text || '' }, g);
   }
 }
 // ---------------------------------------------------------------- structure layers: framing, roof trusses, the datum grid (build/structure3d.py)

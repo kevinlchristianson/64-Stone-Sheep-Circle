@@ -18,7 +18,7 @@ import base64, html, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
-VERSION = 'v11'
+VERSION = 'v13'
 
 import plan, framing, electrical, plumbing, hvac, radiant   # noqa: E402
 import structure3d                                  # noqa: E402
@@ -129,8 +129,8 @@ def trade3d(e, p, m):
 
 
 def radiant3d(r):
-    # PEX loops, leaders and feed pairs at the slab, coloured by zone; manifolds and the heat source as markers
-    return r['items'], r['lines']
+    # the radiant section of the model script builds its own meshes from this: loops, cabinets, feeds, HS-1, thermostats
+    return r['r3d']
 
 
 def main():
@@ -155,9 +155,8 @@ def main():
     with open(os.path.join(HERE, 'schedules.md'), 'w') as f: f.write('\n'.join(md))
 
     items, lines = trade3d(built['e1'][2], built['p1'][2], built['m1'][2])
-    ri, rl = radiant3d(built['r1'][2]); items += ri; lines += rl
     house_lite = {k: HOUSE[k] for k in ('meta', 'rooms', 'windows', 'doors', 'fixtures', 'posts', 'walls', 'totals')}
-    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]), elec3d=built['e1'][2]['devices'], plumb3d=built['p1'][2]['plumb3d'], footprint=plumbing.OUTLINE, hvac3d=built['m1'][2]['hvac3d'])
+    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]), elec3d=built['e1'][2]['devices'], plumb3d=built['p1'][2]['plumb3d'], footprint=plumbing.OUTLINE, hvac3d=built['m1'][2]['hvac3d'], radiant3d=radiant3d(built['r1'][2]))
     floor = plan.build()['sheet']
     floor.L['grid'] = []; floor.L['title'] = []; floor.L['tags'] = []
     floor_svg = base64.b64encode(floor.svg().encode()).decode()

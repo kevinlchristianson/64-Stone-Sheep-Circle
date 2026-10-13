@@ -18,7 +18,7 @@ import base64, html, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
-VERSION = 'v4'
+VERSION = 'v7'
 
 import plan, framing, electrical, plumbing, hvac   # noqa: E402
 import structure3d                                  # noqa: E402

@@ -112,12 +112,12 @@ CU_W, CU_D, CU_H, STAND = 3.1, 1.17, 2.75, 2.0
 
 # (id, room, wall face side, centre along the wall, unit, rooms it serves, condensate, controller spot)
 HEADS = [
-    ('IU-1', 'master_bed', 'n', 23.5, 'CU-1', ['master_bed', 'master_bath', 'master_closet', 'master_hall'], 'gravity', (25.7, 17.42)),
+    ('IU-1', 'master_bed', 'n', 23.5, 'CU-1', ['master_bed', 'master_bath', 'master_closet', 'master_hall'], 'gravity', (25.0, 17.42)),
     ('IU-2', 'dining', 'w', 12.6, 'CU-1', ['dining'], 'pump', (30.95, 16.4)),
     ('IU-3', 'living', 'e', 37.0, LIVING_ON, ['living', 'kitchen', 'entry', 'pantry'], 'pump', (64.05, 40.4)),
-    ('IU-4', 'bed1', 'n', 71.02, 'CU-2', ['bed1', 'bed1_closet', 'bath1'], 'gravity', (68.65, 18.82)),
+    ('IU-4', 'bed1', 'n', 71.02, 'CU-2', ['bed1', 'bed1_closet', 'bath1'], 'gravity', (69.4, 18.82)),
     ('IU-5', 'bed2', 'e', 27.81, 'CU-2', ['bed2', 'bed2_closet', 'bath2'], 'gravity', (68.95, 30.3)),
-    ('IU-6', 'bed3', 'e', 49.5, 'CU-2', ['bed3', 'bed3_closet'], 'gravity', (68.5, 40.39)),
+    ('IU-6', 'bed3', 'e', 49.5, 'CU-2', ['bed3', 'bed3_closet'], 'gravity', (69.2, 40.39)),
 ]
 WHY = {
     'IU-1': 'On the rear wall between the two windows, throwing toward the door; the rear wall is exterior, so the condensate drains straight out by gravity.',

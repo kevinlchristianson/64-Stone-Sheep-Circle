@@ -70,10 +70,10 @@
    "id": "b8",
    "group": "Foundation",
    "name": "Slab-edge and under-slab insulation",
-   "qty": 230.2,
+   "qty": 236.4,
    "unit": "ft",
    "price": 18,
-   "basis": "230 ft of heated slab edge"
+   "basis": "236 ft of heated slab edge"
   },
   {
    "id": "b9",
@@ -232,7 +232,7 @@
    "id": "b26",
    "group": "Insulation",
    "name": "Walls, ceilings and air sealing",
-   "qty": 4799,
+   "qty": 4842,
    "unit": "sq ft",
    "price": 3.2,
    "basis": "to the energy page's R-values"
@@ -241,7 +241,7 @@
    "id": "b27",
    "group": "Interior",
    "name": "Drywall, hang and finish",
-   "qty": 10604,
+   "qty": 10590,
    "unit": "sq ft",
    "price": 3.6,
    "basis": "wall and ceiling board (S-1)"
@@ -259,7 +259,7 @@
    "id": "b29",
    "group": "Interior",
    "name": "Paint",
-   "qty": 2975,
+   "qty": 2962,
    "unit": "sq ft floor",
    "price": 4.5,
    "basis": ""
@@ -268,10 +268,10 @@
    "id": "b30",
    "group": "Interior",
    "name": "Flooring",
-   "qty": 2975,
+   "qty": 2962,
    "unit": "sq ft",
    "price": 9,
-   "basis": "2,975 sq ft of rooms"
+   "basis": "2,962 sq ft of rooms"
   },
   {
    "id": "b31",

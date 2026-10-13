@@ -18,9 +18,10 @@ import base64, html, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
-VERSION = 'v3'
+VERSION = 'v4'
 
 import plan, framing, electrical, plumbing, hvac   # noqa: E402
+import structure3d                                  # noqa: E402
 from setlib import HOUSE, ft_in                     # noqa: E402
 from climate import CLIMATE, ENVELOPE               # noqa: E402
 
@@ -47,7 +48,7 @@ def table_html(t, key):
 def summary_html(key, s):
     if not s: return ''
     labels = {
-        's1': [('runs', 'wall runs'), ('ext_lf', 'lf exterior wall'), ('int_lf', 'lf interior wall'), ('studs', 'studs'), ('wall_board', 'sf wall board'), ('ceiling_board', 'sf ceiling board')],
+        's1': [('runs', 'wall runs'), ('ext_lf', 'lf exterior wall'), ('int_lf', 'lf interior wall'), ('studs', 'studs'), ('wall_board', 'sf wall board'), ('ceiling_board', 'sf ceiling board'), ('trusses', 'roof trusses')],
         'e1': [('devices', 'devices'), ('receptacles', 'receptacles'), ('lights', 'lights'), ('switches', 'switches'), ('circuits', 'circuits'), ('amps', 'A calculated load')],
         'p1': [('fixtures', 'fixtures'), ('dfu', 'DFU'), ('wsfu', 'WSFU'), ('stacks', 'stacks')],
         'm1': [('heat', 'Btu/h heating'), ('cool', 'Btu/h cooling'), ('tons', 'ton heat pump'), ('cfm', 'CFM'), ('registers', 'supply registers'), ('backup_kw', 'kW backup heat')],
@@ -167,7 +168,7 @@ def main():
 
     items, lines = trade3d(built['e1'][2], built['p1'][2], built['m1'][2])
     house_lite = {k: HOUSE[k] for k in ('meta', 'rooms', 'windows', 'doors', 'fixtures', 'posts', 'walls', 'totals')}
-    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines)
+    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]))
     floor = plan.build()['sheet']
     floor.L['grid'] = []; floor.L['title'] = []; floor.L['tags'] = []
     floor_svg = base64.b64encode(floor.svg().encode()).decode()

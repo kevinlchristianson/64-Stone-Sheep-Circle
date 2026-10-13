@@ -73,22 +73,23 @@ LOOPS = [
     ('garage', 22.90, 43.00, 30.04, 66.63, 12), ('garage', 22.90, 66.63, 30.04, 69.13, 12), None,
 ]
 
-# Heat source and manifold stations. 'out' is the axis the leaders leave the wall along.
+# Heat source and manifold stations. 'out' is the axis the leaders leave the wall along; 'face' is the wall face the cabinet
+# hangs on (its coordinate along that axis) and 'mount' the cabinet's bottom and top above the slab, for the 3D model.
 HS = (33.55, 48.8)         # wall-hung on the mechanical closet's east wall (P-1's water manifold and heater share the closet)
 T_SUP = 110.0              # design supply cap, °F: keeps a condensing boiler condensing and an air-to-water heat pump efficient
 STATIONS = {
-    'MF-1': dict(at=(20.6, 18.3), out='y', where='Laundry, on the north wall between the linen alcove and the dryer',
+    'MF-1': dict(at=(20.6, 18.3), out='y', face=18.0, mount=(2.5, 4.1), where='Laundry, on the north wall between the linen alcove and the dryer',
                  detail='Surface-mounted manifold cabinet on the laundry\'s north wall, between the master bath\'s linen alcove and the dryer. That wall is the staggered-stud sound wall to the master bed, so the cabinet is not recessed; leaders drop straight into the slab below.'),
-    'MF-2': dict(at=(22.0, 37.6), out='y', where='Garage, on the mud room wall, beside MF-G',
+    'MF-2': dict(at=(22.0, 37.45), out='y', face=37.133, mount=(4.0, 5.6), where='Garage, on the mud room wall, beside MF-G',
                  detail='Surface-mounted cabinet on the garage face of the mud room wall, 4\' above the slab, beside MF-G; its leaders pass under the wall into the mud room and kitchen. Surface mounting keeps the garage fire separation whole.'),
-    'MF-G': dict(at=(18.8, 37.6), out='y', where='Garage, on the mud room wall, beside MF-2',
+    'MF-G': dict(at=(18.8, 37.45), out='y', face=37.133, mount=(4.0, 5.6), where='Garage, on the mud room wall, beside MF-2',
                  detail='Surface-mounted cabinet on the garage face of the mud room wall, beside MF-2, with the garage\'s own pump P-RG and mixing valve.'),
-    'MF-3': dict(at=(64.65, 25.6), out='x', where='Bedroom hall, recessed in the west wall north of the fireplace',
+    'MF-3': dict(at=(64.55, 25.6), out='x', face=64.17, mount=(2.5, 4.1), where='Bedroom hall, recessed in the west wall north of the fireplace',
                  detail='Recessed manifold cabinet in the hall\'s west wall between the living room opening and the fireplace chase. A 2x4 wall takes a 3-1/2" deep cabinet; fur it to 2x6 locally if the chosen manifold needs more (S-1).'),
 }
 PREFER = {'master_closet': 'MF-1'}   # a near-tie that the zone's own manifold should win
 MC = (33.6, 48.6)          # a manifold in the mechanical closet, for the options
-MUD = (20.4, 37.6)         # the mud room wall station (MF-2 and MF-G)
+MUD = (20.4, 37.45)        # the mud room wall station (MF-2 and MF-G)
 OPTIONS = [
     ('O1', 'All manifolds in the mechanical closet, beside the heat source', {'MC': MC}),
     ('O2', 'Owner\'s first sketch: laundry corner, two on the garage side of the mud room wall, two in the bedroom hall beside the fireplace',
@@ -298,7 +299,7 @@ def build():
     FEED_ROUTES = {
         'MF-1': [HS, (32.0, HS[1]), (32.0, 21.0), (20.6, 21.0), STATIONS['MF-1']['at']],
         'MF-2': [HS, (32.0, HS[1]), (32.0, 44.0), (20.4, 44.0), MUD],
-        'MF-3': [HS, (HS[0], 44.6), (44.2, 44.6), (44.2, 42.3), (64.65, 42.3), STATIONS['MF-3']['at']],
+        'MF-3': [HS, (HS[0], 44.6), (44.2, 44.6), (44.2, 42.3), (STATIONS['MF-3']['at'][0], 42.3), STATIONS['MF-3']['at']],
     }
     for k, pts in FEED_ROUTES.items():
         lf = plen(pts)
@@ -416,19 +417,33 @@ def build():
         ]),
     ]
     summary = dict(loops=len(L), tube_ft=round(tot_tube), heat=round(tot_q), house_heat=round(sum(l['q'] for l in L if l['zone'] != 'ZG')), gpm=round(tot_gpm, 1), supply_f=t_supply, manifolds=len(STATIONS))
-    lines = []
+    # 3D model (build/app_template.html, the radiant section): one tube mesh per loop in the slab, the manifold cabinets with their
+    # riser bundles, the 1" feed pairs under the slab, HS-1 and the thermostats. Heights are feet from the slab top.
+    loops3d = []
     for l in L:
-        nm = f"{l['id']} · zone {l['zone'][1:]}, {', '.join(l['rooms'])}"
-        txt = f"{l['geo']['total']:.0f}' of 1/2\" PEX at {l['spacing']} o.c. to {l['mf']}, {l['gpm']:.2f} gpm (R-1)"
-        for pts in l['geo']['panels'] + l['geo']['conns']:
-            lines.append(dict(layer='radiant', name=nm, text=txt, pts=pts, h=0.06, r=0.05, color=ZONES[l['zone']]['color']))
-        for leg in l['geo']['lead']:
-            lines.append(dict(layer='radiant', name=nm + ' leader', text=txt, pts=leg, h=0.06, r=0.05, color=ZONES[l['zone']]['color']))
-    for f in feeds:
-        lines.append(dict(layer='radiant', name=f"{f['id']} · 1\" feed pair to {f['mf']}", text=f"about {f['lf']:.0f}' each way, insulated (R-1)", pts=f['pts'], h=0.06, r=0.09, color='#6a1b9a'))
-    items = [dict(layer='radiant', x=st['at'][0], y=st['at'][1], h=2.6, size=1.2, name=f"{k} · radiant manifold", text=st['detail']) for k, st in STATIONS.items()]
-    items.append(dict(layer='radiant', x=HS[0], y=HS[1], h=3.5, size=1.4, name='HS-1 · condensing boiler', text='Gas or propane condensing boiler for the slab, with the pumps and zone controller (R-1)'))
-    return dict(sheet=sh, picks=picks, tables=tables, notes=notes, open=open_items, summary=summary, legend=legend, lines=lines, items=items, loops=L)
+        g = l['geo']
+        loops3d.append(dict(id=l['id'], zone=l['zone'], color=ZONES[l['zone']]['color'], mf=l['mf'], rise=list(STATIONS[l['mf']]['at']),
+                            name=f"{l['id']} · zone {l['zone'][1:]}, {', '.join(l['rooms'])}",
+                            text=f"{g['total']:.0f}' of 1/2\" PEX at {l['spacing']} o.c. in the slab, {l['gpm']:.2f} gpm, home run to {l['mf']} (R-1)",
+                            paths=[[list(p) for p in pts] for pts in g['panels'] + g['conns'] + g['lead']],
+                            panels=[list(pn['rect']) for pn in loops[l['i']]]))
+    stations3d = []
+    for k, st in STATIONS.items():
+        x, y = st['at']; lo, hi = st['mount']; w = 0.9
+        if st['out'] == 'y': bx = [x - w, min(st['face'], y - 0.12), x + w, max(st['face'], y + 0.12)]
+        else: bx = [min(st['face'], x - 0.12), y - w, max(st['face'], x + 0.12), y + w]
+        loops_on = [l['id'] for l in L if l['mf'] == k]
+        stations3d.append(dict(id=k, at=[x, y], box=bx, z=[lo, hi], name=f"{k} · radiant manifold, {len(loops_on)} loops",
+                               text=f"{st['detail']} Loops {', '.join(loops_on)}; {sum(l['gpm'] for l in L if l['mf'] == k):.1f} gpm with all calling (R-1)."))
+    feeds3d = [dict(id=f['id'], mf=f['mf'], pts=[list(p) for p in f['pts']], name=f"{f['id']} · 1\" feed pair to {f['mf']}",
+                    text=f"1\" PEX supply and return from HS-1, about {f['lf']:.0f}' each way, insulated, under the slab in the foam (R-1)") for f in feeds]
+    hs3d = dict(id='HS-1', box=[33.0, 48.0, 33.9, 49.6], z=[2.5, 5.0], name='HS-1 · condensing boiler',
+                text='Gas or propane condensing boiler for the slab, wall-hung on the mechanical closet\'s east wall, with P-R1, P-RG, the mixing valves and the zone controller (R-1)')
+    stats3d = [dict(id=Z['stat'], at=list(stats[Z['stat']]), color=Z['color'], name=f"{Z['stat']} · zone {z[1:]} thermostat", text=f"{Z['name']}: {Z['where']} (R-1)") for z, Z in ZONES.items()]
+    foam3d = dict(z=[-0.46, -0.40], name='Foam · 2" R-10 under the slab', ref='Foam',
+                  text='2" rigid foam and a 10-mil vapor barrier under the whole slab and up its edge; the loops are tied to the mesh 2" below the slab top, the feed pairs run in the foam (R-1)')
+    r3d = dict(slab_h=-0.17, feed_h=-0.30, loops=loops3d, stations=stations3d, feeds=feeds3d, hs=hs3d, stats=stats3d, foam=foam3d)
+    return dict(sheet=sh, picks=picks, tables=tables, notes=notes, open=open_items, summary=summary, legend=legend, r3d=r3d, loops=L)
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@ import base64, html, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
-VERSION = 'v8'
+VERSION = 'v10'
 
 import plan, framing, electrical, plumbing, hvac, radiant   # noqa: E402
 import structure3d                                  # noqa: E402
@@ -124,19 +124,8 @@ li {{ margin: 0 0 4px; }}
 
 
 def trade3d(e, p, m):
-    items = []
-    # E-1 devices are built by the model script's buildElectrical() from DATA.elec3d
-    for f in HOUSE['fixtures']:
-        if f['kind'] in plumbing.TABLE:
-            items.append(dict(layer='plumb', x=f['at'][0], y=f['at'][1], h=0.3, size=0.35, name=f"{f['id']} · {f['name']}", text='drain and supply, see P-1'))
-    for s in p['stacks']:
-        items.append(dict(layer='plumb', x=s['at'][0], y=s['at'][1], h=5.0, size=0.3, name=f"{s['id']} · {s['name']} stack", text='3" stack to the roof'))
-        items.append(dict(layer='plumb', x=s['at'][0], y=s['at'][1], h=9.5, size=0.3, name=f"{s['id']} · vent", text='vent through the roof'))
-    for h in p['hose']:
-        items.append(dict(layer='plumb', x=h['at'][0], y=h['at'][1], h=1.5, size=0.35, cold=True, name=h['id'], text=h['name']))
-    # stacks drawn as tall thin boxes: give them height via two points (bottom and top)
-    lines = [dict(layer='plumb', name=l['name'], pts=l['pts'], h=0.15, r=l['r']) for l in p['lines']]
-    return items, lines
+    # E-1 devices are built by the model script's buildElectrical() from DATA.elec3d, P-1 pipes by buildPlumbing() from DATA.plumb3d
+    return [], []
 
 
 def radiant3d(r):
@@ -168,7 +157,7 @@ def main():
     items, lines = trade3d(built['e1'][2], built['p1'][2], built['m1'][2])
     ri, rl = radiant3d(built['r1'][2]); items += ri; lines += rl
     house_lite = {k: HOUSE[k] for k in ('meta', 'rooms', 'windows', 'doors', 'fixtures', 'posts', 'walls', 'totals')}
-    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]), elec3d=built['e1'][2]['devices'], hvac3d=built['m1'][2]['hvac3d'])
+    data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]), elec3d=built['e1'][2]['devices'], plumb3d=built['p1'][2]['plumb3d'], footprint=plumbing.OUTLINE, hvac3d=built['m1'][2]['hvac3d'])
     floor = plan.build()['sheet']
     floor.L['grid'] = []; floor.L['title'] = []; floor.L['tags'] = []
     floor_svg = base64.b64encode(floor.svg().encode()).decode()

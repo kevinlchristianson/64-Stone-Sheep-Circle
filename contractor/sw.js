@@ -1,6 +1,6 @@
 // Bump VERSION whenever the app changes so phones pick up the new copy, and set the
 // same value as VERSION in build/build.py (it goes into the page's header and sheets).
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE = 'ssc-' + VERSION;
 const SHELL = [
   './',

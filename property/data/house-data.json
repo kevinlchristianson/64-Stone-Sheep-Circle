@@ -1,5 +1,5 @@
 {
- "version": "v5",
+ "version": "v6",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -605,6 +605,15 @@
    "cfm": 1600.0,
    "registers": 18,
    "backup_kw": 5
+  },
+  "r1": {
+   "loops": 23,
+   "tube_ft": 4920,
+   "heat": 54493,
+   "house_heat": 43659,
+   "gpm": 10.9,
+   "supply_f": 110.0,
+   "manifolds": 4
   }
  },
  "open_items": {
@@ -649,6 +658,14 @@
    "Mechanical closet opens from the garage: confirm the AHJ allows the air handler there, and air-seal it (gasketed door, sealed plenum, no return openings).",
    "Insulation values and air-tightness target for the house.",
    "Outdoor unit location (drawn by the master closet's outside wall, out of sight from the front)."
+  ],
+  "R-1": [
+   "L14 (Closet (Bedroom 2), Bath 1): the floor carries all but about 135 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",
+   "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
+   "Garage: kept at 50\u00b0F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.",
+   "Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10\u00b0F warmer water for that loop, or 9\" spacing there.",
+   "Mechanical closet: HS-1, pump P-R1 and the zone controller share it with P-1's water manifold and water heater; that is why no manifold is drawn there (O5 in the options shows the fourth manifold saves little tube). A combi boiler removes the water heater and makes room.",
+   "MF-3 cabinet depth in the hall's 2x4 west wall (S-1), and the boiler, pump and zone controller circuits (E-1)."
   ]
  }
 }

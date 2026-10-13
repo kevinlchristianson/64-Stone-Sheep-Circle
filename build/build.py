@@ -4,7 +4,7 @@
     python3 build/build.py     # sheets, schedules, packets, contractor/index.html, property/data/
 
 Reads plan/house.json; writes
-  contractor/index.html            the app (3D, A-1, S-1, E-1, P-1, M-1, the owner's plans, crew chat)
+  contractor/index.html            the app (3D, A-1, S-1, E-1, P-1, M-1, R-1, the owner's plans, crew chat)
   contractor/sheets/*.svg          each sheet on its own
   contractor/packets/*.html        printable trade packets (node build/render_packets.mjs prints the PDFs)
   build/schedules.md               every schedule and note as Markdown
@@ -18,15 +18,15 @@ import base64, html, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
-VERSION = 'v5'
+VERSION = 'v6'
 
-import plan, framing, electrical, plumbing, hvac   # noqa: E402
+import plan, framing, electrical, plumbing, hvac, radiant   # noqa: E402
 import structure3d                                  # noqa: E402
 from setlib import HOUSE, ft_in                     # noqa: E402
 from climate import CLIMATE, ENVELOPE               # noqa: E402
 
 SHEETS = [('a1', 'A-1', 'Plan', plan), ('s1', 'S-1', 'Framing', framing), ('e1', 'E-1', 'Electrical', electrical),
-          ('p1', 'P-1', 'Plumbing', plumbing), ('m1', 'M-1', 'HVAC', hvac)]
+          ('p1', 'P-1', 'Plumbing', plumbing), ('m1', 'M-1', 'HVAC', hvac), ('r1', 'R-1', 'Radiant', radiant)]
 esc = lambda t: html.escape(str(t), quote=True)
 
 
@@ -52,6 +52,7 @@ def summary_html(key, s):
         's1': [('runs', 'wall runs'), ('ext_lf', 'lf exterior wall'), ('int_lf', 'lf interior wall'), ('studs', 'studs'), ('wall_board', 'sf wall board'), ('ceiling_board', 'sf ceiling board'), ('trusses', 'roof trusses')],
         'e1': [('devices', 'devices'), ('receptacles', 'receptacles'), ('lights', 'lights'), ('switches', 'switches'), ('circuits', 'circuits'), ('amps', 'A calculated load')],
         'p1': [('fixtures', 'fixtures'), ('dfu', 'DFU'), ('wsfu', 'WSFU'), ('stacks', 'stacks')],
+        'r1': [('loops', 'loops'), ('tube_ft', 'ft of 1/2" PEX'), ('manifolds', 'manifolds'), ('house_heat', 'Btu/h house'), ('heat', 'Btu/h with the garage'), ('supply_f', '°F supply at design')],
         'm1': [('heat', 'Btu/h heating'), ('cool', 'Btu/h cooling'), ('tons', 'ton heat pump'), ('cfm', 'CFM'), ('registers', 'supply registers'), ('backup_kw', 'kW backup heat')],
     }.get(key, [])
     items = ''.join(f'<li><b>{s[k]:,}</b> {esc(v)}</li>' if isinstance(s[k], int) else f'<li><b>{s[k]:g}</b> {esc(v)}</li>' for k, v in labels if k in s)
@@ -141,6 +142,11 @@ def trade3d(e, p, m):
     return items, lines
 
 
+def radiant3d(r):
+    # PEX loops, leaders and feed pairs at the slab, coloured by zone; manifolds and the heat source as markers
+    return r['items'], r['lines']
+
+
 def main():
     out_c = os.path.join(ROOT, 'contractor')
     os.makedirs(os.path.join(out_c, 'sheets'), exist_ok=True)
@@ -163,6 +169,7 @@ def main():
     with open(os.path.join(HERE, 'schedules.md'), 'w') as f: f.write('\n'.join(md))
 
     items, lines = trade3d(built['e1'][2], built['p1'][2], built['m1'][2])
+    ri, rl = radiant3d(built['r1'][2]); items += ri; lines += rl
     house_lite = {k: HOUSE[k] for k in ('meta', 'rooms', 'windows', 'doors', 'fixtures', 'posts', 'walls', 'totals')}
     data = dict(house=house_lite, picks=picks, trade3d=items, lines3d=lines, struct3d=structure3d.build(built['s1'][2]), elec3d=built['e1'][2]['devices'])
     floor = plan.build()['sheet']

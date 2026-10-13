@@ -732,7 +732,7 @@ def build():
         (None, ['Laundry circuit', '1 x 1,500 VA (18)', '1,500 VA']),
         (None, ['Fixed appliances, nameplate', 'range, dryer, EV-ready, fridge, DW, disposal, hood, openers, boiler, water heater, media', f'{appl:,} VA']),
         (None, ['All other load, demand', 'first 10 kVA at 100%, rest at 40% (220.82(B))', f'{demand:,.0f} VA']),
-        (None, ['Heating / cooling', 'two mini-split outdoor units at 100% (220.82(C)); radiant boiler is gas', f'{hvac:,} VA']),
+        (None, ['Heating / cooling', 'two mini-split outdoor units at 100% (220.82(C)); radiant boiler and water heater are gas or propane (owner, 2026-10-13)', f'{hvac:,} VA']),
         (None, ['Calculated load', f'{total:,.0f} VA / 240 V', f'{amps:,.0f} A on a 200 A service']),
     ]
     spaces = sum(2 if '-' in k and k != '38-40' else 3 if k == '38-40' else 1 for k in CKT)
@@ -752,7 +752,6 @@ def build():
         'Low voltage: Cat6 home runs to the media panel on the pantry\'s mech-room wall (master and living TV boxes, office desk, video doorbell at the front door), powered from circuit 37.',
     ]
     open_items = [
-        'Boiler and water heater fuel: gas or propane is drawn (200A service). An electric boiler or air-to-water heat pump with an electric water heater adds about 80-120A and needs a 320/400A service.',
         'Range fuel: the 48" range is drawn electric on a 50A circuit. A gas or dual-fuel range drops that to a 120V receptacle and adds a gas line.',
         'Mini-split breakers are sized from M-1\'s nominal units (CU-1 18k on 20A/#12, CU-2 36k on 40A/#8; 30A/#10 if the chosen model\'s MOP allows); set them to the nameplate MCA/MOCP of the units bought. If the living head moves to CU-1, CU-1 grows and 5-6 goes to 25-30A.',
         'Utility service: overhead or underground, and which side of the house the meter goes on. The meter-main is drawn on the garage wall facing the porch end.',

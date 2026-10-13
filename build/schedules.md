@@ -292,7 +292,6 @@ Devices, switch legs and circuits for panel P1, drawn on the walls they go in.
 
 ### Open items
 
-- Boiler and water heater fuel: gas or propane is drawn (200A service). An electric boiler or air-to-water heat pump with an electric water heater adds about 80-120A and needs a 320/400A service.
 - Range fuel: the 48" range is drawn electric on a 50A circuit. A gas or dual-fuel range drops that to a 120V receptacle and adds a gas line.
 - Mini-split breakers are sized from M-1's nominal units (CU-1 18k on 20A/#12, CU-2 36k on 40A/#8; 30A/#10 if the chosen model's MOP allows); set them to the nameplate MCA/MOCP of the units bought. If the living head moves to CU-1, CU-1 grows and 5-6 goes to 25-30A.
 - Utility service: overhead or underground, and which side of the house the meter goes on. The meter-main is drawn on the garage wall facing the porch end.
@@ -629,7 +628,7 @@ One row per switch leg. Pick a row to light up its switch and lights on the draw
 | Laundry circuit | 1 x 1,500 VA (18) | 1,500 VA |
 | Fixed appliances, nameplate | range, dryer, EV-ready, fridge, DW, disposal, hood, openers, boiler, water heater, media | 32,500 VA |
 | All other load, demand | first 10 kVA at 100%, rest at 40% (220.82(B)) | 25,222 VA |
-| Heating / cooling | two mini-split outdoor units at 100% (220.82(C)); radiant boiler is gas | 10,800 VA |
+| Heating / cooling | two mini-split outdoor units at 100% (220.82(C)); radiant boiler and water heater are gas or propane (owner, 2026-10-13) | 10,800 VA |
 | Calculated load | 36,022 VA / 240 V | 150 A on a 200 A service |
 
 ### Bill of materials

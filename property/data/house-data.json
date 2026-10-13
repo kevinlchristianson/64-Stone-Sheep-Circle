@@ -1,5 +1,5 @@
 {
- "version": "v14",
+ "version": "v17",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -584,9 +584,9 @@
   },
   "e1": {
    "devices": 228,
-   "circuits": 32,
+   "circuits": 28,
    "spaces": 40,
-   "amps": 145,
+   "amps": 143,
    "receptacles": 94,
    "lights": 91,
    "switches": 27

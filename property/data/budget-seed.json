@@ -208,7 +208,7 @@
    "qty": 228,
    "unit": "device",
    "price": 115,
-   "basis": "228 devices on 32 circuits (E-1)"
+   "basis": "228 devices on 28 circuits (E-1)"
   },
   {
    "id": "b24",
@@ -217,7 +217,7 @@
    "qty": 1,
    "unit": "lot",
    "price": 6500,
-   "basis": "load calc about 145 A"
+   "basis": "load calc about 143 A"
   },
   {
    "id": "b25",

@@ -54,7 +54,7 @@ CIRCUITS = [
     ('24', '15A AFCI', '#14', 'Bedroom 2 receptacles', 'bedroom 2', 'rec', 0),
     ('25', '15A AFCI', '#14', 'Bedroom 3 receptacles', 'bedroom 3', 'rec', 0),
     ('26', '20A', '#12', 'Garage + exterior receptacles, door openers', 'garage walls, both door openers, porch, patio, both mini-split units (210.11(C)(4) exception)', 'rec', 1200),
-    ('27', '15A AFCI', '#14', 'Boiler, circulators, zone controls', 'mechanical room, the three manifold stations (MF-1 laundry, MF-2/MF-G garage, MF-3 hall)', 'rec', 700),
+    ('27', '15A AFCI', '#14', 'Boiler, circulators, zone controls', 'mechanical room: HS-1, the four zone circulators P-R1 to P-R4 and the zone controller', 'rec', 700),
     ('28', '15A AFCI', '#14', 'Water heater (power vent)', 'mechanical room', 'rec', 400),
     ('29', '15A AFCI', '#14', 'Lighting A', 'master suite, master hall, laundry, powder, mud room', 'light', 0),
     ('30', '15A AFCI', '#14', 'Lighting B', 'kitchen, dining, pantry, mech, living, entry, coat closet, porch, patio', 'light', 0),
@@ -205,14 +205,15 @@ ceil(EFL, 'powder', 28.3, 25.1, '', '29', ['powder-light', 'powder-fan'])
 at(REC, 'mud', 16.373, 33.5, 'left', H_REC, '', '20', note='bench')
 at(REC, 'mud', 20.9, 36.84, 'front', H_REC, '', '20')
 at(REC, 'mud', 25.44, 39.6, 'left', H_REC, '', '20')
-at(REC, 'mud', 30.54, 32.0, 'right', H_REC, '', '20')
+at(REC, 'mud', 30.54, 29.2, 'right', H_REC, '', '20', note='')
 at(SW3, 'mud', 30.06, 42.213, 'front', H_SW, '', '29', ['mud'], note='at the garage door, latch side of D6')
 at(SW3, 'mud', 30.54, 37.55, 'right', H_SW, '', '29', ['mud'], note='at the kitchen opening')
 for x, y in ((19.6, 33.6), (27.8, 31.4), (27.8, 38.6)):
     ceil(CAN, 'mud', x, y, '', '29', ['mud'])
 # kitchen: counter run on the left wall with the range, island with sink and dishwasher, fridge and counter on the front wall
-for y in (24.2, 26.6, 32.8, 36.4):
+for y in (24.2, 26.6, 36.4):
     wall(GFCI, 'kitchen', 'left', y, H_CTR, '', '11', note='counter, 4 ft spacing')
+wall(GFCI, 'kitchen', 'left', 33.1, H_CTR, '', '11', note='counter, 4 ft spacing')
 wall(GFCI, 'kitchen', 'front', 34.6, H_CTR, '', '12', note='front counter')
 at(GFCI, 'kitchen', 40.87, 28.2, 'left', 27, '', '12', note='island end panel, living side, below the counter edge', island=True)
 at(GFCI, 'kitchen', 40.87, 33.4, 'left', 27, '', '12', note='island, living side, below the counter edge', island=True)
@@ -238,39 +239,36 @@ wall(REC, 'dining', 'right', 10.37, H_REC, '', '11', note='between the windows')
 wall(DIM, 'dining', 'left', 15.35, H_SW, '', '30', ['dining'], note='kitchen end of the dining wall')
 ceil(PEND, 'dining', 37.27, 11.6, '', '30', ['dining'], h=78, note='chandelier over the table; 30" over the top')
 # pantry and mechanical
-wall(GFCI, 'pantry', 'right', 49.2, H_CTR, '', '12', note='pantry counter')
+wall(GFCI, 'pantry', 'right', 52.6, H_CTR, '', '12', note='pantry counter')
 wall(GFCI, 'pantry', 'left', 47.4, H_CTR, '', '12', note='pantry counter')
 wall(SW, 'pantry', 'rear', 41.85, H_SW, '', '30', ['pantry'], note='inside the opening')
 ceil(CLOSET, 'pantry', 37.0, 49.2, '', '30', ['pantry'], legend='surface LED, closet-rated (410.16)')
 ceil(CLOSET, 'pantry', 41.0, 49.2, '', '30', ['pantry'], legend='surface LED, closet-rated (410.16)')
 wall(MP, 'pantry', 'left', 51.2, 54, '', '33', note='media panel on the mech room wall; every Cat6 home-runs here')
 wall(R20, 'mechanical', 'right', 47.6, 54, '', '27', legend='boiler: 120V service switch + receptacle', note='heat source for the radiant slab (R-1)')
-wall(REC, 'mechanical', 'right', 51.5, 54, '', '27', legend='duplex receptacle, 15A', note='circulators and zone control panel')
+wall(REC, 'mechanical', 'right', 51.5, 54, '', '27', legend='duplex receptacle, 15A', note='zone controller (R-1), which powers the four zone circulators P-R1 to P-R4')
 wall(R20, 'mechanical', 'right', 52.7, 54, '', '28', legend='water heater: 120V receptacle (power vent)', note='')
 wall(SW, 'mechanical', 'rear', 31.35, H_SW, '', '30', ['mech'], note='inside the double doors')
 ceil(SURF, 'mechanical', 32.37, 46.9, '', '30', ['mech'])
-# radiant manifold stations (R-1): a receptacle at each for the actuator wiring module and its transformer
-wall(REC, 'laundry', 'rear', 22.4, 24, '', '27', legend='duplex receptacle, 15A', note='radiant manifold MF-1 actuator module (R-1)')
-at(GFCI, 'garage', 20.4, 37.13, 'rear', 48, '', '27', legend='GFCI receptacle, 15A', note='radiant manifolds MF-2 / MF-G actuator module and the garage circulator P-RG (R-1)')
-wall(REC, 'hall', 'left', 27.4, 24, '', '27', legend='duplex receptacle, 15A', note='radiant manifold MF-3 actuator module (R-1)')
 # living: open to the kitchen; patio doors on the rear wall, fireplace on the bedroom-hall wall
 for x in (44.9, 49.8, 58.2, 63.0):
     wall(REC, 'living', 'rear', x, H_REC, '', '21')
-for y in (18.5, 25.6, 35.2, 40.6):
+for y in (18.5, 37.6, 40.6):
     wall(REC, 'living', 'right', y, H_REC, '', '21')
+wall(REC, 'living', 'right', 28.75, H_REC, '', '21', note='between the MF-3 cabinet in this wall and the fireplace (behind the insert\'s north end)')
 wall(TV, 'living', 'right', 29.6, 66, '', '21', note='over the fireplace mantel')
-wall(REC, 'living', 'right', 32.2, 8, '', '21', legend='duplex receptacle, 15A', note='fireplace insert blower, beside the insert')
+wall(REC, 'living', 'right', 31.3, 8, '', '21', legend='duplex receptacle, 15A', note='fireplace insert blower, at the south end of the insert, clear of the MF-4 leader bay')
 wall(REC, 'living', 'front', 56.0, H_REC, '', '21')
 wall(REC, 'living', 'front', 62.0, H_REC, '', '21')
 ceil(FLOOR, 'living', 52.4, 34.0, '', '21', note='floor box under the sofa (confirm the furniture layout)', h=0)
 wall(SW4, 'living', 'rear', 50.3, H_SW, '', '30', ['living-cans', 'living-fan', 'patio-lights', 'patio-fan'], note='4-gang beside the patio doors: living cans 4-way, living fan, patio lights, patio fan')
-wall(SW3, 'living', 'right', 24.25, H_SW, '', '30', ['living-cans'], note='at the bedroom hall opening')
+wall(SW3, 'living', 'right', 19.35, H_SW, '', '30', ['living-cans'], note='at the bedroom hall opening, north side (MF-3 is in the wall south of it)')
 for x in (47.8, 54.0, 60.2):
     for y in (22.4, 37.0):
         ceil(CAN, 'living', x, y, '', '30', ['living-cans'])
 ceil(FANBOX, 'living', 54.0, 31.4, '', '30', ['living-fan'], note='room centre, below the label')
 # entry, coat closet, office
-wall(REC, 'entry', 'left', 49.6, H_REC, '', '22')
+wall(REC, 'entry', 'left', 52.0, H_REC, '', '22', note='')
 wall(DIM, 'entry', 'right', 52.1, H_SW, '', '30', ['living-cans', 'entry', 'porch'], note='3-gang at the front door: living cans 3-way dimmer, entry light, porch lights')
 ceil(SURF, 'entry', 47.55, 49.4, '', '30', ['entry'])
 ceil(COMBO, 'entry', 48.8, 44.6, '', '31', note='outside the office (a possible bedroom)')
@@ -288,7 +286,7 @@ for x in (54.6, 61.0):
 ceil(SMOKE, 'office', 57.8, 50.6, '', '31')
 # bedroom hall
 wall(REC, 'hall', 'left', 31.0, H_REC, '', '23', note='hall over 10 ft (210.52(H))')
-wall(SW3, 'hall', 'left', 24.95, H_SW, '', '31', ['bhall'], note='living end, just past the opening')
+wall(SW3, 'hall', 'left', 23.65, H_SW, '', '31', ['bhall'], note='living end, between the opening and the MF-3 cabinet')
 wall(SW3, 'hall', 'left', 38.7, H_SW, '', '31', ['bhall'], note='bedroom 3 end')
 for y in (22.0, 30.0, 36.4):
     ceil(CAN, 'hall', 66.5, y, '', '31', ['bhall'])
@@ -309,6 +307,7 @@ wall(SCONCE, 'bath1', 'right', 7.1, 84, '', '31', ['bath1-light'], note='over th
 wall(SW, 'bath1', 'left', 9.3, H_SW, '', '31', ['bath1-light', 'bath1-fan'], note='2-gang, latch side of D19: lights, fan')
 ceil(EFL, 'bath1', 80.0, 10.2, '', '31', ['bath1-light', 'bath1-fan'])
 ceil(WET, 'bath1', 80.4, 14.2, '', '31', ['bath1-light'], note='in the shower')
+wall(GFCI, 'bath1', 'left', 11.2, 20, '', '19', legend='GFCI receptacle, 20A', note='plug-in towel warmer, about 250 W with its own timer: makes up bath 1\'s ~780 Btu/h radiant shortfall at design (R-1)')
 # bedroom 2, bath 2
 wall(REC, 'bed2', 'rear', 73.0, H_REC, '', '24')
 wall(REC, 'bed2', 'right', 26.2, H_REC, '', '24', note='between the windows')
@@ -744,7 +743,7 @@ def build():
         'Smoke alarms in every bedroom and the office; smoke + CO combination alarms outside each sleeping area (master hall, bedroom hall, entry outside the office). All 120V, interconnected, battery backup (IRC R314, R315; CO because of the attached garage, the wood fireplace and the gas boiler).',
         'Bath exhaust fans 110 CFM with humidity sensing and an integrated LED light: the light switches with the room\'s other lights, the fan on its own rocker with a timer (14/3 from the bank). Ducted outside in rigid duct.',
         'Mini-splits: each outdoor unit has its own 2-pole circuit and a fused disconnect within sight; the indoor heads are fed from their outdoor unit through the interconnect cable, so they have no circuits of their own. CU-1 (24k, master, dining and living heads) sits in the rear alcove between the master bedroom and the covered patio, and CU-2 (24k, bedrooms 1-3) in the right side yard against the Bath 2 wall, per M-1; breakers are sized from the nominal units until the nameplates are known. A weatherproof GFCI receptacle is within 25 ft of each outdoor unit (210.63).',
-        'Radiant (R-1): the wall-hung boiler HS-1, its system circulator and the zone controller share 15A circuit 27 with a service switch at the boiler, and each remote manifold station has a receptacle on 27 for its actuator wiring module (MF-1 laundry, MF-2/MF-G on the garage side of the mud room wall with the garage circulator, MF-3 bedroom hall). The water heater\'s power vent is on 32. Thermostats are 24V back to the zone controller, not line voltage. The MF-3 cabinet sits below the hall 3-way S at 48".',
+        'Radiant (R-1): the wall-hung boiler HS-1, the zone controller and the four zone circulators P-R1 to P-R4 are all in the mechanical closet and share 15A circuit 27, with a service switch at the boiler; the controller wires each circulator from its own pump relay. The manifolds have no actuators (each manifold is wholly on one zone), so the five manifold cabinets need no power. Thermostats T1 to T4 are 24V, wired to the controller in the closet. The water heater\'s power vent is on 28. Bath 1 gets a GFCI receptacle for a plug-in towel warmer (about 250 W) to make up its radiant shortfall.',
         'Low voltage: Cat6 home runs to the media panel on the pantry\'s mech-room wall (master and living TV boxes, office desk, video doorbell at the front door), powered from circuit 33.',
     ]
     open_items = [

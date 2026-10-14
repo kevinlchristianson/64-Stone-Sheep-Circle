@@ -205,10 +205,10 @@
    "id": "b23",
    "group": "Electrical",
    "name": "Rough and finish wiring",
-   "qty": 228,
+   "qty": 226,
    "unit": "device",
    "price": 115,
-   "basis": "228 devices on 28 circuits (E-1)"
+   "basis": "226 devices on 28 circuits (E-1)"
   },
   {
    "id": "b24",

@@ -82,23 +82,18 @@ GATES = [
     (30.54, 31.75, 30.833, 34.5, 'mud'),          # G4 kitchen into the mud room, under the base cabinets, into MF-K
     (43.707, 46.75, 44.0, 50.75, 'pantry'),       # G3 entry into the pantry, into MF-5
     (64.167, 33.5, 64.46, 36.75, 'hall'),         # G5 living into the hall, into MF-4
-    (25.5, 21.833, 27.5, 22.127, 'powder'),       # G6 master hall into the powder room
+    (64.167, 24.0, 64.46, 28.25, 'hall'),         # G8 living into the hall, into MF-3
+    (25.5, 21.833, 28.5, 22.127, 'powder'),       # G6 master hall into the powder room
     (78.25, 15.83, 80.5, 16.13, 'bath1'),         # G7 bedroom 2 closet into bath 1, under the shower floor
 ]
-# nothing passes under these: fixtures with flanges, drains or stub-ups, appliances, the hearth. Tube may pass under the
-# kitchen base cabinets (south of the range), the laundry's linen cabinet and the shower floors; the fields keep out of
-# every fixture by their own rectangles.
-def _fx(kind_ids, grow=0.0):
-    out = []
-    for f in HOUSE['fixtures']:
-        if f['id'] in kind_ids or f['kind'] in kind_ids:
-            x, y = f['at']; w, h = f['size']
-            out.append((x - w / 2 - grow, y - h / 2 - grow, x + w / 2 + grow, y + h / 2 + grow))
-    return out
-NO_TUBE = (_fx({'fireplace'}, 0.3) + _fx({'wc'}, 0.25) + _fx({'island', 'range', 'ref', 'tub'}, 0.2)
-           + _fx({'K-BACK', 'MB-VAN', 'B2-VAN', 'washer', 'dryer', 'lav'}, 0.1))
-DRAINS = [(f['at'][0], f['at'][1], 1.0) for f in HOUSE['fixtures'] if f['kind'] == 'drain']
-
+# The tube is 4-1/2" down in the slab, so it runs under everything that sits on the floor: cabinets, the island, tubs,
+# showers, vanities, toilets, the washer and dryer, the hearth (owner, 2026-10-14). Only the walls (and their plates), the
+# posts and the manifold port rows keep it out. Where a drain or a closet flange comes up through the slab the installer
+# shifts that one run over a channel for the length of the fitting (note on the sheet).
+NO_TUBE = []
+DRAINS = []
+PENETRATIONS = ([f for f in HOUSE['fixtures'] if f['kind'] in ('drain', 'wc', 'tub')]      # where P-1 comes up through the slab inside a field
+                + [dict(id=st['id'], kind='stack', name=f"{st['name']} vent stack", at=st['at']) for st in plumbing.STACKS])
 # Panels: room, rectangle in plan feet, the edge the loop ends sit on ('W', 'E', 'N', 'S'; 'r' starts the bands from the
 # other end of that edge), the manifold, and how many 6" rows a band (one loop) may take (0 = whatever 200' allows).
 # Rectangles stay 6" off the walls where tube would be near a plate, clear of the cabinets, tubs, vanities, the island,
@@ -106,64 +101,95 @@ DRAINS = [(f['at'][0], f['at'][1], 1.0) for f in HOUSE['fixtures'] if f['kind'] 
 # that pass by (those lanes are heated by the leaders).
 PANELS = {
     # zone 1, master suite: MF-1
-    'MB':  ('master_bed', 16.81, 0.81, 30.19, 15.6, 'Sr', 'MF-1', 10),
-    'BA1': ('master_bath', 9.3, 6.0, 13.6, 13.1, 'S', 'MF-1', 0),        # north of the double vanity; leaders down the west side, through the closet and the laundry
-    'BA2': ('master_bath', 10.8, 14.9, 15.3, 23.1, 'E', 'MF-1', 0),      # south of the vanity, east of the shower; leaders out through the bedroom door, with a lane east of it for BA1's
-    'MC':  ('master_closet', 6.4, 26.5, 15.1, 33.1, 'E', 'MF-1', 0),     # starts below the pocket door's north jamb so the bath 1 leaders get past
-    'LA':  ('laundry', 19.9, 20.3, 22.2, 29.3, 'N', 'MF-1', 0),          # between the linen cabinet and the washer / dryer; the lane west of it carries the closet and bath leaders
-    'MH':  ('master_hall', 25.4, 18.3, 30.19, 21.5, 'S', 'MF-2', 0),      # its leaders go through the powder room to the mud room
+    'MB':  ('master_bed', 16.76, 0.76, 30.24, 15.5, 'Sr', 'MF-1', 0),     # three bands; the rows south of it carry the bath leaders east to the gate
+    'BAM': ('master_bath', 6.13, 11.25, 14.75, 17.25, 'Er', 'MF-1', 0),   # the bath between the toilet partition and the shower, vanity and tub included; ends at the bedroom door
+    'BAN': ('master_bath', 8.75, 6.25, 15.87, 11.1, 'Sr', 'MF-1', 0),     # north end by the vanity, running on into the toilet nook (BAW); its leaders go down the vanity wall to the door
+    'BAW': ('master_bath', 6.13, 5.84, 8.5, 9.0, 'E', 'MF-1', 0),         # the toilet nook, tail of BAN
+    'MCN': ('master_closet', 6.75, 25.25, 15.0, 28.0, 'E', 'MF-1', 0),   # closet, north half, running on through the bath door into the shower end of the bath (BAS)
+    'BAS': ('master_bath', 6.13, 19.0, 15.87, 23.0, 'Sr', 'MF-1', 0),     # shower end of the bath, tail of MCN
+    'LA':  ('laundry', 20.25, 19.0, 24.6, 28.5, 'N', 'MF-1', 0),          # laundry under the washer and dryer, straight up into the ports, running on through the pocket door into the closet's south half (MCS)
+    'MCS': ('master_closet', 6.13, 28.25, 15.25, 33.54, 'E', 'MF-1', 0),  # closet, south half, tail of LA
     # zone 2, great room and utility: MF-2, MF-K, MF-5
-    'MU1': ('mud', 16.73, 32.0, 24.6, 35.1, 'S', 'MF-2', 0),
-    'MU2': ('mud', 27.3, 29.0, 29.8, 41.4, 'S', 'MF-2', 0),               # its leaders leave at the south end and come up the lane by the garage door; the lane west of it carries the hall leaders
-    'DI':  ('dining', 32.5, 5.9, 43.35, 15.8, 'W', 'MF-K', 10),
-    'KN':  ('kitchen', 33.0, 16.6, 43.35, 22.6, 'W', 'MF-K', 0),          # north of the base cabinets and the island
-    'KE':  ('kitchen', 41.3, 23.0, 43.35, 36.3, 'S', 'MF-K', 0),          # east of the island
-    'KS':  ('kitchen', 33.6, 37.7, 43.35, 41.6, 'W', 'MF-K', 0),          # south of the island, north of the back cabinet
-    'PA':  ('pantry', 34.56, 46.5, 42.9, 52.9, 'E', 'MF-5', 0),               # south of the coat closet's back wall
-    'EN':  ('entry', 47.5, 44.0, 49.7, 49.0, 'S', 'MF-5', 0),             # the entry's west side and south end carry leaders
-    'LW':  ('living', 44.4, 17.2, 53.9, 41.6, 'S', 'MF-5', 6),
-    'LE1': ('living', 53.9, 17.2, 60.2, 42.1, 'E', 'MF-3', 16),            # four bands: two north of the fireplace to MF-3, two south to MF-4
-    'LE2': ('living', 60.9, 19.3, 62.8, 26.9, 'S', 'MF-3', 0),            # north of the fireplace; leaders out at its south end, along the hearth and up the wall to the hall opening
-    'LE3': ('living', 60.9, 34.8, 63.3, 41.3, 'N', 'MF-4', 0),            # south of the fireplace
+    'MUW': ('mud', 17.25, 30.75, 24.75, 35.6, 'W', 'MF-2', 0),            # mud room west of the garage door, straight down into the ports; runs on through the powder room (PW) into the master hall (MH)
+    'PW':  ('powder', 26.0, 22.5, 30.24, 27.25, 'S', 'MF-2', 0),         # the powder room, under the toilet and lav; tail of MUW
+    'MH':  ('master_hall', 25.34, 18.25, 28.74, 21.5, 'Sr', 'MF-2', 0),    # the master hall, last panel of MUW's loop, fed under the powder room wall
+    'MUE': ('mud', 26.5, 29.0, 30.0, 41.9, 'W', 'MF-2', 0),              # mud room east leg, from the powder door to the garage door; the lane west of it carries the leaders
+    'KNN': ('kitchen', 32.75, 5.9, 43.4, 17.0, 'Wr', 'MF-K', 0),          # kitchen and dining north of the living room opening, out to the dining's east wall; two bands
+    'KN':  ('kitchen', 32.75, 17.5, 41.0, 44.1, 'Wr', 'MF-K', 0),          # dining and kitchen as one field from the rear wall to the pantry wall, under the island, sink, range and back cabinets; the lane under the west wall carries the leaders to MF-K
+    'KE':  ('kitchen', 41.5, 17.15, 44.6, 41.0, 'Sr', 'MF-5', 0),         # the strip where the kitchen opens to the living room, north of the coat closet; its leaders drop down the entry's west side into MF-5
+    'PA':  ('pantry', 34.51, 46.5, 43.25, 52.97, 'N', 'MF-K', 0),         # the pantry, wall to wall; its leaders run out through the pantry door and under the kitchen's west wall to MF-K
+    'EN':  ('entry', 46.75, 43.1, 50.0, 52.1, 'Wr', 'MF-5', 0),           # 18 rows; the rows below are OF1's lane to the gate           # the entry between the leader lanes, straight under the pantry wall into MF-5; runs on through the office doors into the office's north half (OF0)
+    'OF0': ('office', 51.75, 43.1, 63.87, 47.1, 'Wr', 'MF-5', 0),         # office north half, tail of EN
+    'OF1': ('office', 51.75, 47.4, 63.87, 52.97, 'W', 'MF-5', 0),         # office south half; out through the doors, down the entry's east side and west along the front door rows into MF-5
+    'LW':  ('living', 45.0, 17.15, 51.3, 41.5, 'S', 'MF-5', 0),           # living, west part: two bands whose leaders go down the entry's west side into MF-5
+    'LE0': ('living', 51.25, 18.0, 62.8, 23.6, 'E', 'MF-3', 0),           # living east in four bands of 12 rows; LE0 and LE2 keep a lane to reach their gate, LE1 and LE3 sit on theirs
+    'LE1': ('living', 51.25, 24.0, 63.6, 29.6, 'E', 'MF-3', 0),
+    'LE2': ('living', 51.25, 30.0, 62.8, 35.6, 'E', 'MF-4', 0),
+    'LE3': ('living', 51.25, 36.0, 63.6, 41.6, 'E', 'MF-4', 0),           # living, east part: four bands, the two north ones out the hall opening to MF-3, the two south ones under the hall wall into MF-4; the lane east of it carries their leaders
     # zone 3, bedroom wing and office: MF-3, MF-4, MF-5
-    'OF':  ('office', 52.5, 43.1, 63.8, 52.9, 'W', 'MF-5', 10),
-    'B1':  ('bed1', 64.81, 5.9, 77.1, 16.6, 'S', 'MF-3', 12),
-    'C2':  ('bed2_closet', 79.2, 17.0, 82.6, 20.8, 'S', 'MF-3', 0),       # one loop with bath 1: out through the closet door, on under the shower floor
-    'BT1': ('bath1', 78.3, 6.3, 80.1, 12.0, 'S', 'MF-3', 0),               # the tail of that loop: the open floor west of the lav and toilet, north of the shower
-    'B2':  ('bed2', 71.0, 22.4, 82.6, 33.75, 'W', 'MF-3', 12),
-    'BT2': ('bath2', 69.5, 34.75, 79.8, 37.3, 'W', 'MF-4', 0),
-    'B3':  ('bed3', 64.81, 42.3, 77.1, 52.9, 'N', 'MF-4', 12),
+    'B1':  ('bed1', 65.0, 5.9, 77.3, 17.6, 'Sr', 'MF-3', 0),              # bedroom 1 wall to wall; both bands' leaders run along the hall wall to the door and down the hall
+    'C2':  ('bed2_closet', 79.5, 17.0, 82.3, 20.9, 'S', 'MF-3', 0),       # one loop with bath 1: out through the closet door, west along bedroom 2's rear wall and down the hall
+    'BT1': ('bath1', 78.5, 5.9, 82.3, 15.3, 'S', 'MF-3', 0),              # the tail of that loop: all of bath 1, under the vanity, toilet and shower
+    'B2':  ('bed2', 70.25, 22.6, 82.9, 33.3, 'Wr', 'MF-3', 0),            # bedroom 2 in two bands; the lane under its hall wall carries the closet loop and the north band to the door
+    'BT2': ('bath2', 69.25, 34.75, 82.9, 39.7, 'W', 'MF-4', 0),           # bath 2 wall to wall, under the vanity, toilet and tub; out the door and round the hall's east side into MF-4
+    'B3':  ('bed3', 65.5, 41.25, 72.1, 52.85, 'N', 'MF-4', 0),             # bedroom 3, west part, straight out the door
+    'B3E': ('bed3', 72.5, 41.25, 76.1, 52.85, 'N', 'MF-4', 0),             # bedroom 3, east part; runs on round the foot of the room into the closet (B3C)
+    'B3C': ('bed3_closet', 78.5, 41.4, 82.75, 44.75, 'W', 'MF-4', 0),     # bedroom 3 closet, tail of B3E
     # garage, 6" like the house (owner, 2026-10-13): MF-G
-    'GW':  ('garage', 1.0, 39.5, 5.5, 66.8, 'N', 'MF-G', 4),               # west of the man door line; leaders along the north wall
-    'GM':  ('garage', 6.5, 43.5, 13.5, 66.8, 'N', 'MF-G', 6),              # west of the floor drain; the strip under the ports carries its leaders
-    'GN':  ('garage', 16.0, 43.5, 20.5, 66.8, 'N', 'MF-G', 6),             # east of the floor drain, under the ports; the rear wall steps back at 15.4
-    'GC':  ('garage', 21.8, 39.5, 23.5, 69.2, 'N', 'MF-G', 4),             # straight under the ports
-    'GE':  ('garage', 25.5, 45.0, 29.5, 69.2, 'W', 'MF-G', 24),            # east of the mud room; leaders up the lane east of GC
+    # garage west half in six bands, 4 columns wide at the west end where the leaders are longest, 6 toward the ports; the
+    # leaders fan east along the north wall into the ports, the first two straight up out of their own columns, so those
+    # two bands reach further north and the next two start a little lower, which brings all six out near the same length
+    'GW0': ('garage', 1.0, 38.5, 2.6, 66.6, 'N', 'MF-G', 0),
+    'GW1': ('garage', 3.0, 39.0, 4.6, 66.6, 'N', 'MF-G', 0),
+    'GW2': ('garage', 5.0, 42.5, 7.6, 66.6, 'N', 'MF-G', 0),
+    'GW3': ('garage', 8.0, 42.0, 10.6, 66.6, 'N', 'MF-G', 0),
+    'GW4': ('garage', 11.0, 41.5, 13.6, 66.6, 'N', 'MF-G', 0),
+    'GW5': ('garage', 14.0, 41.5, 16.6, 66.6, 'N', 'MF-G', 0),
+    'GS':  ('garage', 17.0, 41.5, 19.6, 66.6, 'Nr', 'MF-G', 0),           # the strip under the west ports, straight up into them
+    'GM1': ('garage', 20.0, 38.0, 22.6, 66.6, 'N', 'MF-G', 0),            # under the middle ports, straight up into them
+    'GE0': ('garage', 24.5, 43.0, 30.1, 51.6, 'W', 'MF-G', 0),           # 18 rows            # east of the mud room, north part; runs on through the mechanical door into the mechanical closet (MECH)
+    'MECH': ('mechanical', 31.5, 46.75, 33.6, 52.9, 'W', 'MF-G', 0),      # the mechanical closet, tail of GE0
+    'GE1': ('garage', 24.5, 52.0, 30.1, 62.6, 'W', 'MF-G', 0),            # south-east, middle rows; leaders up the lane east of GM1
+    'GE2': ('garage', 24.5, 63.0, 30.1, 68.6, 'W', 'MF-G', 0),            # south-east corner at the garage door wall; leaders up the same lane; runs on west along the door wall (GSS)
+    'GSS': ('garage', 15.75, 67.0, 22.6, 68.6, 'Er', 'MF-G', 0),          # the strip along the garage door wall under GS and GM1, tail of GE2
 }
-# loops that run on into a second panel (open pair through the first, a routed pair connector, closed pair in the second)
-CHAINS = [('C2', 'BT1')]
+# loops that run on through more panels (open pairs through all but the last, routed pair connectors between, closed pair in the last)
+# chain heads whose far edge is a wall: their open pair ends beside their own leads at the entry edge instead
+OPEN_AT_ENTRY = {'GE2', 'B3E'}
+CHAINS = [('C2', 'BT1'), ('BAN', 'BAW'), ('MCN', 'BAS'), ('LA', 'MCS'), ('MUW', 'PW', 'MH'), ('EN', 'OF0'), ('B3E', 'B3C'), ('GE0', 'MECH'), ('GE2', 'GSS')]
 # where the bands of one panel go to different stations
-BAND_STATION = {('LE1', 2): 'MF-4', ('LE1', 3): 'MF-4'}
+BAND_STATION = {}
 # bands set by hand (6" rows per loop, from the first row): LE1's two north bands keep their lead nodes clear of the
 # fireplace chase, which sits beside rows 27.5 to 31.5
-BANDS = {'LE1': [14, 16, 10, 10]}
+BANDS = {'MB': [8, 8, 10], 'B1': [12, 12], 'B2': [10, 10], 'GW0': [4], 'GW1': [4], 'GW2': [6], 'GW3': [6], 'GW4': [6], 'GW5': [6], 'GS': [6], 'GM1': [6], 'GE0': [18], 'GE1': [22], 'GE2': [12], 'KNN': [12, 10], 'KN': [18, 18, 18]}
 # the order the leaders are routed in: the loop routed first takes the lane along the wall, the next hugs it, so the
 # bundles nest. At a port row fed from one side, the loop nearest that end goes first; where bands leave a panel past
 # each other toward a gate, the far band goes first and turns off before the near one passes it; where every band
 # leaves through the same door, the near band goes first and the far one comes round the outside.
 # An entry is a panel, or 'panel.band' for one band of it.
-ORDER = ['BA2', 'BA1', 'MC', 'LA', 'MB', 'MU1', 'MU2', 'MH', 'DI', 'KN', 'KS', 'KE', 'PA', 'LW', 'OF.0', 'EN', 'OF.1',
-         'LE2', 'LE1.1', 'LE1.0', 'B1', 'C2', 'B2', 'LE3', 'LE1.3', 'LE1.2', 'BT2', 'B3', 'GW', 'GM', 'GN', 'GC', 'GE']
-NEAR_FIRST = {'LW', 'B1', 'B3', 'GE'}
+ORDER = ['BAM', 'BAN', 'MCN', 'LA', 'MB', 'MUW', 'MUE', 'PA', 'KN.0', 'KN.1', 'KNN.1', 'KNN.0', 'KN.2', 'KE', 'LW.0', 'LW.1', 'EN', 'OF1',
+         'LE0', 'LE1', 'B1.1', 'B1.0', 'C2', 'B2.1', 'B2.0', 'LE3', 'LE2', 'B3', 'B3E', 'BT2',
+         'GW0', 'GW1', 'GW2', 'GW3', 'GW4', 'GW5', 'GS', 'GM1', 'GE0', 'GE1', 'GE2']
+NEAR_FIRST = set()
 # floor a loop's leaders keep off (x0, y0, x1, y1 in feet), so the pair routed first takes the inside of a bundle and
 # the ones after it wrap round the outside: LE1's second band stays off the wall side of the lane east of LE2 so the
 # first band can come down outside it; the closet loop crosses the hall under the bedroom 2 door before turning north
-KEEP_OUT = {'LE1.1': [(63.2, 17.0, 63.6, 20.4)],
+KEEP_OUT = {
+    # the lane beside GM1 carries three pairs: GE0's next to its field, GE1's in the middle, GE2's by GM1
+    'GE0': [(22.7, 38.0, 23.8, 42.9)], 'GE1': [(22.7, 38.0, 23.3, 62.9)],
             # the three loops that reach MF-3 through the bedroom 2 door turn north at the door, one column further
             # west each, and the first lands on the farthest ports so the others nest inside it
-            'C2': [(64.5, 28.5, 67.5, 33.75)], 'B2.0': [(64.5, 28.5, 67.0, 33.75)], 'B2.1': [(64.5, 28.5, 66.5, 33.75)]}
+            'C2': [(64.5, 28.5, 67.5, 33.75)], 'B2.1': [(64.5, 28.5, 67.0, 33.75)], 'B2.0': [(64.5, 28.5, 66.5, 33.75)],
+            # bath 2's loop goes round the hall's east side and comes into MF-4 north of the bedroom 3 leaders
+            'BT2': [(64.5, 34.5, 67.25, 39.5)],
+            # bedroom 1's west band takes the west side of its door so the east band can come round outside it
+            'B1.1': [(66.5, 18.25, 68.5, 22.0)]}
 # a loop held to one pair of ports: the coordinate along the port row of its first port (the next one is its second)
-PORT = {'BA2': 18.75, 'BA1': 19.75, 'C2': 27.0, 'B2.0': 27.5, 'B2.1': 28.0}
+PORT = {'BAM': 18.75, 'BAN': 19.75, 'MUW': 17.0, 'PA': 34.25, 'KN.0': 33.75, 'KN.1': 33.25, 'KNN.1': 31.75, 'KNN.0': 32.25, 'KN.2': 32.75,
+        'KE': 46.75, 'LW.0': 47.25, 'LW.1': 47.75, 'EN': 49.5, 'OF1': 50.5,
+        'LE0': 24.5, 'LE1': 24.0, 'B1.1': 25.0, 'B1.0': 25.5, 'C2': 27.0, 'B2.1': 27.5, 'B2.0': 28.0,
+        'LE2': 33.5, 'BT2': 34.0, 'B3E': 35.5, 'LE3': 36.0, 'B3': 36.5,
+        'GW0': 16.5, 'GW1': 17.0, 'GW2': 17.5, 'GW3': 18.0, 'GW4': 18.5, 'GW5': 19.0, 'GS': 19.5, 'GM1': 20.0, 'GE2': 22.75, 'GE1': 23.5, 'GE0': 24.0}
 
 
 # ---------------------------------------------------------------- the layout
@@ -189,22 +215,49 @@ def band_len(panel, v0, n):
     return plen_nodes(nodes)
 
 
-def plan_bands(panel, cap, st_at):
-    """Split a panel into bands (one loop each) so that a band's tube plus a rough leader fits the loop budget."""
+def est_lead(panel, st_at, v0=None, n=None):
+    """A rough leader length for a loop of this panel (or of its band at rows v0..v0+n), both ways with the rises, from
+    its lead nodes to the station."""
+    if v0 is None:
+        x0, y0, x1, y1 = panel.rect_ft()
+        ex, ey = {'W': (x0, (y0 + y1) / 2), 'E': (x1, (y0 + y1) / 2), 'N': ((x0 + x1) / 2, y0), 'S': ((x0 + x1) / 2, y1)}[panel.entry]
+    else:
+        ex, ey = ft(panel.to_node(-1, v0 + panel.s * (n // 2)))
+    return 2 * 1.3 * (abs(ex - st_at[0]) + abs(ey - st_at[1])) + 2 * RISE
+
+
+def plan_bands(panel, cap, st_at, target, lead=None):
+    """Split a panel into bands (one loop each) so that every band's tube plus its own leader comes as close to `target` as
+    the rows allow, never over the loop budget: bands far from the station get fewer rows. `lead` is the panel's measured
+    average leader from the last pass; it scales the estimates."""
     m, R = panel.local()
     R2 = R - R % 2
     if R2 < 2: return []
-    if cap:
-        nmax = min(cap, R2)
-    else:
-        x0, y0, x1, y1 = panel.rect_ft()
-        ex, ey = {'W': (x0, (y0 + y1) / 2), 'E': (x1, (y0 + y1) / 2), 'N': ((x0 + x1) / 2, y0), 'S': ((x0 + x1) / 2, y1)}[panel.entry]
-        lead = 2 * 1.3 * (abs(ex - st_at[0]) + abs(ey - st_at[1])) + 2 * RISE
-        nmax = 2
-        for n in range(2, R2 + 1, 2):
-            if band_len(panel, 0, n) + lead <= MAX_LOOP - 6: nmax = n
-            else: break
-    return band_loops(panel, nmax)
+    scale = 1.0 if lead is None else lead / max(1.0, est_lead(panel, st_at))
+    def leads_for(bands): return [scale * est_lead(panel, st_at, v0, n) for v0, n in bands]
+    best = None
+    for nb in range(1, R2 // 2 + 1):
+        bands = band_loops(panel, -(-R2 // nb) + (-(-R2 // nb)) % 2)
+        if len(bands) != nb: continue
+        # reshape: rows in proportion to the tube each band may carry after its leader
+        for _ in range(4):
+            lds = leads_for(bands)
+            w = [max(0.15, target - ld) for ld in lds]
+            raw = [R2 * x / sum(w) for x in w]
+            sizes = [max(2, int(round(x / 2)) * 2) for x in raw]
+            while sum(sizes) > R2: sizes[sizes.index(max(sizes))] -= 2
+            while sum(sizes) < R2: sizes[sizes.index(min(sizes))] += 2
+            nbands = []; v = 0
+            for n in sizes: nbands.append((v, n)); v += n * panel.s
+            if nbands == bands: break
+            bands = nbands
+        if cap and max(n for _, n in bands) > cap: continue
+        lens = [band_len(panel, v0, n) + ld for (v0, n), ld in zip(bands, leads_for(bands))]
+        if max(lens) > MAX_LOOP - 4: continue
+        score = max(abs(L - target) for L in lens)
+        if best is None or score < best[0]: best = (score, bands)
+        if max(lens) < target - 30: break          # splitting further only shortens them
+    return best[1] if best else band_loops(panel, 2)
 
 
 def _sub(a, b): return (a[0] - b[0], a[1] - b[1])
@@ -219,16 +272,20 @@ def band_rect(panel, v0, n):
     return (x0 * P - h, y0 * P - h, x1 * P + h, y1 * P + h)
 
 
-def layout(caps=None, first=(), verbose=False, stop_before=None):
+TARGET = 180.0            # the loop length every band is planned to, ft, so loops on a manifold come out alike
+TARGETS = {}              # per-station overrides
+
+
+def layout(caps=None, first=(), verbose=False, stop_before=None, leads=None):
     """Lay every loop out on the grid. Returns the loops (fields, leaders, lengths), the grid and a list of failures."""
-    caps = dict(caps or {})
+    caps = dict(caps or {}); leads = dict(leads or {})
     grid = Grid(HOUSE, gates=GATES, no_tube=NO_TUBE, drains=DRAINS)
     panels = {k: Panel(v[0], v[1], v[2], v[3], v[4], v[5]) for k, v in PANELS.items()}
     for pn in panels.values():
         grid.field.update(pn.bbox_nodes())
     for k, st in STATIONS.items():
         grid.add_ports(k, port_nodes(st), st['room'])
-    chained = {b: a for a, b in CHAINS}
+    chained = {t: c for c in CHAINS for t in c[1:]}
     loops = []
     for k, v in PANELS.items():
         if k in chained: continue
@@ -237,20 +294,31 @@ def layout(caps=None, first=(), verbose=False, stop_before=None):
             bands = []; vv = 0
             for n in BANDS[k]: bands.append((vv, n)); vv += n * pn.s
         else:
-            bands = plan_bands(pn, caps.get(k, v[7]), station_at(STATIONS[st]))
+            bands = plan_bands(pn, caps.get(k, v[7]), station_at(STATIONS[st]), TARGETS.get(st, TARGET), leads.get(k))
+        chain = next((c for c in CHAINS if c[0] == k), None)
         for bi, (v0, n) in enumerate(bands):
             st_b = BAND_STATION.get((k, bi), st)
-            tail = next((b for a, b in CHAINS if a == k), None)
-            if tail:
-                if n % 4 == 0: n -= 2          # an open pair must end at the far edge
+            if chain:
+                # the loop runs on through every panel of the chain: open pairs through all but the last, which closes it
+                if k in OPEN_AT_ENTRY:
+                    if n % 4 == 2: n -= 2      # the open pair ends at the entry edge, beside the leads
+                elif n % 4 == 0: n -= 2        # an open pair must end at the far edge
                 if n < 2: continue
-                na, nb, lin, lout, ends = pair_open(pn, v0, n)
-                pb = panels[tail]
-                m2, R2 = pb.local(); n2 = R2 - R2 % 2
-                nodes2, _, lin2, lout2 = band_path(pb, 0, n2)
-                loops.append(dict(panel=k, band=bi, st=st_b, room=v[0], a=na, b=nb, lead_in=lin, lead_out=lout, ends=ends, n=n,
-                                  tail=tail, field2=nodes2, lead_in2=lin2, lead_out2=lout2, panels=[pn, pb], rooms=[v[0], PANELS[tail][0]],
-                                  rects=[band_rect(pn, v0, n), band_rect(pb, 0, n2)]))
+                segs = []
+                for i, name in enumerate(chain):
+                    pb = panels[name]
+                    if i == 0: v_, n_ = v0, n
+                    else:
+                        m2, R2 = pb.local(); v_, n_ = 0, R2 - R2 % 2
+                        if i < len(chain) - 1 and n_ % 4 == 0: n_ -= 2
+                    if i < len(chain) - 1:
+                        na, nb, lin, lout, ends = pair_open(pb, v_, n_)
+                        segs.append(dict(open=True, a=na, b=nb, lin=lin, lout=lout, ends=ends, panel=pb, rect=band_rect(pb, v_, n_), room=PANELS[name][0]))
+                    else:
+                        nodes, _, lin, lout = band_path(pb, v_, n_)
+                        segs.append(dict(open=False, field=nodes, lin=lin, lout=lout, panel=pb, rect=band_rect(pb, v_, n_), room=PANELS[name][0]))
+                loops.append(dict(panel=k, band=bi, st=st_b, room=v[0], segs=segs, a=segs[0]['a'], lead_in=segs[0]['lin'], lead_out=segs[0]['lout'], n=n,
+                                  panels=[g['panel'] for g in segs], rooms=[g['room'] for g in segs], rects=[g['rect'] for g in segs]))
             else:
                 nodes, corners, lin, lout = band_path(pn, v0, n)
                 loops.append(dict(panel=k, band=bi, st=st_b, room=v[0], field=nodes, lead_in=lin, lead_out=lout, panels=[pn], rooms=[v[0]], n=n,
@@ -260,29 +328,41 @@ def layout(caps=None, first=(), verbose=False, stop_before=None):
     for i, l in enumerate(loops):
         l['tag'] = f'L{i + 1}'
         if 'field' in l:
-            grid.take(l['field'], l['tag'] + 'f')
+            grid.take(l['field'], l['tag'] + 'f'); nodes = l['field']
         else:
-            grid.take(l['a'], l['tag'] + 'a'); grid.take(l['b'], l['tag'] + 'b'); grid.take(l['field2'], l['tag'] + 'f')
-            grid.used[l['ends'][0]] = l['tag'] + 'c1'; grid.used[l['ends'][1]] = l['tag'] + 'c2'
-            grid.used[l['lead_in2']] = l['tag'] + 'c1'; grid.used[l['lead_out2']] = l['tag'] + 'c2'
+            nodes = []
+            for j, g in enumerate(l['segs']):
+                if g['open']:
+                    grid.take(g['a'], f"{l['tag']}a{j}"); grid.take(g['b'], f"{l['tag']}b{j}"); nodes += g['a'] + g['b']
+                    grid.used[g['ends'][0]] = f"{l['tag']}c{j}a"; grid.used[g['ends'][1]] = f"{l['tag']}c{j}b"
+                else:
+                    grid.take(g['field'], f"{l['tag']}f{j}"); nodes += g['field']
+                if j: grid.used[g['lin']] = f"{l['tag']}c{j - 1}a"; grid.used[g['lout']] = f"{l['tag']}c{j - 1}b"
         grid.used[l['lead_in']] = l['tag'] + 's'; grid.used[l['lead_out']] = l['tag'] + 'r'
-        hit = [n for n in (l.get('field') or l['a'] + l['b'] + l['field2']) if n in grid.blocked or n not in grid.room]
-        if hit: bad.append(f"{l['tag']} {l['panel']}: field over a wall, fixture or drain at {[ft(n) for n in hit[:3]]}")
+        hit = [n for n in nodes if n in grid.blocked or n not in grid.room]
+        if hit: bad.append(f"{l['tag']} {l['panel']}: field over a wall or post at {[ft(n) for n in hit[:3]]}")
     if bad: raise ValueError('; '.join(bad))
     fails = []
-    # connectors of the chained loops: the pair runs on from the two open ends to the second panel's lead nodes
+    # connectors of the chained loops: the pair runs on from a panel's two open ends to the next panel's lead nodes
     for l in loops:
-        if 'tail' not in l: continue
-        e0, e1 = l['ends']; t1, t2 = l['tag'] + 'c1', l['tag'] + 'c2'
-        r = pair_route(grid, e0, e1, _sub(e0, l['a'][-1]), leads=(l['lead_in2'], l['lead_out2']))
-        if not r:
-            fails.append((l['tag'], l['panel'], 'connector')); l['conn'] = None
-            continue
-        ca, cb = r
-        grid.take(ca, t1); grid.take(cb, t2)
-        # tube A runs on from end 0; if its connector lands on lead_out2 the second panel is run the other way round
-        if ca[-1] == l['lead_out2']: l['field2'] = l['field2'][::-1]
-        l['conn'] = (ca, cb)
+        if 'segs' not in l: continue
+        ok = True
+        for j in range(len(l['segs']) - 1):
+            g, h = l['segs'][j], l['segs'][j + 1]
+            e0, e1 = g['ends']; t = f"{l['tag']}c{j}"
+            r = pair_route(grid, e0, e1, _sub(e0, g['a'][-1]), leads=(h['lin'], h['lout'])) if ok else None
+            if not r:
+                if ok: fails.append((l['tag'], l['panel'], 'connector'))
+                g['conn'] = None; ok = False
+                continue
+            ca, cb = r
+            grid.used[ca[-1]] = t + 'a'; grid.used[cb[-1]] = t + 'b'     # whichever lead each tube landed on
+            grid.take(ca, t + 'a'); grid.take(cb, t + 'b')
+            # tube A runs on from end 0; if its connector lands on the next panel's lead-out, that panel is run the other way round
+            if ca[-1] == h['lout']:
+                if h['open']: h['a'], h['b'] = h['b'], h['a']; h['ends'] = (h['ends'][1], h['ends'][0])
+                else: h['field'] = h['field'][::-1]
+            g['conn'] = (ca, cb)
     # leaders, farthest loops first (they take the outside lanes), with any hand-picked ones before them
     def far(l):
         sx, sy = station_at(STATIONS[l['st']]); x, y = ft(l['lead_in'])
@@ -321,15 +401,19 @@ def layout(caps=None, first=(), verbose=False, stop_before=None):
         tube = []
         if l.get('sup'): tube += l['sup'][::-1]
         if 'field' in l:
-            tube += l['field']
+            tube += l['field']; l['in_floor'] = plen_nodes(l['field'])
         else:
-            tube += l['a']
-            if l.get('conn'):
-                tube += l['conn'][0] + l['field2'] + l['conn'][1][::-1]
-            tube += l['b'][::-1]
+            A, B, L = [], [], 0.0
+            for g in l['segs']:
+                if g['open']:
+                    A += g['a']; B = g['b'][::-1] + B; L += plen_nodes(g['a']) + plen_nodes(g['b'])
+                    if g.get('conn'):
+                        ca, cb = g['conn']; A += ca; B = cb[::-1] + B; L += plen_nodes(ca) + plen_nodes(cb) + 2 * P
+                else:
+                    A += g['field']; L += plen_nodes(g['field'])
+            tube += A + B; l['in_floor'] = L
         if l.get('ret'): tube += l['ret']
         l['tube'] = tube
-        l['in_floor'] = plen_nodes(l['field']) if 'field' in l else plen_nodes(l['a']) + plen_nodes(l['b']) + plen_nodes(l['field2']) + (plen_nodes(l['conn'][0]) + plen_nodes(l['conn'][1]) if l.get('conn') else 0)
         l['leader'] = (plen_nodes(l['sup']) if l.get('sup') else 0) + (plen_nodes(l['ret']) if l.get('ret') else 0) + 2 * RISE
         l['total'] = l['in_floor'] + l['leader'] + (2 * P if l.get('sup') else 0) + (2 * P if l.get('ret') else 0)   # the steps from lead nodes into the field
         l['ports'] = (l['sup'][-1], l['ret'][-1]) if l.get('sup') and l.get('ret') else None
@@ -337,13 +421,21 @@ def layout(caps=None, first=(), verbose=False, stop_before=None):
 
 
 def solve(verbose=False):
-    """Lay out, then trim any band whose loop came out over budget, and put loops that could not be routed first."""
-    caps = {}; first = []
-    for it in range(14):
-        loops, grid, fails = layout(caps, first, verbose)
+    """Lay out with estimated leaders, then again with the leaders as routed (so the bands are planned to the real
+    totals), then trim any band whose loop came out over budget and put loops that could not be routed first."""
+    caps = {}; first = []; leads = {}
+    for it in range(16):
+        loops, grid, fails = layout(caps, first, verbose, leads=leads)
         over = [l for l in loops if l['total'] > MAX_LOOP]
         if verbose:
             print(f"pass {it}: {len(loops)} loops, {len(fails)} failures, {len(over)} over {MAX_LOOP:.0f}'")
+        if it < 2:
+            # plan the next pass with each panel's measured leader (its bands' average)
+            acc = {}
+            for l in loops:
+                if l.get('sup'): acc.setdefault(l['panel'], []).append(l['leader'] + 4 * P)
+            leads = {k: sum(v) / len(v) for k, v in acc.items()}
+            if it == 0: continue
         if not fails and not over: return loops, grid
         for tag, panel, what in fails:
             if panel not in first: first.append(panel)
@@ -502,6 +594,12 @@ def build():
         sh.close_group()
         picks[f['id']] = dict(tag=f['id'], sub=f"Feed pair to {f['to']}", fields=[('Pipe', '1" PEX supply + return, closed-cell insulated end to end, in the base course under the nub boards'),
                                                                                 ('Run', f"about {f['lf']:.0f}' each way from HS-1"), ('Flow', f"{f['gpm']:.1f} gpm with every loop on {f['to']} calling")])
+    for f in PENETRATIONS:   # where P-1 comes up through a field: the installer shifts one run over a channel there
+        x, y = f['at']; what = {'wc': 'closet flange', 'drain': 'drain body', 'tub': 'tub trap', 'stack': 'stack'}[f['kind']]
+        sh.open_group('X-' + f['id'], f"{f['id']}: {f['name']} comes up through the slab here (P-1). Shift the one run it meets over a channel for the length of the fitting, so the tube stays 3\" clear of the {what}.", layer='tags', hit=(x, y, 0.9))
+        sh.circle(x, y, 0.42, '#fff', '#b4462f', 1.2, layer='tags')
+        sh.line(x - 0.3, y - 0.3, x + 0.3, y + 0.3, '#b4462f', 1.2, layer='tags'); sh.line(x - 0.3, y + 0.3, x + 0.3, y - 0.3, '#b4462f', 1.2, layer='tags')
+        sh.close_group(layer='tags')
     for k, st in STATIONS.items():
         on = by_st[k]; n = len(on); nports = len(grid.ports[k])
         x, y = station_at(st)
@@ -550,13 +648,14 @@ def build():
     n_coils = coils([l['total'] * 1.02 for l in loops])
     unheated_txt = ', '.join(f"{nm} ({q:,.0f} Btu/h)" for _, nm, q in unheated)
     leaders_txt = ', '.join(f"{nm} ({ft:.0f}' of leaders for {q:,.0f} Btu/h)" for _, nm, q, ft in by_leaders)
-    gates_txt = 'under the master bed wall into MF-1, under the kitchen wall into MF-K, under the entry wall into MF-5, under the living room wall into MF-4, under the master hall wall into the powder room, and under the bath 1 wall from the bedroom 2 closet'
+    gates_txt = 'under the master bed wall into MF-1, under the kitchen wall into MF-K, under the entry wall into MF-5, under the living room wall into MF-3 and MF-4, under the master hall wall into the powder room, and under the bath 1 wall from the bedroom 2 closet'
+    spread_txt = ', '.join(f"{k} {min(l['total'] for l in by_st[k]):.0f}'-{max(l['total'] for l in by_st[k]):.0f}'" for k in STATIONS if by_st[k])
     station_txt = '; '.join(f"{k} ({lc(STATIONS[k]['where'])}, {len(by_st[k])} loops) serves " + ', '.join(sorted({r for l in by_st[k] for r in l['room_names']}, key=lambda n: [r['name'] for r in HOUSE['rooms']].index(n))) for k in STATIONS)
     notes = [
         f"The layout is drawn on the boards' own grid. {BOARD['name']}s ({BOARD['size']:.0f}' x {BOARD['size']:.0f}', {BOARD['thick_in']:.0f}\" thick: {BOARD['eps_in']:.0f}\" of EPS, R-{BOARD['r']:.0f}, under a {BOARD['puck_in']:.0f}\" grid of pucks on {BOARD['pitch_in']:.0f}\" centres) go down in a running bond with their puck rows on the 3\" lines from the datum at 0,0 (the garage-door wall's outside face and the master bed's rear wall line, as on every sheet), so every tube on this sheet sits in a channel between pucks. Lay the first board's corner at the datum and the rest follow; a board cut at a wall keeps its grid.",
-        f"Tube: {len(loops)} loops of 1/2\" O2-barrier PEX, none over {MAX_LOOP:.0f}' with its leaders and the 2' rises at the cabinet ({longest['id']} is the longest at {longest['total']:.0f}', {shortest['id']} the shortest at {shortest['total']:.0f}'). Fields at 6\" o.c. (every other channel), supply and return side by side so each loop's two ends leave its field together; leaders run as 3\" pairs through doorways and along walls to their manifold. Nothing crosses anything: the whole layout was checked tube by tube on the grid. One continuous coil per loop, no fittings in the slab; tag both ends with the loop number at the cabinet.",
+        f"Tube: {len(loops)} loops of 1/2\" O2-barrier PEX, none over {MAX_LOOP:.0f}' with its leaders and the 2' rises at the cabinet ({longest['id']} is the longest at {longest['total']:.0f}', {shortest['id']} the shortest at {shortest['total']:.0f}'). Fields at 6\" o.c. (every other channel), supply and return side by side so each loop's two ends leave its field together; leaders run as 3\" pairs through doorways and along walls to their manifold. Nothing crosses anything: the whole layout was checked tube by tube on the grid. One continuous coil per loop, no fittings in the slab; tag both ends with the loop number at the cabinet. The loops on one manifold are planned to like lengths so they balance on their flow meters ({spread_txt}); MF-1's spread is the master bath, whose three small fields are boxed in by the toilet and shower walls and can neither join each other nor share rows with the bedroom.",
         f"Under a wall only where drawn, straight across and only for the length drawn: {gates_txt}. Mark every wall crossing on the boards before the pour so the plate anchors and shots stay 12\" off it; everywhere else the leaders go through the doorway.",
-        f"Nothing under the kitchen base cabinets' footprint except the leaders drawn there, nor under the island, fridge, back cabinet, range, washer, dryer, tubs, vanities or the fireplace hearth. 12\" clear of the floor drains and shower drains, 3\" of a toilet flange; the showers' floors are heated. The bathroom loops heat the open floor; the closets and halls get their heat from the leaders passing through, and the laundry has a small field of its own.",
+        f"The tube runs under everything that sits on the floor: the kitchen base cabinets, island, fridge and range, the washer and dryer, the tubs, showers, vanities and toilets, the hearth. It lies about {-SLAB_H * 12:.0f}\" below the top of the slab, so nothing fastened to the floor reaches it; only the walls and their plates, the posts and the manifold port rows keep it out. Where P-1 brings a drain, a tub trap, a closet flange or a vent stack up through the slab ({len(PENETRATIONS)} places, each marked with a crossed circle) shift the one run it meets over a channel for the length of the fitting, so the tube stays 3\" clear of the flange or drain body; the showers' floors are heated like the rest.",
         f"Manifolds, seven stations, each with a 3\" port position per tube end in one row along its wall (the schedule gives every loop's two port numbers, counted from the low end of the row): {station_txt}. HS-1 in the mechanical closet feeds all seven on six 1\" insulated pairs under the boards, {feed_lf:.0f}' each way in all; MF-2 and MF-G share one pair rising in the garage wall.",
         f"The leaders rise straight up out of the slab at their port positions into the cabinet (sleeve each rise in 12\" of pipe insulation where it leaves the concrete) and bundle up to the manifold; they may be gathered sideways in the last 12\" below the cabinet. Cabinets are recessed in the kitchen and entry walls (MF-K, MF-5) and the hall wall (MF-3, MF-4) and surface-mounted on the laundry's sound wall (MF-1) and both faces of the garage wall (MF-2, MF-G).",
         f"Zoning is by thermostat: four zones (master suite, great room and utility, bedroom wing and office, garage) on 24 V actuators at each loop's manifold port, so a room can get its own thermostat later by rewiring, without new tube.",
@@ -569,6 +668,7 @@ def build():
         f"P-1's water lines, vents and drains are all in the base course below the boards and the feed pairs (cold PEX {plumbing.ft_in(-plumbing.COLD_H)} down, hot {plumbing.ft_in(-plumbing.HOT_H)}, drains below both), so the boards go down whole, with no channels cut for plumbing.",
     ]
     open_items = [f"{l['id']} ({', '.join(l['room_names'])}): the floor carries all but about {l['short']:,.0f} Btu/h of the room at {CLIMATE['heat_design_f']:.0f}°F with {T_SUP:.0f}°F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days." for l in shorts] + [
+        "Not tubed: the coat closet (about 6 sq ft), the bedroom 1 bypass closet (about 17 sq ft) and the 3' x 10' notch at the garage's north wall beside the master closet (about 31 sq ft). Each is too small for a loop of its own at the lengths on its manifold, and none can be added to a neighbouring loop without crossing another; all three sit inside heated floor and borrow from it.",
         "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
         'Garage: kept at 50°F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.',
         'Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10°F warmer water for that loop.',
@@ -577,7 +677,7 @@ def build():
         f"The {BOARD['name']}s come {BOARD['per_bundle']} to a bundle ({BOARD['per_bundle'] * BOARD['sf']:.0f} sq ft), {BOARD['min_bundles']} bundles minimum: {bundles} bundles cover the {slab_sf:,} sq ft slab with 5% for cuts. Confirm the lead time; the board layout can start at any corner as long as the grid holds the datum.",
     ]
     sh.title_block([f"{len(loops)} loops, {tot_tube:,.0f}' of 1/2\" PEX, {len(STATIONS)} manifolds, no loop over {MAX_LOOP:.0f}'.", 'Red zone 1, orange zone 2, blue zone 3, green garage.',
-                    f"{tot_q / 1000:,.0f} kBtu/h at design, {t_supply:.0f}°F supply.", f"{BOARD['name']}s on the 3\" grid from the datum; nothing crosses."])
+                    f"{tot_q / 1000:,.0f} kBtu/h at design, {t_supply:.0f}°F supply.", f"{BOARD['name']}s on the 3\" grid from the datum; nothing crosses; tube under every fixture."])
     loop_rows = [(l['id'], [l['id'], l['zone'][1:], ', '.join(l['room_names']), l['st'], '/'.join(str(p) for p in port_no(l)), f"{l['in_floor']:.0f}'", f"{l['leader'] / 2:.0f}'", f"{l['total']:.0f}'",
                            f"{l['q']:,.0f}", f"{l['gpm']:.2f} gpm", f"{l['head']:.1f} ft", f"{l['t_surf']:.0f}°F"]) for l in loops]
     for z, Z in ZONES.items():

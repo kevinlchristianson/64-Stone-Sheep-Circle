@@ -21,6 +21,7 @@ import electrical
 import plumbing
 
 CEIL = HOUSE['meta']['ceiling_ft']
+PLATE_T = 1.5 / 12   # a flat 2x4 header or sill
 WET = {'wc', 'lav', 'tub', 'shower', 'washer', 'sink', 'dw'}
 OPENINGS = [dict(o, otype='window') for o in HOUSE['windows']] + [dict(d, otype='door') for d in HOUSE['doors'] if d['kind'] != 'glass']
 TYPES = {'E': '2x6 exterior', 'I': '2x4 partition', 'S': '2x6 plate, staggered 2x4 studs'}
@@ -193,9 +194,12 @@ def recess_checks(R, BL):
                 if d.get('h') is None: continue
                 on = (r['c0'] - 0.1 <= d['x'] <= r['c1'] + 0.1 and k0 - 0.1 <= d['y'] <= k1 + 0.1) if not r['horiz'] else (r['c0'] - 0.1 <= d['y'] <= r['c1'] + 0.1 and k0 - 0.1 <= d['x'] <= k1 + 0.1)
                 if not on: continue
-                hgt = d['h'] / 12
-                if hgt < c['sill']: hits.append(f"E-1 {d['id']} ({ROOMS[d['room']]['name'].lower()}, {d['h']}\") is in the leader bay under the cabinet")
-                elif hgt <= c['head'] + 2 / 12: hits.append(f"E-1 {d['id']} ({ROOMS[d['room']]['name'].lower()}, {d['h']}\") is inside the rough opening")
+                b0, b1 = (d['h'] - 1.5) / 12, (d['h'] + 1.5) / 12          # a 3"-tall box centred on its height
+                who = f"E-1 {d['id']} ({ROOMS[d['room']]['name'].lower()}, {d['h']}\")"
+                if b0 >= c['head'] + PLATE_T: continue                           # above the header: clear
+                if b1 > c['sill']: hits.append(f"{who} is inside the rough opening or its header (clear at {math.ceil((c['head'] + PLATE_T) * 12 + 1.5)}\" and up)" if b1 > c['head'] else f"{who} is inside the rough opening")
+                elif b1 > c['sill'] - PLATE_T: hits.append(f"{who} hits the sill")
+                else: hits.append(f"{who} is in the leader bay under the cabinet")
             for b in BL:
                 if b['wall'] != r['n']: continue
                 b0, b1 = (b['band'][0], b['band'][2]) if r['horiz'] else (b['band'][1], b['band'][3])

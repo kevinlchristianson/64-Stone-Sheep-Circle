@@ -8,21 +8,51 @@ truss, so every interior wall is a non-bearing partition.
 
 Tags follow the Zero Rd S-1: walls are numbered red circles ("wall 12"), doors tan boxes (D#), windows blue
 boxes (W#). Tags are placed clear of each other and of the room names.
+
+R-1's recessed manifold cabinets (MF-K, MF-5, MF-3, MF-4) are framed openings in their 2x4 partitions: kings, a flat 2x4
+header and sill, no cripples under the sill (the loop leaders rise through that bay). Each is checked against the
+electrical boxes (E-1), the pipes (P-1), the blocking bands and the walls that tee in.
 """
 import math
 from setlib import HOUSE, ROOMS, Sheet, ft_in, centroid, room_at, esc, px, py, S as SC
 import roof
+import radiant
+import electrical
+import plumbing
 
 CEIL = HOUSE['meta']['ceiling_ft']
+PLATE_T = 1.5 / 12   # a flat 2x4 header or sill
 WET = {'wc', 'lav', 'tub', 'shower', 'washer', 'sink', 'dw'}
 OPENINGS = [dict(o, otype='window') for o in HOUSE['windows']] + [dict(d, otype='door') for d in HOUSE['doors'] if d['kind'] != 'glass']
 TYPES = {'E': '2x6 exterior', 'I': '2x4 partition', 'S': '2x6 plate, staggered 2x4 studs'}
 COL = {'2x6 exterior': '#7a4f1d', '2x4 partition': '#b8762a', '2x6 plate, staggered 2x4 studs': '#3f8a45'}
-WALL_TAG, DOOR_TAG, WIN_TAG, BLOCK = '#b4462f', '#b8762a', '#2c6aa0', '#c2369a'
+WALL_TAG, DOOR_TAG, WIN_TAG, BLOCK, RECESS_TAG = '#b4462f', '#b8762a', '#2c6aa0', '#c2369a', '#6a3d9a'
+RECESSED = ('MF-K', 'MF-5', 'MF-3', 'MF-4')   # R-1 cabinets recessed in partitions; MF-1, MF-2 and MF-G are surface-mounted
+BAND_H = {'Grab bars and paper holder': [(2.62, 3.0)], 'Grab bars, valve and bench': [(2.62, 3.0), (3.88, 4.25)], 'Grab bars and valve': [(2.62, 3.0)],
+          'Cabinets and vanity top': [(2.75, 2.96), (6.88, 7.08)], 'Washer box': [(3.0, 4.0)], 'TV above the fireplace': [(4.0, 6.0)]}   # blocking heights, ft above the slab
 
 
 def ftype(w):
     return 'S' if w.get('frame') == 'S' else w['kind']
+
+
+def recesses():
+    """R-1's recessed manifold cabinets as framed openings. Rough opening: the cabinet + 1/2" each way (confirm with the
+    cabinet maker); span and heights from R-1's STATIONS."""
+    out = []
+    for k in RECESSED:
+        st = radiant.STATIONS[k]
+        lo, hi = st['lo'] - 0.25 / 12, st['hi'] + 0.25 / 12
+        out.append(dict(id=k, otype='recess', kind='recess', axis=st['axis'], face=st['face'], side=st['side'], room=st['room'], where=st['where'],
+                        cab=(st['lo'], st['hi'], st['mount'][0], st['mount'][1]), span=(lo, hi), w=hi - lo, sill=st['mount'][0] - 0.25 / 12, head=st['mount'][1] + 0.25 / 12))
+    return out
+
+
+RECESSES = recesses()
+
+
+def recess_ro(c):
+    return f"{ft_in(c['w'])} wide x {ft_in(c['head'] - c['sill'])} tall, {ft_in(c['sill'])} to {ft_in(c['head'])} above the slab"
 
 
 def runs():
@@ -63,10 +93,14 @@ def runs():
         r['id'] = f'wall{i}'
         r['openings'] = [o for o in OPENINGS if o['axis'] == ('y' if r['horiz'] else 'x') and abs(o['at'] - r['line']) < 0.6
                          and o['span'][0] >= r['a0'] - 0.3 and o['span'][1] <= r['a1'] + 0.3]
+        r['recesses'] = [c for c in RECESSES if c['axis'] == ('y' if r['horiz'] else 'x') and r['c0'] - 0.05 <= c['face'] <= r['c1'] + 0.05
+                         and c['span'][0] >= r['a0'] and c['span'][1] <= r['a1']]
         r['rooms'] = sides(r)
         r['wet'] = r['kind'] != 'E' and any(f['kind'] in WET and near(r, f) for f in HOUSE['fixtures'])
         r['type'] = TYPES[r['kind']]
         r['garage'] = 'garage' in r['rooms'] and any(n not in ('garage', 'outside', 'porch') for n in r['rooms'])
+    missing = [c['id'] for c in RECESSES if not any(c in r['recesses'] for r in out)]
+    assert not missing, f'S-1: no wall run hosts the R-1 cabinet(s) {missing}'
     return out
 
 
@@ -133,7 +167,61 @@ def studs(r):
     for o in r['openings']:
         jacks = 2 * header(o, r['kind'] == 'E')[2]
         n += 2 + jacks - max(0, math.floor(ro_width(o) * 12 / oc) - 1)
+    for c in r['recesses']:
+        n += 2 - max(0, math.floor(c['w'] * 12 / oc) - 1)     # kings in, the studs the recess removes out (header and sill from offcuts)
     return max(n, 3)
+
+
+def recess_checks(R, BL):
+    """What each recess runs into. The cabinet takes the whole 3-1/2" of a 2x4 wall, so a box on either face inside the
+    rough opening is in the way, and so is one in the leader bay under it (the tubes rise there from the slab)."""
+    if any('id' not in d for d in electrical.DEV): electrical.number()
+    pipes = plumbing.build()['plumb3d']     # P-1's own 3D pipes, at their real heights
+    out = {}
+    for r in R:
+        for c in r['recesses']:
+            lo, hi = c['span']; k0, k1 = lo - 1.5 / 12, hi + 1.5 / 12     # with the kings
+            hits = []
+            if r['kind'] != 'I': hits.append(f"the host wall is {r['type']}, not a 2x4 partition")
+            for o in r['openings']:
+                o0, o1 = o['span']; w = ro_width(o); m = (o0 + o1) / 2
+                if m - w / 2 - 3 / 12 < k1 and m + w / 2 + 3 / 12 > k0: hits.append(f"{o['id']} is within 3\" of the recess (its king studs)")
+            for t in R:
+                if t['horiz'] == r['horiz'] or t is r: continue
+                if (t['a0'] - 0.05 <= r['c1'] and t['a1'] + 0.05 >= r['c0']) and t['c0'] < k1 and t['c1'] > k0:
+                    hits.append(f"wall {t['n']} tees in inside the recess")
+            for d in electrical.DEV:
+                if d.get('h') is None: continue
+                on = (r['c0'] - 0.1 <= d['x'] <= r['c1'] + 0.1 and k0 - 0.1 <= d['y'] <= k1 + 0.1) if not r['horiz'] else (r['c0'] - 0.1 <= d['y'] <= r['c1'] + 0.1 and k0 - 0.1 <= d['x'] <= k1 + 0.1)
+                if not on: continue
+                b0, b1 = (d['h'] - 1.5) / 12, (d['h'] + 1.5) / 12          # a 3"-tall box centred on its height
+                who = f"E-1 {d['id']} ({ROOMS[d['room']]['name'].lower()}, {d['h']}\")"
+                if b0 >= c['head'] + PLATE_T: continue                           # above the header: clear
+                if b1 > c['sill']: hits.append(f"{who} is inside the rough opening or its header (clear at {math.ceil((c['head'] + PLATE_T) * 12 + 1.5)}\" and up)" if b1 > c['head'] else f"{who} is inside the rough opening")
+                elif b1 > c['sill'] - PLATE_T: hits.append(f"{who} hits the sill")
+                else: hits.append(f"{who} is in the leader bay under the cabinet")
+            for b in BL:
+                if b['wall'] != r['n']: continue
+                b0, b1 = (b['band'][0], b['band'][2]) if r['horiz'] else (b['band'][1], b['band'][3])
+                if b0 < k1 and b1 > k0 and any(h0 < c['head'] and h1 > c['sill'] for h0, h1 in BAND_H[b['what']]):
+                    hits.append(f"{b['what'].lower()} blocking ({b['name']}) crosses the recess: stop it at the kings")
+            for f in HOUSE['fixtures']:
+                if f['kind'] != 'fireplace': continue
+                (fx, fy), (fw, fh) = f['at'], f['size']
+                f0, f1, gap = (fx - fw / 2, fx + fw / 2, min(abs(fy - fh / 2 - r['c1']), abs(fy + fh / 2 - r['c0']))) if r['horiz'] else (fy - fh / 2, fy + fh / 2, min(abs(fx - fw / 2 - r['c1']), abs(fx + fw / 2 - r['c0'])))
+                if f0 < k1 + 1 and f1 > k0 - 1 and gap < 3:
+                    hits.append(f"the fireplace insert is {ft_in(gap)} off the other face: keep the cabinet and its tubing out of the insert's clearances and chase (its manual)")
+            along = (lambda q: q[0]) if r['horiz'] else (lambda q: q[1])
+            across = (lambda q: q[1]) if r['horiz'] else (lambda q: q[0])
+            for p in pipes:
+                pts = p.get('pts') or ([list(p['at']) + [0]] if 'at' in p else [])
+                seg = list(zip(pts, pts[1:])) or [(q, q) for q in pts]
+                for a, b in seg:
+                    if any(r['c0'] - 0.1 <= across(q) <= r['c1'] + 0.1 and k0 <= along(q) <= k1 and q[2] > -0.1
+                           for q in ([a[i] + (b[i] - a[i]) * t / 20 for i in range(3)] for t in range(21))):
+                        hits.append(f"P-1 {p['name']} runs in this bay"); break
+            out[c['id']] = hits
+    return out
 
 
 # ---------------------------------------------------------------- tag placement: first free spot from a list of candidates
@@ -212,6 +300,13 @@ def build():
         w = len(r['name']) * 0.5
         pl.block(cx - w / 2, cy - 1.0, cx + w / 2, cy + 0.1)
     BL = blocking(R)
+    # the cabinet tags go down before the wall numbers, so each sits right in front of its cabinet
+    rec_at = {}
+    for r in R:
+        for c in r['recesses']:
+            mid, face = (c['span'][0] + c['span'][1]) / 2, c['face']
+            cands = [((mid + d2, face + c['side'] * d) if r['horiz'] else (face + c['side'] * d, mid + d2)) for d in (1.1, 1.9) for d2 in (0, -1.0, 1.0)]
+            rec_at[c['id']] = pl.place(cands, 0.42 * len(c['id']) + 0.5, 1.05)
     for b in BL:
         x0, y0, x1, y1 = b['band']
         sh.line(x0, y0, x1, y1, BLOCK, 2.2, '4,2', layer='disc-lab')
@@ -219,13 +314,14 @@ def build():
         x0, y0, x1, y1 = (r['a0'], r['c0'], r['a1'], r['c1']) if r['horiz'] else (r['c0'], r['a0'], r['c1'], r['a1'])
         st = studs(r)
         rooms = ', '.join(ROOMS[n]['name'] if n in ROOMS else 'outside' for n in r['rooms'])
-        ops = ', '.join(o['id'] for o in r['openings'])
+        ops = ', '.join([o['id'] for o in r['openings']] + [c['id'] for c in r['recesses']])
         notes = []
         if r['garage']: notes.append('garage separation: 5/8" Type X on the garage side, seal penetrations')
         if r['kind'] == 'S': notes.append('sound wall: 2x6 plates, 2x4 studs alternating faces at 12" o.c. (24" o.c. each face), R-15 batt woven between, no stud touches both faces; grown 2" into the laundry')
         if r['kind'] == 'S' and any(o['kind'] == 'pocket' for o in r['openings']): notes.append('the pocket door D11 needs a 2x6 pocket frame here')
         if r['wet'] and r['kind'] == 'I': notes.append('plumbing wall, 2x4 (owner): 3" drains and vents bored through plates get a steel strap across the cut (IRC R602.6.1)')
         if r['kind'] == 'E': notes.append('PT bottom plate on the slab, sill gasket, 1/2" anchor bolts at 6\' o.c. and 12" from ends')
+        if r['recesses']: notes.append('recessed manifold cabinet ' + ', '.join(c['id'] for c in r['recesses']) + ' (R-1): framed opening, see the recess schedule')
         bl = [b for b in BL if b['wall'] == r['n']]
         if bl: notes.append('blocking: ' + ', '.join(f"{b['what'].lower()} ({b['name']})" for b in bl))
         title = f"Wall {r['n']} · {r['type']} · {ft_in(r['len'])}"
@@ -294,6 +390,27 @@ def build():
             if o['id'] == 'D7': fields.append(('Code', 'Opens from the garage: rate like D6 if the closet counts as part of the house; combustion air per the appliance that goes in'))
             picks[o['id']] = dict(tag=o['id'], sub=o['name'], fields=fields)
             door_rows.append((o['id'], [o['id'], o['name'], kinds[o['kind']], f"{ft_in(o['w'])} x {ft_in(o['h'])}", rough(o), hd, between]))
+    # R-1's recessed manifold cabinets: a framed opening in the partition, tagged on the face the cabinet opens to
+    RC = recess_checks(R, BL)
+    rec_rows = []
+    for r in R:
+        for c in r['recesses']:
+            lo, hi = c['span']
+            x0, y0, x1, y1 = (lo, r['c0'], hi, r['c1']) if r['horiz'] else (r['c0'], lo, r['c1'], hi)
+            rm = ROOMS[c['room']]['name']
+            title = f"{c['id']} · recessed manifold cabinet · {rm} · wall {r['n']}"
+            sh.rect(x0, y0, x1, y1, '#fff', RECESS_TAG, 0.9, '2,1.5', layer='disc')
+            tx, ty = rec_at[c['id']]
+            box_tag(sh, tx, ty, c['id'], RECESS_TAG, c['id'], title)
+            cab = f"{ft_in(c['cab'][1] - c['cab'][0])} wide x {ft_in(c['cab'][3] - c['cab'][2])} tall, bottom at {ft_in(c['cab'][2])} (R-1)"
+            framing_txt = ('2x4 kings full height each side; flat 2x4 header over the opening with cripples at 16" to the top plate; flat 2x4 sill under it; '
+                           'no cripples under the sill: the loop leaders rise in that bay. Bore the bottom plate and the sill 7/8" at each port (3" o.c.), centred in the plate.')
+            checks = RC[c['id']]
+            picks[c['id']] = dict(tag=c['id'], sub='Recessed manifold cabinet · ' + rm, fields=[
+                ('Where', c['where']), ('Wall', f"wall {r['n']} ({r['type']}, 3-1/2\" deep: the cabinet takes the whole depth and its back sits on the far face's drywall)"),
+                ('Cabinet', cab), ('Rough opening', recess_ro(c) + ' (cabinet + 1/2" each way; confirm with the cabinet maker)'), ('Framing', framing_txt),
+                ('Conflicts', '; '.join(checks) if checks else 'none found against E-1, P-1, the blocking or the walls that tee in')])
+            rec_rows.append((c['id'], [c['id'], rm, f"wall {r['n']}", cab, recess_ro(c), 'kings, flat 2x4 header and sill, open leader bay', '; '.join(checks) or 'none']))
     # legend, in the strip under the plan (as the Zero Rd S-1)
     bar = lambda c: f'<rect x="-9" y="-3" width="18" height="6" fill="{c}"/>'
     sh.legend([(bar(COL['2x6 exterior']), '2x6 exterior @ 16"'), (bar(COL['2x4 partition']), '2x4 partition @ 16"'),
@@ -301,6 +418,7 @@ def build():
                (f'<line x1="-9" y1="0" x2="9" y2="0" stroke="{BLOCK}" stroke-width="2.2" stroke-dasharray="4,2"/>', 'blocking band'),
                (f'<circle r="6" fill="#fff" stroke="{WALL_TAG}"/>', 'wall #'), (f'<rect x="-7" y="-5" width="14" height="10" fill="#fff" stroke="{DOOR_TAG}"/>', 'D# door, rough opening'),
                (f'<rect x="-7" y="-5" width="14" height="10" rx="2" fill="#fff" stroke="{WIN_TAG}"/>', 'W# window'),
+               (f'<rect x="-7" y="-5" width="14" height="10" fill="#fff" stroke="{RECESS_TAG}"/>', 'MF- recessed manifold cabinet (R-1)'),
                ('<circle r="6" fill="#fff" stroke="#2c6aa0" stroke-width="1.1"/><path d="M-6,0 a6,6 0 0 1 6,-6 v6 z M6,0 a6,6 0 0 1 -6,6 v-6 z" fill="#2c6aa0"/>', '0,0 datum, grid 5\'')])
 
     # take-offs
@@ -343,9 +461,12 @@ def build():
         'Roof: trusses at 24" o.c. bearing on the exterior walls (roof framing schedule). The main trusses span front to rear on the A-2 ridge line; a 2-ply girder truss (G1) on the master-wing/kitchen line carries the master wing and garage trusses, so the wall under it is a partition. Hang every partition top plate with slip clips (no nails into the bottom chords) so truss uplift doesn\'t crack the ceilings.',
         'Door rough openings: leaf + 2" wide, + 2-1/2" tall; pockets 2 x leaf + 1". Window rough openings: unit + 1/2" each way (confirm with the window maker).',
         'Garage separation: 5/8" Type X on the garage side of the walls to the house and on the garage ceiling; D6 is a 20-minute self-closing door.',
+        'Recessed manifold cabinets (purple, R-1): MF-K, MF-5, MF-3 and MF-4 sit in 2x4 partitions. Each is a framed opening: kings full height, a flat 2x4 header with cripples above, a flat 2x4 sill, and no cripples below it because the loop leaders come up out of the slab in that bay. Bore the bottom plate and sill 7/8" at each port; nothing else goes in the bay (no boxes, cable or pipe).',
         'Blocking (magenta): the bands on the drawing and the blocking schedule; grab-bar blocking at every toilet, tub and shower; vanity tops and mirrors, the washer box, the TV over the fireplace.',
     ]
     open_items = [
+        'Manifold cabinet depth: a 2x4 wall gives 3-1/2". Recessed cabinets for manifolds with zone actuators usually need 3-3/4" to 4-3/4"; pick the manifold and cabinet first. If it needs more, fur that stretch of wall to 2x6 (wall 22 behind the kitchen base cabinets hides it; on wall 26 it bumps 2" into the living room).',
+        *[f"{k}: " + '; '.join(v) + '.' for k, v in RC.items() if v],
         'Datum: confirm the 0,0 layout corner with the surveyor\'s pins before the forms go in.',
         'Window sizes and heights are scaled from the elevations; confirm the window schedule with the supplier before framing.',
         f"Bedroom 3's only window (W17, 4'x4') scales with a {ft_in(4.0)} sill: above the 44\" egress limit. Lower it or use a casement sized for egress.",
@@ -364,6 +485,8 @@ def build():
         dict(key='windows', title='Window schedule', cols=['Window', 'Room', 'Unit', 'Rough opening', 'Head / sill', 'Header', 'Egress'], rows=win_rows),
         dict(key='roof', title='Roof framing schedule', lede='Draft truss layout from A-2 (see the 3D model\'s roof trusses layer). Stations are feet from the datum. The truss maker designs the final layout.',
              cols=['Mark', 'Roof', 'Type', 'Span', 'Pitch', 'Peak above slab', 'Count', 'Where'], rows=T['rows']),
+        dict(key='recesses', title='Recessed manifold cabinets', lede='R-1\'s manifold cabinets that sit in the 2x4 partitions. MF-1, MF-2 and MF-G are surface-mounted and need no framing.',
+             cols=['Cabinet', 'Room', 'Wall', 'Cabinet', 'Rough opening', 'Framing', 'Conflicts'], rows=rec_rows),
         dict(key='blocking', title='Blocking schedule', cols=['Wall', 'Room', 'Fixture', 'For', 'Blocking'], rows=block_rows),
         dict(key='takeoff', title='Lumber, sheathing and drywall', lede='Rough-order quantities from the wall data, for pricing. The framer takes off the final list.', cols=['Item', 'Quantity', 'Basis', 'Notes'], rows=takeoff_rows),
     ]

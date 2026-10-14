@@ -1,5 +1,5 @@
 {
- "version": "v24",
+ "version": "v26",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -576,7 +576,7 @@
   "s1": {
    "ext_lf": 328,
    "int_lf": 375,
-   "studs": 1003,
+   "studs": 1002,
    "wall_board": 7580,
    "ceiling_board": 3010,
    "runs": 57,
@@ -610,13 +610,13 @@
    "backup_kw": 0
   },
   "r1": {
-   "loops": 43,
-   "tube_ft": 7109,
-   "heat": 53627,
-   "house_heat": 42561,
-   "gpm": 11.2,
+   "loops": 44,
+   "tube_ft": 7200,
+   "heat": 53534,
+   "house_heat": 42610,
+   "gpm": 10.9,
    "supply_f": 110.0,
-   "manifolds": 7,
+   "manifolds": 5,
    "boards": 274
   }
  },
@@ -628,11 +628,9 @@
    "Powder room sink, fireplace chimney route, bedroom 3 egress window."
   ],
   "S-1": [
-   "Manifold cabinet depth: a 2x4 wall gives 3-1/2\". Recessed cabinets for manifolds with zone actuators usually need 3-3/4\" to 4-3/4\"; pick the manifold and cabinet first. If it needs more, fur that stretch of wall to 2x6 (wall 22 behind the kitchen base cabinets hides it; on wall 26 it bumps 2\" into the living room).",
-   "MF-K: E-1 R17 (mud room, 16\") is in the leader bay under the cabinet; E-1 R20 (kitchen, 44\") is inside the rough opening; cabinets and vanity top blocking (Wall cabinets and counter, left wall) crosses the recess: stop it at the kings.",
+   "Manifold cabinet depth: a 2x4 wall gives 3-1/2\". Recessed manifold cabinets usually need 3-3/4\" to 4-3/4\"; pick the manifold and cabinet first. If it needs more, fur that stretch of wall 26 to 2x6 (it bumps 2\" into the living room).",
    "MF-3: E-1 R41 (bedroom hall, 24\") is in the leader bay under the cabinet; E-1 R47 (living, 16\") is in the leader bay under the cabinet; E-1 S16 (living, 48\") is inside the rough opening or its header (clear at 53\" and up); E-1 S19 (bedroom hall, 48\") is inside the rough opening or its header (clear at 53\" and up); the fireplace insert is 1'-6 1/2\" off the other face: keep the cabinet and its tubing out of the insert's clearances and chase (its manual).",
-   "MF-4: E-1 R48 (living, 16\") is in the leader bay under the cabinet.",
-   "MF-5: E-1 R34 (pantry, 44\") is inside the rough opening; E-1 R55 (entry, 16\") is in the leader bay under the cabinet.",
+   "MF-4: E-1 R48 (living, 16\") is in the leader bay under the cabinet; E-1 R51 (living, 8\") is in the leader bay under the cabinet; the fireplace insert is 1'-6 1/2\" off the other face: keep the cabinet and its tubing out of the insert's clearances and chase (its manual).",
    "Datum: confirm the 0,0 layout corner with the surveyor's pins before the forms go in.",
    "Window sizes and heights are scaled from the elevations; confirm the window schedule with the supplier before framing.",
    "Bedroom 3's only window (W17, 4'x4') scales with a 4'-0\" sill: above the 44\" egress limit. Lower it or use a casement sized for egress.",
@@ -672,13 +670,14 @@
    "Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about 133 CFM continuous under the IRC)."
   ],
   "R-1": [
-   "L32 (Bedroom 3, Closet (Bedroom 3)): the floor carries all but about 345 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",
-   "Not tubed: the coat closet (about 6 sq ft), the bedroom 1 bypass closet (about 17 sq ft) the 3' x 10' notch at the garage's north wall beside the master closet (about 31 sq ft) and an 18\" strip along the laundry's east wall under the washer and dryer (about 11 sq ft). The first three are too small for a loop of their own at the lengths on their manifold, and none can be added to a neighbouring loop without crossing another; the laundry loop is already 178' and a wider field would take it past 200'. All four sit inside heated floor and borrow from it.",
+   "L31 (Bedroom 3, Closet (Bedroom 3)): the floor carries all but about 345 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",
+   "Not tubed: the coat closet (about 6 sq ft), the bedroom 1 bypass closet (about 20 sq ft), the 3' x 10' notch at the garage's north wall beside the master closet (about 31 sq ft, left bare by decision 2026-10-14), the laundry's west floor along the counter (about 15 sq ft: every way of tubing it either takes the laundry loop past 200' or crosses the closet and mud room leaders that use that floor) and the west 18\" of the powder room under the lav (about 9 sq ft: the powder is the middle panel of the mud room leg's loop, which can only be 3' or 5' wide there, and 5' would not clear the east wall). The first three are too small for a loop of their own at the lengths on their manifold, and none can be added to a neighbouring loop without crossing another. All five sit inside heated floor and borrow from it.",
    "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
    "Garage: kept at 50\u00b0F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.",
    "Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10\u00b0F warmer water for that loop.",
-   "Cabinet depths on S-1: MF-3 and MF-4 recess into the hall's 2x4 west wall (3-1/2\" deep; fur locally if the chosen manifold needs more), MF-K into the kitchen wall and MF-5 into the entry wall.",
-   "E-1: an outlet at each of the seven manifold cabinets for the actuators (MF-1, MF-2, MF-G, MF-K, MF-5, MF-3, MF-4), and the boiler, pump and zone controller on circuit 27.",
+   "S-1: MF-3 and MF-4 recess into the hall's 2x4 west wall (3-1/2\" deep; fur locally if the chosen manifold needs more). MF-4's recess is 2'-0\" longer than S-1 framed it, 32'-0\" to 37'-3\" along the wall; the MF-K and MF-5 recesses are no longer needed and MF-1's surface cabinet now runs 18'-6\" to 24'-3\" at 4' up, over the dryer.",
+   "E-1: no actuators, so the receptacles at the manifold cabinets are not needed; HS-1, the four circulators and the zone controller stay on circuit 27, and T1 to T4 wire to the zone controller in the closet.",
+   "P-1: the closet's east wall is shared, MF-2 low at its north end under HS-1 and the water heater at its south end; the main water manifold and its risers stay west of MF-2's port column (x 33'-6\"). The pantry floor carries MF-2's leaders at 3\" across its west end and runs warmer than the rooms around it; sleeve the bundle if the pantry should stay cool.",
    "The EPS25 Super 4 nub boards come 5 to a bundle (80 sq ft), 3 bundles minimum: 55 bundles cover the 4,167 sq ft slab with 5% for cuts. Confirm the lead time; the board layout can start at any corner as long as the grid holds the datum."
   ]
  }

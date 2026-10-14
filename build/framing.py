@@ -9,7 +9,7 @@ truss, so every interior wall is a non-bearing partition.
 Tags follow the Zero Rd S-1: walls are numbered red circles ("wall 12"), doors tan boxes (D#), windows blue
 boxes (W#). Tags are placed clear of each other and of the room names.
 
-R-1's recessed manifold cabinets (MF-K, MF-5, MF-3, MF-4) are framed openings in their 2x4 partitions: kings, a flat 2x4
+R-1's recessed manifold cabinets (the stations R-1 flags recessed: MF-3, MF-4) are framed openings in their 2x4 partitions: kings, a flat 2x4
 header and sill, no cripples under the sill (the loop leaders rise through that bay). Each is checked against the
 electrical boxes (E-1), the pipes (P-1), the blocking bands and the walls that tee in.
 """
@@ -27,7 +27,7 @@ OPENINGS = [dict(o, otype='window') for o in HOUSE['windows']] + [dict(d, otype=
 TYPES = {'E': '2x6 exterior', 'I': '2x4 partition', 'S': '2x6 plate, staggered 2x4 studs'}
 COL = {'2x6 exterior': '#7a4f1d', '2x4 partition': '#b8762a', '2x6 plate, staggered 2x4 studs': '#3f8a45'}
 WALL_TAG, DOOR_TAG, WIN_TAG, BLOCK, RECESS_TAG = '#b4462f', '#b8762a', '#2c6aa0', '#c2369a', '#6a3d9a'
-RECESSED = ('MF-K', 'MF-5', 'MF-3', 'MF-4')   # R-1 cabinets recessed in partitions; MF-1, MF-2 and MF-G are surface-mounted
+RECESSED = tuple(k for k, st in radiant.STATIONS.items() if st.get('recessed'))   # R-1 cabinets recessed in partitions (MF-3, MF-4); the rest are surface-mounted
 BAND_H = {'Grab bars and paper holder': [(2.62, 3.0)], 'Grab bars, valve and bench': [(2.62, 3.0), (3.88, 4.25)], 'Grab bars and valve': [(2.62, 3.0)],
           'Cabinets and vanity top': [(2.75, 2.96), (6.88, 7.08)], 'Washer box': [(3.0, 4.0)], 'TV above the fireplace': [(4.0, 6.0)]}   # blocking heights, ft above the slab
 
@@ -461,11 +461,11 @@ def build():
         'Roof: trusses at 24" o.c. bearing on the exterior walls (roof framing schedule). The main trusses span front to rear on the A-2 ridge line; a 2-ply girder truss (G1) on the master-wing/kitchen line carries the master wing and garage trusses, so the wall under it is a partition. Hang every partition top plate with slip clips (no nails into the bottom chords) so truss uplift doesn\'t crack the ceilings.',
         'Door rough openings: leaf + 2" wide, + 2-1/2" tall; pockets 2 x leaf + 1". Window rough openings: unit + 1/2" each way (confirm with the window maker).',
         'Garage separation: 5/8" Type X on the garage side of the walls to the house and on the garage ceiling; D6 is a 20-minute self-closing door.',
-        'Recessed manifold cabinets (purple, R-1): MF-K, MF-5, MF-3 and MF-4 sit in 2x4 partitions. Each is a framed opening: kings full height, a flat 2x4 header with cripples above, a flat 2x4 sill, and no cripples below it because the loop leaders come up out of the slab in that bay. Bore the bottom plate and sill 7/8" at each port; nothing else goes in the bay (no boxes, cable or pipe).',
+        'Recessed manifold cabinets (purple, R-1): ' + ' and '.join(RECESSED) + ' sit in 2x4 partitions. Each is a framed opening: kings full height, a flat 2x4 header with cripples above, a flat 2x4 sill, and no cripples below it because the loop leaders come up out of the slab in that bay. Bore the bottom plate and sill 7/8" at each port; nothing else goes in the bay (no boxes, cable or pipe).',
         'Blocking (magenta): the bands on the drawing and the blocking schedule; grab-bar blocking at every toilet, tub and shower; vanity tops and mirrors, the washer box, the TV over the fireplace.',
     ]
     open_items = [
-        'Manifold cabinet depth: a 2x4 wall gives 3-1/2". Recessed cabinets for manifolds with zone actuators usually need 3-3/4" to 4-3/4"; pick the manifold and cabinet first. If it needs more, fur that stretch of wall to 2x6 (wall 22 behind the kitchen base cabinets hides it; on wall 26 it bumps 2" into the living room).',
+        'Manifold cabinet depth: a 2x4 wall gives 3-1/2". Recessed manifold cabinets usually need 3-3/4" to 4-3/4"; pick the manifold and cabinet first. If it needs more, fur that stretch of wall 26 to 2x6 (it bumps 2" into the living room).',
         *[f"{k}: " + '; '.join(v) + '.' for k, v in RC.items() if v],
         'Datum: confirm the 0,0 layout corner with the surveyor\'s pins before the forms go in.',
         'Window sizes and heights are scaled from the elevations; confirm the window schedule with the supplier before framing.',

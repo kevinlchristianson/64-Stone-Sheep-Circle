@@ -1,5 +1,5 @@
 {
- "version": "v21",
+ "version": "v23",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -610,11 +610,11 @@
    "backup_kw": 0
   },
   "r1": {
-   "loops": 47,
-   "tube_ft": 5957,
-   "heat": 52119,
-   "house_heat": 41581,
-   "gpm": 11.9,
+   "loops": 43,
+   "tube_ft": 7109,
+   "heat": 53627,
+   "house_heat": 42561,
+   "gpm": 11.2,
    "supply_f": 110.0,
    "manifolds": 7,
    "boards": 274
@@ -667,7 +667,8 @@
    "Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about 133 CFM continuous under the IRC)."
   ],
   "R-1": [
-   "L31 (Closet (Bedroom 2), Bath 1): the floor carries all but about 780 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",
+   "L32 (Bedroom 3, Closet (Bedroom 3)): the floor carries all but about 345 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",
+   "Not tubed: the coat closet (about 6 sq ft), the bedroom 1 bypass closet (about 17 sq ft) the 3' x 10' notch at the garage's north wall beside the master closet (about 31 sq ft) and an 18\" strip along the laundry's east wall under the washer and dryer (about 11 sq ft). The first three are too small for a loop of their own at the lengths on their manifold, and none can be added to a neighbouring loop without crossing another; the laundry loop is already 178' and a wider field would take it past 200'. All four sit inside heated floor and borrow from it.",
    "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
    "Garage: kept at 50\u00b0F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.",
    "Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10\u00b0F warmer water for that loop.",

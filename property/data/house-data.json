@@ -1,5 +1,5 @@
 {
- "version": "v26",
+ "version": "v28",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -597,8 +597,8 @@
    "wsfu": 35.7,
    "stacks": 5,
    "peak_gpm": 11.3,
-   "drain_ft": 229,
-   "pex_ft": 724,
+   "drain_ft": 228,
+   "pex_ft": 726,
    "exit_invert": 2.55
   },
   "m1": {

@@ -46,7 +46,7 @@ STACKS = [
 TRUNK_Y = 26.8
 PIPES = [
     dict(id='BD', name='4" building drain', size='4"', pts=[(25.0, TRUNK_Y), (25.0, 0.0), (25.0, -10.0)], into=None),
-    dict(id='DT', name='East trunk: kitchen, bath 1, bath 2', size='3"', pts=[(80.5, 7.13), (80.5, TRUNK_Y), (25.0, TRUNK_Y)], into='BD'),
+    dict(id='DT', name='East trunk: kitchen, bath 1, bath 2', size='3"', pts=[(80.25, 7.13), (80.25, TRUNK_Y), (25.0, TRUNK_Y)], into='BD'),
     dict(id='D2', name='Bath 2 branch', size='3"', pts=[(71.3, 38.2), (78.5, 38.2), (78.5, TRUNK_Y)], into='DT'),
     dict(id='DM', name='Master bath branch', size='3"', pts=[(7.9, 21.08), (7.9, 12.0), (25.0, 12.0)], into='BD'),
     dict(id='DF', name='Floor drain line, garage and mechanical', size='2"', pts=[(14.96, 52.14), (25.0, 52.14), (25.0, TRUNK_Y)], into='BD'),
@@ -64,17 +64,44 @@ DRAIN_TOP = -1.2                      # the highest any drain's crown (invert + 
 OD = {'4"': 4.5 / 12, '3"': 3.5 / 12, '2"': 2.375 / 12, '1-1/2"': 1.9 / 12}   # PVC DWV outside diameters
 CLEANOUTS = [('CO1', (25.0, -1.5), '4" two-way cleanout outside the rear wall, at grade, where the building drain leaves'),
              ('CO2', (25.0, TRUNK_Y), '4" cleanout to the floor where the trunk, the floor drain line and the building drain meet'),
-             ('CO3', (80.5, 7.13), '3" cleanout to the floor at the head of the east trunk (bath 1)')]
+             ('CO3', (80.25, 7.13), '3" cleanout to the floor at the head of the east trunk (bath 1)')]
 # Water: a 3/4" or 1/2" cold and hot pair from the closet manifold to each fixture group, in one piece under the slab (no joints
 # under the slab), to a small manifold in that group's vanity or wet wall, then short 1/2" lines to the fixtures.
 GROUPS = [
-    dict(id='PM-1', name='Master bath', at=(15.08, 9.63), where='in the double vanity base', fixtures=['MB-WC', 'MB-TUB', 'MB-LAV1', 'MB-LAV2', 'MB-SHR'], cold='3/4"', hot='3/4"'),
+    dict(id='PM-1', name='Master bath', at=(15.205, 9.63), where='in the double vanity base', fixtures=['MB-WC', 'MB-TUB', 'MB-LAV1', 'MB-LAV2', 'MB-SHR'], cold='3/4"', hot='3/4"'),
     dict(id='PM-2', name='Laundry and powder', at=(24.81, 24.2), where='in the laundry / powder wet wall, behind an access panel on the laundry side', fixtures=['LA-WASH', 'PR-WC', 'PR-LAV'], cold='3/4"', hot='1/2"'),
     dict(id='K-SINK', name='Kitchen island', at=(38.68, 27.6), where='straight to the sink stops; the dishwasher tees off the hot stop under the sink', fixtures=['K-SINK', 'K-DW'], cold='1/2"', hot='1/2"', direct=True),
     dict(id='PM-3', name='Bath 1', at=(77.73, 11.0), where='in the bath 1 / bedroom 1 wall, behind an access panel in the bedroom 1 closet side', fixtures=['B1-LAV', 'B1-WC', 'B1-SHR'], cold='3/4"', hot='1/2"'),
-    dict(id='PM-4', name='Bath 2', at=(72.87, 38.98), where='in the double vanity base', fixtures=['B2-LAV1', 'B2-LAV2', 'B2-WC', 'B2-TUB'], cold='3/4"', hot='1/2"'),
+    dict(id='PM-4', name='Bath 2', at=(72.87, 39.17), where='in the double vanity base', fixtures=['B2-LAV1', 'B2-LAV2', 'B2-WC', 'B2-TUB'], cold='3/4"', hot='1/2"'),
 ]
 GROUP_OF = {fid: g for g in GROUPS for fid in g['fixtures']}
+# Where a riser P-1 can place comes up through the slab: a few inches off the fixture so it rises between R-1's tubes, which run
+# under every fixture at 6" centres (checked against R-1's third-pass layout, PR #24; rerun the clash check when R-1 relays).
+# A fixture's drain rises at rise_at(), its cold line at cold_at() (the same spot unless it has a 'cold' key), its hot line at
+# hot_at(); a group manifold's hot side at its 'hot' key.
+# The ones that can't move (closet flanges, floor and shower drains, tub drains, the stacks) are on R-1's own list, where the
+# installer shifts one run over a channel. The trunk head and CO3 sit 3" west of R-1's tube line at X 80.5 for the same reason.
+CLEAR = {'MB-LAV1': (15.205, 7.6), 'MB-LAV1/hot': (15.33, 7.85), 'B1-LAV': (81.83, 7.13), 'B1-LAV/hot': (82.14, 7.38), 'LA-WASH': (23.725, 23.3), 'LA-WASH/hot': (23.85, 23.55),
+         'B2-LAV1': (71.3, 38.79), 'B2-LAV1/hot': (71.55, 38.79), 'B2-LAV2': (74.4, 38.79), 'B2-LAV2/hot': (74.65, 38.79), 'B1-SHR': (80.305, 14.15), 'B1-SHR/hot': (80.68, 14.4), 'MB-SHR/hot': (8.145, 21.42),
+         'MB-TUB/hot': (7.75, 14.175), 'B2-TUB/hot': (81.82, 37.315), 'MB-WC/cold': (7.05, 7.31),
+         'PM-1/hot': (15.32, 9.93), 'PM-4/hot': (73.17, 39.345), 'K-SINK/hot': (38.855, 27.9), 'K-SINK/loop': (38.79, 27.6)}
+
+
+def rise_at(fid):
+    return CLEAR.get(fid, tuple(FIX[fid]['at']))
+
+
+def cold_at(fid):
+    return CLEAR.get(fid + '/cold', rise_at(fid))
+
+
+def hot_at(fid):
+    x, y = rise_at(fid)
+    return CLEAR.get(fid + '/hot', (x + 0.25, y + 0.25))
+
+
+def group_hot(g):
+    return CLEAR.get(g['id'] + '/hot', (g['at'][0] + 0.3, g['at'][1] + 0.3))
 GAL_PER_FT = {'1/2"': 0.0092, '3/4"': 0.0184}   # PEX inside volume
 HOSE = [dict(id='HB1', at=(36.0, 53.9), name='Hose bibb, front porch (frost-free)'),
         dict(id='HB2', at=(46.0, 16.6), name='Hose bibb, rear patio (frost-free)'),
@@ -157,8 +184,8 @@ def drain_net():
     for f in PLUMBED:
         if f['kind'] == 'dw' or f['kind'] == 'shower' and f['room'] in showers and any(g['kind'] == 'drain' and g['room'] == f['room'] for g in PLUMBED): continue
         pid = PIPE_OF[f['room']]
-        q, along_x = nearest_on(PIPE[pid]['pts'], f['at'])
-        arm = [p for i, p in enumerate(manhattan(tuple(f['at']), q, 'x' if along_x else 'y')) if i == 0 or dist(p, manhattan(tuple(f['at']), q, 'x' if along_x else 'y')[i - 1]) > 1e-6]
+        q, along_x = nearest_on(PIPE[pid]['pts'], rise_at(f['id']))
+        arm = [p for i, p in enumerate(manhattan(rise_at(f['id']), q, 'x' if along_x else 'y')) if i == 0 or dist(p, manhattan(rise_at(f['id']), q, 'x' if along_x else 'y')[i - 1]) > 1e-6]
         size = arm_size(f)
         arms[f['id']] = dict(pts=arm, size=size, pipe=pid, z=slope_back(arm, z_at(pid, q), size) if len(arm) > 1 else [z_at(pid, q)])
     for st in STACKS:
@@ -279,32 +306,28 @@ def supply_net(NET, VENTS):
     """Cold and hot runs: closet manifold to each group manifold, group manifold to each fixture, and the hose bibbs; hot wait at
     the farthest fixture. Everything that comes up through the PEX bands is a post the runs keep clear of."""
     posts = [(*SERVICE, PR['1"']), (*COLD_DROP, PR['3/4"']), (*HOT_DROP, PR['3/4"'])]
-    for fid, a in NET['arms'].items(): posts.append((*FIX[fid]['at'], 0.15 if FIX[fid]['kind'] == 'wc' else SIZE_R[a['size']]))
+    for fid, a in NET['arms'].items(): posts.append((*a['pts'][0], 0.15 if FIX[fid]['kind'] == 'wc' else SIZE_R[a['size']]))
     posts += [(*s['at'], 0.13) for s in STACKS if s['id'] != ISLAND]
     posts += [(*at, SIZE_R['4"' if id == 'CO2' else '3"']) for id, at, _ in CLEANOUTS if id != 'CO1']
     for v in VENTS:
         if v.get('under'): posts.append((*v['wall'], SIZE_R[v['size']] * 0.8))
-        if v.get('loop'): x, y = v['fixture']['at']; posts += [(x + 0.3, y, 0.072), (x + 0.6, y + 0.3, 0.072)]
+        if v.get('loop'): posts += [(*p, 0.072) for p in loop_vent(v)]
     for g in GROUPS:
-        gx, gy = g['at']; posts += [(gx, gy, PR[g['cold']]), (gx + 0.3, gy + 0.3, PR[g['hot']])]
-        for fid in g['fixtures']:
-            x, y = FIX[fid]['at']; posts += [(x, y, PR['1/2"']), (x + 0.25, y + 0.25, PR['1/2"'])]
+        posts += [(*g['at'], PR[g['cold']]), (*group_hot(g), PR[g['hot']])]
+        for fid in g['fixtures']: posts += [(*cold_at(fid), PR['1/2"']), (*hot_at(fid), PR['1/2"'])]
     posts += [(*h['at'], PR['3/4"']) for h in HOSE]
     R = Router(posts)
     out, bad = [dict(g, stubs={}, hot_stubs={}) for g in GROUPS], 0
     for g in out:   # the short runs first, so the long feeds go around the other groups' fixtures
         if g.get('direct'): continue
-        gx, gy = g['at']
         for fid in g['fixtures']:
             k = FIX[fid]['kind']
             if k == 'dw': continue
-            x, y = FIX[fid]['at']
-            if TABLE[k][3]: g['stubs'][fid], n = R.route(g['at'], (x, y), 'cold', PR['1/2"'], g['id']); bad += n
-            if TABLE[k][4]: g['hot_stubs'][fid], n = R.route((gx + 0.25, gy + 0.25), (x + 0.25, y + 0.25), 'hot', PR['1/2"'], g['id']); bad += n
+            if TABLE[k][3]: g['stubs'][fid], n = R.route(g['at'], cold_at(fid), 'cold', PR['1/2"'], g['id']); bad += n
+            if TABLE[k][4]: g['hot_stubs'][fid], n = R.route(group_hot(g), hot_at(fid), 'hot', PR['1/2"'], g['id']); bad += n
     for g in out:
-        gx, gy = g['at']
         g['cold_run'], n1 = R.route(COLD_DROP, g['at'], 'cold', PR[g['cold']], 'MAN', g['id'])
-        g['hot_run'], n2 = R.route(HOT_DROP, (gx + 0.3, gy + 0.3), 'hot', PR[g['hot']], 'MAN', g['id'])
+        g['hot_run'], n2 = R.route(HOT_DROP, group_hot(g), 'hot', PR[g['hot']], 'MAN', g['id'])
         bad += n1 + n2
     for h in HOSE:
         h['run'], n = R.route(COLD_DROP, h['at'], 'cold', PR['3/4"'], 'MAN', h['id']); bad += n
@@ -321,6 +344,12 @@ def arm_size(f):
 
 ISLAND = 'ST3'
 VENT_AT = {'B1-SHR': (80.75, 15.98)}   # moved along its wall to come up between R-1's leaders under it (ST4 is set between R-1's tubes too)
+
+
+def loop_vent(v):
+    """The island loop vent's two legs through the slab: up off the sink drain and back down to the vent under the slab."""
+    x, y = v['fixture']['at']
+    return CLEAR.get('K-SINK/loop', (x + 0.3, y)), (x + 0.6, y + 0.3)
 
 
 def vents():
@@ -470,7 +499,9 @@ def build():
         'Slopes are the IPC minimums (1/8" per ft at 3" and 4", 1/4" per ft below 3"), worked back from the exit; the shallowest invert is ' + depth(top_inv) + ' under the slab.',
         f'Under the slab, top down: 4" of concrete; R-1\'s 5" nub boards with the radiant loops on them ({depth(BOARD_BOTTOM)} to their underside); R-1\'s 1" feed pairs right under the boards; then P-1 in the base course, each in its own band so nothing crosses at the same depth: '
         f'cold PEX about {depth(COLD_H)} down, hot PEX about {depth(HOT_H)} down, and every drain below both (crowns no higher than {depth(DRAIN_TOP)}). Vent legs under the slab leave their drain at its own depth. '
-        'Rough in, test and backfill the plumbing before the vapor barrier and boards go down; sleeve each line where it comes up through the boards and slab.',
+        'Rough in, test and backfill the plumbing before the vapor barrier and boards go down; sleeve each line where it comes up through the boards and slab. '
+        'R-1\'s tube runs under the fixtures at 6" centres, so each riser that can move (lav and sink drains, the washer box, the PEX stub-ups and group manifolds, CO3) is set a few inches off its fixture to come up between two tubes; '
+        'the closet flanges, floor and shower drains, tub drains and stacks can\'t move, and R-1 marks each one where its installer shifts one run over a channel.',
         f'Supply: 1" service to a main manifold in the mechanical closet, then one cold and hot pair to each fixture group, in one piece under the slab (no fittings under the slab), to a small manifold in the vanity or wet wall; '
         f'short 1/2" lines from there to each fixture. {pex_lf["3/4\""] + pex_lf["1/2\""]:.0f} ft of PEX in all. {wsfu_c:.1f} cold + {wsfu_h:.1f} hot WSFU. Hot runs under the slab get R-3 closed-cell insulation (IECC R403.5.3), since they sit below the radiant boards. Pressure-balanced or thermostatic valves at the tubs and showers.',
         f"Hot water takes longest at {hot_far['name'].lower()} (about {hot_far['wait_s']:.0f} s at a lavatory); see open items for a recirculation pump.",
@@ -541,7 +572,7 @@ def model3d(NET, SUP, VENTS, wsfu):
         name = f"{fid} · {f['name']}"
         if len(a['pts']) > 1: tube('drain', r, sloped(a['pts'], a['z'], r), fid, name, f"{a['size']} fixture drain under the slab to {a['pipe']}")
         top = {'wc': 0.15, 'drain': 0.0, 'tub': 0.3, 'washer': 2.8}.get(f['kind'], 1.4)
-        tube('drain', 0.15 if f['kind'] == 'wc' else r, [(*f['at'], a['z'][0] + r), (*f['at'], top)], fid, name, f"{TABLE[f['kind']][2]} drain up through the slab to the trap, invert {depth(a['z'][0])}")
+        tube('drain', 0.15 if f['kind'] == 'wc' else r, [(*a['pts'][0], a['z'][0] + r), (*a['pts'][0], top)], fid, name, f"{TABLE[f['kind']][2]} drain up through the slab to the trap, invert {depth(a['z'][0])}")
     # stacks through the roof (the island has a loop vent instead)
     for s in STACKS:
         if s['id'] == ISLAND: continue
@@ -554,9 +585,9 @@ def model3d(NET, SUP, VENTS, wsfu):
         name, text = f"{f['id']} · {f['name']} vent", f"{v['size']} vent" + (f", to the {v['to']} stack in the attic" if v['to'] else ' through the roof')
         low = vent_low(v, NET) if v.get('under') else 0.0 if f['kind'] in ('wc', 'tub', 'shower', 'drain') else 1.3
         if v.get('loop'):
-            x, y = f['at']
-            tube('vent', r, [(x + 0.3, y, low), (x + 0.3, y, 2.6), (x + 0.6, y + 0.3, 2.6), (x + 0.6, y + 0.3, low)], f['id'], f"{f['id']} · island loop vent", 'Loop vent: rises inside the island to the counter underside and loops back down (or an AAV where the AHJ allows)')
-            tube('vent', r, flat([(x + 0.6, y + 0.3)] + v['under'][1:], low), f['id'], name, f"2\" vent under the slab at the sink drain's depth ({depth(low)}) to the laundry wall, then up to ST2's vent in the attic")
+            (ax, ay), (bx, by) = loop_vent(v)
+            tube('vent', r, [(ax, ay, low), (ax, ay, 2.6), (bx, by, 2.6), (bx, by, low)], f['id'], f"{f['id']} · island loop vent", 'Loop vent: rises inside the island to the counter underside and loops back down (or an AAV where the AHJ allows)')
+            tube('vent', r, flat([(bx, by)] + v['under'][1:], low), f['id'], name, f"2\" vent under the slab at the sink drain's depth ({depth(low)}) to the laundry wall, then up to ST2's vent in the attic")
         elif v.get('under'):
             tube('vent', r, flat(v['under'], low), f['id'], name, text + f"; leaves the drain under the slab and runs to the wall first, {depth(low)} down, under the PEX")
         top = VENT_H if v['attic'] else roof_over(v['wall']) + 1.0
@@ -576,7 +607,7 @@ def model3d(NET, SUP, VENTS, wsfu):
         ct = 1.7 if direct else 1.2   # the pair comes up into the vanity or wall to the group manifold (or the sink stops)
         tube('cold', PR[g['cold']], [(*COLD_DROP, 3.0), (*COLD_DROP, COLD_H)] + flat(g['cold_run'][1:], COLD_H) + [(gx, gy, ct)], g['id'], f"{g['id']} · cold feed, {g['name'].lower()}",
              f"{g['cold']} PEX cold from MAN, {plen(g['cold_run']):.0f} ft in one piece, {depth(COLD_H)} down {band}")
-        tube('hot', PR[g['hot']], [(*HOT_DROP, 3.0), (*HOT_DROP, HOT_H)] + flat(g['hot_run'][1:], HOT_H) + [(gx + 0.3, gy + 0.3, ct)], g['id'], f"{g['id']} · hot feed, {g['name'].lower()}",
+        tube('hot', PR[g['hot']], [(*HOT_DROP, 3.0), (*HOT_DROP, HOT_H)] + flat(g['hot_run'][1:], HOT_H) + [(*g['hot_run'][-1], ct)], g['id'], f"{g['id']} · hot feed, {g['name'].lower()}",
              f"{g['hot']} PEX hot from MAN, {plen(g['hot_run']):.0f} ft, insulated, {depth(HOT_H)} down {band}; about {g['wait_s']:.0f} s for hot water at the farthest fixture")
         if not direct:
             out.append(dict(shape='box', m='cold', box=[gx - 0.35, gy - 0.35, gx + 0.35, gy + 0.35, 1.2, 1.7], ref=g['id'], name=f"{g['id']} · {g['name']} manifold", text=f"Group manifold {g['where']}"))

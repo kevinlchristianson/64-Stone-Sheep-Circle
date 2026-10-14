@@ -1,5 +1,5 @@
 {
- "version": "v19",
+ "version": "v21",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -598,8 +598,8 @@
    "stacks": 5,
    "peak_gpm": 11.3,
    "drain_ft": 229,
-   "pex_ft": 721,
-   "exit_invert": 2.19
+   "pex_ft": 724,
+   "exit_invert": 2.55
   },
   "m1": {
    "heat": 40299,
@@ -648,7 +648,7 @@
    "Low voltage: TVs in the bedrooms, ceiling Wi-Fi access points, cameras, and whether the media panel should move out of the pantry."
   ],
   "P-1": [
-   "Confirm the drain leaves at 25,0 (assumed): city sewer or septic, and the invert there. The house needs about 2'-2 1/2\" of cover at the wall plus the fall to the main or tank.",
+   "Confirm the drain leaves at 25,0 (assumed): city sewer or septic, and the invert there. The house needs about 2'-6 1/2\" of cover at the wall plus the fall to the main or tank.",
    "Water source (city or well) and where it enters; the main manifold is drawn in the mechanical closet.",
    "A demand recirculation pump (button or motion sensor at each bath) on the hot side would cut the wait at the far baths to a few seconds; it needs a 1/2\" return or the cold line as the return.",
    "Water heater fuel and type. A heat-pump water heater needs about 700 cu ft of air or a ducted kit; the 3' x 8' mechanical closet is too small without one. A gas unit needs venting and combustion air.",
@@ -671,7 +671,6 @@
    "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
    "Garage: kept at 50\u00b0F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.",
    "Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10\u00b0F warmer water for that loop.",
-   "P-1's hot and cold PEX runs at 6.5\" to 8\" below the slab top, which is now inside the 5\" board layer. Either drop them into the base course under the boards (about 10\" down) or cut channels in the EPS for them; P-1 to pick.",
    "Cabinet depths on S-1: MF-3 and MF-4 recess into the hall's 2x4 west wall (3-1/2\" deep; fur locally if the chosen manifold needs more), MF-K into the kitchen wall and MF-5 into the entry wall.",
    "E-1: an outlet at each of the seven manifold cabinets for the actuators (MF-1, MF-2, MF-G, MF-K, MF-5, MF-3, MF-4), and the boiler, pump and zone controller on circuit 27.",
    "The EPS25 Super 4 nub boards come 5 to a bundle (80 sq ft), 3 bundles minimum: 55 bundles cover the 4,167 sq ft slab with 5% for cuts. Confirm the lead time; the board layout can start at any corner as long as the grid holds the datum."

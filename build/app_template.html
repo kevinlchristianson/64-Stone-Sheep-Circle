@@ -1017,8 +1017,8 @@ for (const t of T3) {
   }
 })();
 // ---------------------------------------------------------------- plumbing (P-1), as Zero Rd's buildPlumbing(): pipes as tubes at their real depth.
-// Drains under the slab with a riser to each fixture, stacks through the roof, vents up the walls and across the attic,
-// PEX home runs from the manifold under the slab and up to each fixture (build/plumbing.py model3d()).
+// Drains under the slab with a riser to each fixture, stacks through the roof, vents up the walls and across the attic, and the
+// group PEX feeds and fixture runs, all in the base course below R-1's boards and feed pairs (build/plumbing.py model3d()).
 (function buildPlumbing() {
   const P = DATA.plumb3d; if (!P) return;
   const tube = (a, b, r, material, data) => {

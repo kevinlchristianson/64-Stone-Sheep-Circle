@@ -1,6 +1,7 @@
 """The 3D model's structure layers, built from the S-1 wall runs and the roof truss layout (the 5' grid lives on the sheets only):
 
-  framing  plates, studs, kings, jacks, headers, sills and cripples for every wall run (S-1), stud by stud
+  framing  plates, studs, kings, jacks, headers, sills and cripples for every wall run (S-1), stud by stud, with the
+           framed recesses for R-1's manifold cabinets
   truss    the roof trusses, girder, rafters and beams (build/roof.py)
 
 Boxes are [x0, y0, x1, y1, bottom, top, material] in plan feet (heights above the slab); one list per wall run
@@ -50,6 +51,8 @@ def frame_run(r):
         head = min(framing.ro_head(o), top - 2 * PLATE - hd)
         sill = (o['sill'] - 0.25 / 12) if o['otype'] == 'window' else 0
         ops.append((lo, hi, head, sill, hd, jacks, o))
+    for c in r['recesses']:                                 # R-1 manifold cabinet: kings, flat 2x4 header and sill, open leader bay
+        ops.append((c['span'][0], c['span'][1], c['head'], c['sill'], PLATE, 0, c))
     stud_b, stud_t = PLATE, top - 2 * PLATE
     blocked = lambda p: any(lo - STUD * (j + 1) - 0.01 < p < hi + STUD * (j + 1) + 0.01 for lo, hi, _, _, _, j, _ in ops)
     oc = 1.0 if staggered else 16 / 12
@@ -71,9 +74,10 @@ def frame_run(r):
         p = lo + 16 / 12
         while p < hi - 0.05:                                                  # cripples above, and below a window
             place(p - STUD / 2, p + STUD / 2, head + hd, stud_t)
-            if sill > 0.3: place(p - STUD / 2, p + STUD / 2, stud_b, sill - 2 * PLATE)
+            if sill > 0.3 and o['otype'] != 'recess': place(p - STUD / 2, p + STUD / 2, stud_b, sill - 2 * PLATE)
             p += 16 / 12
-        if sill > 0.3: place(lo, hi, sill - 2 * PLATE, sill, mat)           # double sill
+        if o['otype'] == 'recess': place(lo, hi, sill - PLATE, sill, mat)   # single flat sill; the leaders rise through it
+        elif sill > 0.3: place(lo, hi, sill - 2 * PLATE, sill, mat)         # double sill
     return out
 
 
@@ -81,7 +85,8 @@ def build(s1):
     R, T, BL = s1['runs'], s1['roof'], s1['blocking']
     runs = []
     for r in R:
-        ops = ', '.join(f"{o['id']} RO {framing.rough(o)}, {framing.header(o, r['kind'] == 'E')[0]}" for o in r['openings'])
+        ops = ', '.join([f"{o['id']} RO {framing.rough(o)}, {framing.header(o, r['kind'] == 'E')[0]}" for o in r['openings']]
+                        + [f"{c['id']} manifold cabinet recess RO {framing.recess_ro(c)}" for c in r['recesses']])
         oc = 'studs 12" o.c. on alternating faces' if r['kind'] == 'S' else 'studs 16" o.c.'
         text = (f"Framing, wall {r['n']}: {r['type']}, {ft_in(r['len'])}; PT bottom plate, {oc}, double top plate at 9'-1 1/8\". "
                 + (f"Openings: {ops}. " if ops else '') + 'See S-1.')
@@ -89,10 +94,19 @@ def build(s1):
     # blocking bands as thin boxes on the stud face, at a typical height for the item
     for b in BL:
         x0, y0, x1, y1 = b['band']
-        bands = {'Grab bars and paper holder': [(2.62, 3.0)], 'Grab bars, valve and bench': [(2.62, 3.0), (3.88, 4.25)], 'Grab bars and valve': [(2.62, 3.0)],
-                 'Cabinets and vanity top': [(2.75, 2.96), (6.88, 7.08)], 'Washer box': [(3.0, 4.0)], 'TV above the fireplace': [(4.0, 6.0)]}[b['what']]
+        bands = framing.BAND_H[b['what']]
         e = 0.06
-        boxes = [[x0, y0 - e, x1, y1 + e, h0, h1, 4] if y0 == y1 else [x0 - e, y0, x1 + e, y1, h0, h1, 4] for h0, h1 in bands]
+        horiz = y0 == y1
+        host = next(r for r in R if r['n'] == b['wall'])
+        boxes = []
+        for h0, h1 in bands:
+            pieces = [(x0, x1) if horiz else (y0, y1)]
+            for c in host['recesses']:                      # blocking stops at a recess's kings
+                if not (h0 < c['head'] and h1 > c['sill']): continue
+                k0, k1 = c['span'][0] - STUD, c['span'][1] + STUD
+                pieces = [q for a, z in pieces for q in ((a, min(z, k0)), (max(a, k1), z)) if q[1] - q[0] > 0.05]
+            for a, z in pieces:
+                boxes.append([a, y0 - e, z, y1 + e, h0, h1, 4] if horiz else [x0 - e, a, x1 + e, z, h0, h1, 4])
         runs.append(dict(name=f"Blocking · wall {b['wall']}", ref=f"Wall {b['wall']}", text=f"Blocking on wall {b['wall']}, {b['what'].lower()} for the {b['name'].lower()}: {b['how']}. See the S-1 blocking schedule.",
                          boxes=[[round(v, 3) if isinstance(v, float) else v for v in bx] for bx in boxes]))
     trusses = [dict(axis=t['axis'], s=t['s'], m=t['members'], k=t['kind'], ref=t['mark'], name=f"Roof truss {t['mark']}" if t['kind'] not in ('rafter',) else ('Patio rafter' if t['area'] == 'PR' else 'Porch rafter'), text=t['text'])

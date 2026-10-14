@@ -1,5 +1,5 @@
 {
- "version": "v18",
+ "version": "v19",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -610,13 +610,14 @@
    "backup_kw": 0
   },
   "r1": {
-   "loops": 23,
-   "tube_ft": 4922,
-   "heat": 54493,
-   "house_heat": 43659,
-   "gpm": 10.9,
+   "loops": 47,
+   "tube_ft": 5957,
+   "heat": 52119,
+   "house_heat": 41581,
+   "gpm": 11.9,
    "supply_f": 110.0,
-   "manifolds": 4
+   "manifolds": 7,
+   "boards": 274
   }
  },
  "open_items": {
@@ -666,12 +667,14 @@
    "Ventilation: continuous bath fans (drawn) or paired through-wall ERVs (about 133 CFM continuous under the IRC)."
   ],
   "R-1": [
-   "L14 (Closet (Bedroom 2), Bath 1): the floor carries all but about 135 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",
+   "L31 (Closet (Bedroom 2), Bath 1): the floor carries all but about 780 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",
    "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
    "Garage: kept at 50\u00b0F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.",
-   "Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10\u00b0F warmer water for that loop, or 9\" spacing there.",
-   "Mechanical closet: HS-1, pump P-R1 and the zone controller share it with P-1's water manifold and water heater; that is why no manifold is drawn there (O5 in the options shows the fourth manifold saves little tube). A combi boiler removes the water heater and makes room.",
-   "MF-3 cabinet depth in the hall's 2x4 west wall (S-1), and the boiler, pump and zone controller circuits (E-1)."
+   "Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10\u00b0F warmer water for that loop.",
+   "P-1's hot and cold PEX runs at 6.5\" to 8\" below the slab top, which is now inside the 5\" board layer. Either drop them into the base course under the boards (about 10\" down) or cut channels in the EPS for them; P-1 to pick.",
+   "Cabinet depths on S-1: MF-3 and MF-4 recess into the hall's 2x4 west wall (3-1/2\" deep; fur locally if the chosen manifold needs more), MF-K into the kitchen wall and MF-5 into the entry wall.",
+   "E-1: an outlet at each of the seven manifold cabinets for the actuators (MF-1, MF-2, MF-G, MF-K, MF-5, MF-3, MF-4), and the boiler, pump and zone controller on circuit 27.",
+   "The EPS25 Super 4 nub boards come 5 to a bundle (80 sq ft), 3 bundles minimum: 55 bundles cover the 4,167 sq ft slab with 5% for cuts. Confirm the lead time; the board layout can start at any corner as long as the grid holds the datum."
   ]
  }
 }

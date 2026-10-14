@@ -1,33 +1,37 @@
-"""R-1 Radiant: PEX loops in the slab, manifolds, zones, flows and the manifold options.
+"""R-1 Radiant: PEX loops on 3" nub boards under the slab, manifolds, zones and flows.
 
-The house heats from its slab: 1/2" PEX in a 4" slab over R-10 foam, laid as
-counterflow spirals (supply and return interleaved, so the floor is even)
-6" off the walls and clear of cabinets, tubs, the island and the hearth.
-Spacing is 9" o.c. in the baths and wherever a room needs 15 Btu/h per sq ft
-or more, 12" o.c. elsewhere. Room loads are M-1's (hvac.room_load, the same
-envelope and Powell design temperature); the garage gets its own loops held
-at 50°F. Loops are kept under 300' including leaders.
+The house heats from its slab: 1/2" PEX laid on EPS25 Super 4 nub boards (4' x 4', 4" of EPS R-18 under a 1"
+grid of pucks that hold the tube on a 3" grid), with 4" of concrete over the pucks. Every tube run sits on that 3"
+grid, so the whole layout is a walk over a lattice of nodes 3" apart (build/nubgrid.py): a node holds one tube and
+nothing can cross. Fields are tube pairs snaking together 6" apart (supply and return side by side, nested bends),
+so both ends of a loop sit together at one edge of the panel; from there the leaders are routed node by node to a
+manifold port, hugging walls, through doorways and under walls where a gate allows it. Loops stay under 200' with
+their leaders. Room loads are M-1's (hvac.room_load); the garage gets its own loops at 6" held at 50°F.
 
-Zoning is by thermostat, not by manifold: every loop has a 24 V actuator on
-its manifold port, and a thermostat drives whichever loops are its zone. So
-manifolds go where they make the shortest loops, and zones follow how the
-rooms are used. The options table routes the same loops to four manifold
-layouts (including the owner's first sketch) and compares them.
+Zoning is by thermostat, not by manifold: every loop has a 24 V actuator on its manifold port, and a thermostat
+drives whichever loops are its zone.
 """
 import math
-from setlib import HOUSE, ROOMS, Sheet, ft_in, room_at
+from setlib import HOUSE, ROOMS, S, Sheet, px, py
 from climate import CLIMATE
 import hvac
+import plumbing
+from nubgrid import P, CLR, Grid, Panel, band_loops, band_path, pair_open, pair_route, verify, corners_ft, node, ft, plen_nodes
 
-MAX_LOOP = 300.0          # ft of 1/2" PEX per loop, leaders included
+MAX_LOOP = 200.0          # ft of 1/2" PEX per loop, leaders included (owner, 2026-10-13)
 DT = 10.0                 # design temperature drop per loop, °F
-DOWN = 0.10               # share of each loop's heat lost down and out the slab edge, over R-10
-R_SLAB = {6: 0.25, 9: 0.37, 12: 0.50}   # water to slab surface, h·sf·°F/Btu, 1/2" PEX in a 4" slab
+DOWN = 0.07               # share of each loop's heat lost down and out the slab edge, over R-18 boards
+R_SLAB = {6: 0.25}        # water to slab surface, h·sf·°F/Btu, 1/2" PEX 6" o.c. in a 4" slab
 R_COVER = 0.20            # hard-surface flooring assumed (tile, LVP, engineered wood); carpet is ~1.5
 R_SURF = 0.50             # slab surface to room (2.0 Btu/h·sf·°F)
 GARAGE_F = 50.0
 RISE = 2.0                # ft of leader per end, slab up into the manifold
 GARAGE_COLOR = '#2e7d32'
+BOARD = dict(name='EPS25 Super 4 nub board', size=4.0, sf=16.0, thick_in=5.0, eps_in=4.0, puck_in=1.0, r=18.0, pitch_in=3.0, per_bundle=5, min_bundles=3,
+             url='https://pexuniverse.com/eps25-super-4-foam-insulation')
+SLAB_H = -0.39            # tube centre: on the EPS between the pucks, 4-1/2" below the slab top (feet from the slab top)
+FEED_H = -0.85            # 1" feed pairs in the base course under the boards
+BOARD_Z = (-0.75, -0.333) # the board itself: 5" from the base course to the top of the pucks (4" slab above)
 
 ZONES = {
     'Z1': dict(name='Master suite', color='#c62828', stat='T1', where='Master bed, interior wall by the hall door',
@@ -40,415 +44,589 @@ ZONES = {
                rooms=['garage']),
 }
 ZONE_OF = {r: z for z, v in ZONES.items() for r in v['rooms']}
+STATS = {'T1': (27.6, 16.6), 'T2': (46.0, 41.6), 'T3': (66.5, 39.2), 'TG': (24.2, 40.2)}
 
-# Panels: (room, x0, y0, x1, y1, spacing inches), already 6" off the wall faces and clear of
-# cabinets, tubs, the island, the fridge and the hearth. A loop is one or more panels in series.
-LOOPS = [
-    # zone 1, master suite
-    ('master_hall', 25.54, 18.33, 30.04, 21.33, 12), ('master_bed', 16.96, 0.96, 30.04, 17.04, 12), None,
-    ('master_bath', 13.54, 14.17, 15.67, 23.67, 9), ('master_bath', 9.30, 6.04, 13.54, 23.67, 9), ('master_bath', 6.33, 17.13, 9.30, 23.67, 9), None,
-    ('master_closet', 6.33, 24.96, 15.58, 33.34, 12), None,
-    # zone 2, great room and utility
-    ('dining', 31.33, 6.04, 43.21, 15.62, 6), None,
-    ('kitchen', 31.33, 38.20, 43.21, 41.80, 12), ('kitchen', 33.42, 23.20, 36.24, 38.20, 12), None,
-    ('kitchen', 31.33, 16.62, 43.21, 23.20, 12), ('kitchen', 41.12, 23.20, 43.21, 38.20, 12), None,
-    ('laundry', 18.80, 18.50, 24.08, 29.30, 12), ('powder', 25.54, 22.63, 30.04, 27.15, 9), None,
-    ('mud', 25.94, 36.34, 30.04, 41.71, 12), ('mud', 16.87, 30.76, 30.04, 36.34, 12), None,
-    ('pantry', 34.71, 45.69, 43.21, 52.77, 9), ('entry', 44.50, 42.98, 50.58, 52.77, 9), None,
-    ('living', 44.21, 17.35, 63.67, 27.30, 12), None,
-    ('living', 44.21, 27.30, 58.90, 31.90, 12), None,
-    ('living', 44.21, 31.90, 63.67, 41.98, 12), None,
-    # zone 3, bedroom wing and office
-    ('hall', 64.96, 19.44, 68.04, 39.48, 12), ('bath2', 69.33, 34.90, 79.70, 37.52, 9), ('bed3_closet', 78.25, 40.77, 82.48, 44.77, 9), None,
-    ('bed1', 64.96, 6.04, 77.08, 18.44, 9), None,
-    ('bed2_closet', 78.37, 16.63, 82.48, 20.73, 6), ('bath1', 78.37, 8.90, 82.48, 15.33, 6), ('bath1', 78.37, 6.04, 80.60, 8.90, 6), None,
-    ('bed2', 69.33, 22.02, 82.48, 33.61, 12), None,
-    ('bed3', 64.96, 40.77, 76.96, 52.77, 9), None,
-    ('office', 51.87, 43.27, 63.67, 52.77, 12), None,
-    # garage: 12" o.c., 12" back from the overhead doors, clear of the floor drain by 12"
-    ('garage', 6.33, 34.63, 15.58, 37.63, 12), ('garage', 1.46, 37.63, 24.65, 43.00, 12), None,
-    ('garage', 1.46, 43.00, 8.60, 66.63, 12), None,
-    ('garage', 8.60, 43.00, 15.75, 66.63, 12), None,
-    ('garage', 15.75, 43.00, 22.90, 66.63, 12), ('garage', 15.91, 66.63, 22.90, 69.13, 12), None,
-    ('garage', 22.90, 43.00, 30.04, 66.63, 12), ('garage', 22.90, 66.63, 30.04, 69.13, 12), None,
-]
-
-# Heat source and manifold stations. 'out' is the axis the leaders leave the wall along; 'face' is the wall face the cabinet
-# hangs on (its coordinate along that axis) and 'mount' the cabinet's bottom and top above the slab, for the 3D model.
+# Heat source and the manifold stations. A station hangs on a wall face ('face' is that coordinate along 'axis'; 'side' is
+# the room side of it); its loop ends rise out of the slab in one row of 3" ports on the first grid line in front of the
+# face, between 'lo' and 'hi' along the wall. 'riser' is where the 1" feed pair comes up to it.
 HS = (33.55, 48.8)         # wall-hung on the mechanical closet's east wall (P-1's water manifold and heater share the closet)
-T_SUP = 110.0              # design supply cap, °F: keeps a condensing boiler condensing and an air-to-water heat pump efficient
+T_SUP = 110.0              # design supply cap, °F: keeps a condensing boiler condensing
 STATIONS = {
-    'MF-1': dict(at=(20.6, 18.3), out='y', face=18.0, mount=(2.5, 4.1), where='Laundry, on the north wall between the linen alcove and the dryer',
-                 detail='Surface-mounted manifold cabinet on the laundry\'s north wall, between the master bath\'s linen alcove and the dryer. That wall is the staggered-stud sound wall to the master bed, so the cabinet is not recessed; leaders drop straight into the slab below.'),
-    'MF-2': dict(at=(22.0, 37.45), out='y', face=37.133, mount=(4.0, 5.6), where='Garage, on the mud room wall, beside MF-G',
-                 detail='Surface-mounted cabinet on the garage face of the mud room wall, 4\' above the slab, beside MF-G; its leaders pass under the wall into the mud room and kitchen. Surface mounting keeps the garage fire separation whole.'),
-    'MF-G': dict(at=(18.8, 37.45), out='y', face=37.133, mount=(4.0, 5.6), where='Garage, on the mud room wall, beside MF-2',
-                 detail='Surface-mounted cabinet on the garage face of the mud room wall, beside MF-2, with the garage\'s own pump P-RG and mixing valve.'),
-    'MF-3': dict(at=(64.55, 25.6), out='x', face=64.17, mount=(2.5, 4.1), where='Bedroom hall, recessed in the west wall north of the fireplace',
+    'MF-1': dict(room='laundry', axis='y', face=18.0, side=+1, lo=18.75, hi=22.0, mount=(2.5, 4.1), riser=(22.6, 18.4),
+                 where='Laundry, on the north wall west of the dryer',
+                 detail='Surface-mounted manifold cabinet on the laundry\'s north wall, between the linen alcove and the dryer. That wall is the staggered-stud sound wall to the master bed, so the cabinet is not recessed. The master bed, bath and hall loops come under that wall straight up into it; the closet, bath and laundry loops come up from the laundry side.'),
+    'MF-2': dict(room='mud', axis='y', face=36.84, side=-1, lo=17.0, hi=18.75, mount=(2.5, 4.1), riser=(19.4, 36.4),
+                 where='Mud room, on the south wall (garage wall), west end',
+                 detail='Surface-mounted cabinet on the mud room side of the garage wall, back to back with MF-G; the feed pair rises in that wall and serves both.'),
+    'MF-G': dict(room='garage', axis='y', face=37.133, side=+1, lo=16.5, hi=24.75, mount=(4.0, 5.6), riser=(19.4, 37.6),
+                 where='Garage, on the mud room wall (two 7-loop manifolds side by side)',
+                 detail='Surface-mounted cabinets on the garage face of the mud room wall, 4\' above the slab, back to back with MF-2, with the garage\'s own pump P-RG and mixing valve. Surface mounting keeps the garage fire separation whole.'),
+    'MF-K': dict(room='mud', axis='x', face=30.54, side=-1, lo=31.75, hi=34.5, mount=(2.5, 4.1), riser=(30.0, 35.2),
+                 where='Mud room, east wall (kitchen wall), south of the powder room',
+                 detail='Recessed cabinet in the mud room side of the kitchen wall. The kitchen and dining loops come under that wall, under the base cabinets south of the range, straight into it.'),
+    'MF-5': dict(room='pantry', axis='x', face=43.707, side=-1, lo=46.75, hi=50.75, mount=(2.5, 4.1), riser=(43.3, 51.2),
+                 where='Pantry, on the east wall (entry wall)',
+                 detail='Recessed cabinet in the pantry side of the entry wall. The entry, office and living room loops come under that wall straight into it; the pantry loop comes up on the pantry side. Ten feet of 1" feed from HS-1 under the pantry floor.'),
+    'MF-3': dict(room='hall', axis='x', face=64.46, side=+1, lo=24.0, hi=28.25, mount=(2.5, 4.1), riser=(64.9, 28.9),
+                 where='Bedroom hall, west wall north of the fireplace',
                  detail='Recessed manifold cabinet in the hall\'s west wall between the living room opening and the fireplace chase. A 2x4 wall takes a 3-1/2" deep cabinet; fur it to 2x6 locally if the chosen manifold needs more (S-1).'),
+    'MF-4': dict(room='hall', axis='x', face=64.46, side=+1, lo=33.5, hi=36.75, mount=(2.5, 4.1), riser=(64.9, 37.4),
+                 where='Bedroom hall, west wall south of the fireplace',
+                 detail='Recessed cabinet in the hall\'s west wall south of the fireplace chase, across from the bath 2 door. The living room\'s east loops come under that wall straight into it.'),
 }
-PREFER = {'master_closet': 'MF-1'}   # a near-tie that the zone's own manifold should win
-MC = (33.6, 48.6)          # a manifold in the mechanical closet, for the options
-MUD = (20.4, 37.45)        # the mud room wall station (MF-2 and MF-G)
-OPTIONS = [
-    ('O1', 'All manifolds in the mechanical closet, beside the heat source', {'MC': MC}),
-    ('O2', 'Owner\'s first sketch: laundry corner, two on the garage side of the mud room wall, two in the bedroom hall beside the fireplace',
-     {'K1': (17.4, 18.3), 'K2': (16.4, 37.6), 'K3': (64.65, 32.4)}),
-    ('O3', 'Two stations: the mechanical closet, and the bedroom hall', {'MC': MC, 'MF-3': STATIONS['MF-3']['at']}),
-    ('O4', 'Three stations: laundry north wall (MF-1), mud room wall in the garage (MF-2 and MF-G), bedroom hall north of the fireplace (MF-3)',
-     {'MF-1': STATIONS['MF-1']['at'], 'MUD': MUD, 'MF-3': STATIONS['MF-3']['at']}),
-    ('O5', 'O4 plus a fourth manifold in the mechanical closet for the kitchen, pantry and entry', {'MF-1': STATIONS['MF-1']['at'], 'MUD': MUD, 'MF-3': STATIONS['MF-3']['at'], 'MC': MC}),
+# tube passes under these stretches of wall (x0, y0, x1, y1 is the wall itself; 'into' names the room on the far side).
+# Under a wall a tube only goes straight across; the gates in front of a manifold match its port row, so each tube
+# comes up into its own port.
+GATES = [
+    (18.75, 17.54, 22.0, 18.0, 'laundry'),        # G1 master bed into the laundry, straight into MF-1
+    (30.54, 31.75, 30.833, 34.5, 'mud'),          # G4 kitchen into the mud room, under the base cabinets, into MF-K
+    (43.707, 46.75, 44.0, 50.75, 'pantry'),       # G3 entry into the pantry, into MF-5
+    (64.167, 33.5, 64.46, 36.75, 'hall'),         # G5 living into the hall, into MF-4
+    (25.5, 21.833, 27.5, 22.127, 'powder'),       # G6 master hall into the powder room
+    (78.25, 15.83, 80.5, 16.13, 'bath1'),         # G7 bedroom 2 closet into bath 1, under the shower floor
 ]
-DRAWN = 'O4'
-MAX_PORTS = 24     # a station can stack two 12-port manifolds
+# nothing passes under these: fixtures with flanges, drains or stub-ups, appliances, the hearth. Tube may pass under the
+# kitchen base cabinets (south of the range), the laundry's linen cabinet and the shower floors; the fields keep out of
+# every fixture by their own rectangles.
+def _fx(kind_ids, grow=0.0):
+    out = []
+    for f in HOUSE['fixtures']:
+        if f['id'] in kind_ids or f['kind'] in kind_ids:
+            x, y = f['at']; w, h = f['size']
+            out.append((x - w / 2 - grow, y - h / 2 - grow, x + w / 2 + grow, y + h / 2 + grow))
+    return out
+NO_TUBE = (_fx({'fireplace'}, 0.3) + _fx({'wc'}, 0.25) + _fx({'island', 'range', 'ref', 'tub'}, 0.2)
+           + _fx({'K-BACK', 'MB-VAN', 'B2-VAN', 'washer', 'dryer', 'lav'}, 0.1))
+DRAINS = [(f['at'][0], f['at'][1], 1.0) for f in HOUSE['fixtures'] if f['kind'] == 'drain']
+
+# Panels: room, rectangle in plan feet, the edge the loop ends sit on ('W', 'E', 'N', 'S'; 'r' starts the bands from the
+# other end of that edge), the manifold, and how many 6" rows a band (one loop) may take (0 = whatever 200' allows).
+# Rectangles stay 6" off the walls where tube would be near a plate, clear of the cabinets, tubs, vanities, the island,
+# the fridge and the hearth, and leave lanes beside the entry edge for the leaders of their own bands and of the loops
+# that pass by (those lanes are heated by the leaders).
+PANELS = {
+    # zone 1, master suite: MF-1
+    'MB':  ('master_bed', 16.81, 0.81, 30.19, 15.6, 'Sr', 'MF-1', 10),
+    'BA1': ('master_bath', 9.3, 6.0, 13.6, 13.1, 'S', 'MF-1', 0),        # north of the double vanity; leaders down the west side, through the closet and the laundry
+    'BA2': ('master_bath', 10.8, 14.9, 15.3, 23.1, 'E', 'MF-1', 0),      # south of the vanity, east of the shower; leaders out through the bedroom door, with a lane east of it for BA1's
+    'MC':  ('master_closet', 6.4, 26.5, 15.1, 33.1, 'E', 'MF-1', 0),     # starts below the pocket door's north jamb so the bath 1 leaders get past
+    'LA':  ('laundry', 19.9, 20.3, 22.2, 29.3, 'N', 'MF-1', 0),          # between the linen cabinet and the washer / dryer; the lane west of it carries the closet and bath leaders
+    'MH':  ('master_hall', 25.4, 18.3, 30.19, 21.5, 'S', 'MF-2', 0),      # its leaders go through the powder room to the mud room
+    # zone 2, great room and utility: MF-2, MF-K, MF-5
+    'MU1': ('mud', 16.73, 32.0, 24.6, 35.1, 'S', 'MF-2', 0),
+    'MU2': ('mud', 27.3, 29.0, 29.8, 41.4, 'S', 'MF-2', 0),               # its leaders leave at the south end and come up the lane by the garage door; the lane west of it carries the hall leaders
+    'DI':  ('dining', 32.5, 5.9, 43.35, 15.8, 'W', 'MF-K', 10),
+    'KN':  ('kitchen', 33.0, 16.6, 43.35, 22.6, 'W', 'MF-K', 0),          # north of the base cabinets and the island
+    'KE':  ('kitchen', 41.3, 23.0, 43.35, 36.3, 'S', 'MF-K', 0),          # east of the island
+    'KS':  ('kitchen', 33.6, 37.7, 43.35, 41.6, 'W', 'MF-K', 0),          # south of the island, north of the back cabinet
+    'PA':  ('pantry', 34.56, 46.5, 42.9, 52.9, 'E', 'MF-5', 0),               # south of the coat closet's back wall
+    'EN':  ('entry', 47.5, 44.0, 49.7, 49.0, 'S', 'MF-5', 0),             # the entry's west side and south end carry leaders
+    'LW':  ('living', 44.4, 17.2, 53.9, 41.6, 'S', 'MF-5', 6),
+    'LE1': ('living', 53.9, 17.2, 60.2, 42.1, 'E', 'MF-3', 16),            # four bands: two north of the fireplace to MF-3, two south to MF-4
+    'LE2': ('living', 60.9, 19.3, 62.8, 26.9, 'S', 'MF-3', 0),            # north of the fireplace; leaders out at its south end, along the hearth and up the wall to the hall opening
+    'LE3': ('living', 60.9, 34.8, 63.3, 41.3, 'N', 'MF-4', 0),            # south of the fireplace
+    # zone 3, bedroom wing and office: MF-3, MF-4, MF-5
+    'OF':  ('office', 52.5, 43.1, 63.8, 52.9, 'W', 'MF-5', 10),
+    'B1':  ('bed1', 64.81, 5.9, 77.1, 16.6, 'S', 'MF-3', 12),
+    'C2':  ('bed2_closet', 79.2, 17.0, 82.6, 20.8, 'S', 'MF-3', 0),       # one loop with bath 1: out through the closet door, on under the shower floor
+    'BT1': ('bath1', 78.3, 6.3, 80.1, 12.0, 'S', 'MF-3', 0),               # the tail of that loop: the open floor west of the lav and toilet, north of the shower
+    'B2':  ('bed2', 71.0, 22.4, 82.6, 33.75, 'W', 'MF-3', 12),
+    'BT2': ('bath2', 69.5, 34.75, 79.8, 37.3, 'W', 'MF-4', 0),
+    'B3':  ('bed3', 64.81, 42.3, 77.1, 52.9, 'N', 'MF-4', 12),
+    # garage, 6" like the house (owner, 2026-10-13): MF-G
+    'GW':  ('garage', 1.0, 39.5, 5.5, 66.8, 'N', 'MF-G', 4),               # west of the man door line; leaders along the north wall
+    'GM':  ('garage', 6.5, 43.5, 13.5, 66.8, 'N', 'MF-G', 6),              # west of the floor drain; the strip under the ports carries its leaders
+    'GN':  ('garage', 16.0, 43.5, 20.5, 66.8, 'N', 'MF-G', 6),             # east of the floor drain, under the ports; the rear wall steps back at 15.4
+    'GC':  ('garage', 21.8, 39.5, 23.5, 69.2, 'N', 'MF-G', 4),             # straight under the ports
+    'GE':  ('garage', 25.5, 45.0, 29.5, 69.2, 'W', 'MF-G', 24),            # east of the mud room; leaders up the lane east of GC
+}
+# loops that run on into a second panel (open pair through the first, a routed pair connector, closed pair in the second)
+CHAINS = [('C2', 'BT1')]
+# where the bands of one panel go to different stations
+BAND_STATION = {('LE1', 2): 'MF-4', ('LE1', 3): 'MF-4'}
+# bands set by hand (6" rows per loop, from the first row): LE1's two north bands keep their lead nodes clear of the
+# fireplace chase, which sits beside rows 27.5 to 31.5
+BANDS = {'LE1': [14, 16, 10, 10]}
+# the order the leaders are routed in: the loop routed first takes the lane along the wall, the next hugs it, so the
+# bundles nest. At a port row fed from one side, the loop nearest that end goes first; where bands leave a panel past
+# each other toward a gate, the far band goes first and turns off before the near one passes it; where every band
+# leaves through the same door, the near band goes first and the far one comes round the outside.
+# An entry is a panel, or 'panel.band' for one band of it.
+ORDER = ['BA2', 'BA1', 'MC', 'LA', 'MB', 'MU1', 'MU2', 'MH', 'DI', 'KN', 'KS', 'KE', 'PA', 'LW', 'OF.0', 'EN', 'OF.1',
+         'LE2', 'LE1.1', 'LE1.0', 'B1', 'C2', 'B2', 'LE3', 'LE1.3', 'LE1.2', 'BT2', 'B3', 'GW', 'GM', 'GN', 'GC', 'GE']
+NEAR_FIRST = {'LW', 'B1', 'B3', 'GE'}
+# floor a loop's leaders keep off (x0, y0, x1, y1 in feet), so the pair routed first takes the inside of a bundle and
+# the ones after it wrap round the outside: LE1's second band stays off the wall side of the lane east of LE2 so the
+# first band can come down outside it; the closet loop crosses the hall under the bedroom 2 door before turning north
+KEEP_OUT = {'LE1.1': [(63.2, 17.0, 63.6, 20.4)],
+            # the three loops that reach MF-3 through the bedroom 2 door turn north at the door, one column further
+            # west each, and the first lands on the farthest ports so the others nest inside it
+            'C2': [(64.5, 28.5, 67.5, 33.75)], 'B2.0': [(64.5, 28.5, 67.0, 33.75)], 'B2.1': [(64.5, 28.5, 66.5, 33.75)]}
+# a loop held to one pair of ports: the coordinate along the port row of its first port (the next one is its second)
+PORT = {'BA2': 18.75, 'BA1': 19.75, 'C2': 27.0, 'B2.0': 27.5, 'B2.1': 28.0}
 
 
-# ---------------------------------------------------------------- geometry
-def spiral(x0, y0, x1, y1, s, corner):
-    """Counterflow spiral in a panel: supply spirals in at pitch 2s, return spirals out between.
-    Starts at the panel corner nearest `corner` and ends s in from it on the diagonal."""
-    W, D = x1 - x0, y1 - y0
-    left = abs(corner[0] - x0) <= abs(corner[0] - x1); top = abs(corner[1] - y0) <= abs(corner[1] - y1)
-    tx = lambda u: x0 + u if left else x1 - u
-    ty = lambda v: y0 + v if top else y1 - v
+# ---------------------------------------------------------------- the layout
+def _line(face, side):
+    """The first grid line on the room side of a wall face that keeps tube out of the plate's way."""
+    return int(math.ceil((face + 0.2) / P - 1e-9)) if side > 0 else int(math.floor((face - 0.2) / P + 1e-9))
 
-    def inward(a, b, c, d, p):
-        pts = [(a, b)]
-        while True:
-            if d - b < 0.05 or c - a < 0.05: break
-            pts.append((a, d))
-            pts.append((c, d))
-            if d - b < p: break
-            pts.append((c, b))
-            if c - (a + p) < 0.05: break
-            pts.append((a + p, b))
-            a, b, c, d = a + p, b + p, c - p, d - p
-        return pts
 
-    p = 2 * s
-    sup = inward(0, 0, W, D, p)
-    ret = inward(s, s, W - s, D - s, p) if W > 2 * s and D > 2 * s else []
-    if ret:
-        e, f = sup[-1], ret[-1]
-        mid = [(e[0], f[1])] if abs(e[0] - f[0]) > 1e-6 and abs(e[1] - f[1]) > 1e-6 else []
-        path = sup + mid + ret[::-1]
+def port_nodes(st):
+    k = _line(st['face'], st['side'])
+    a, b = int(round(st['lo'] / P)), int(round(st['hi'] / P))
+    return [(i, k) for i in range(a, b + 1)] if st['axis'] == 'y' else [(k, j) for j in range(a, b + 1)]
+
+
+def station_at(st):
+    """The middle of the port row, in feet (where the leaders gather up into the cabinet)."""
+    k = _line(st['face'], st['side']) * P
+    return ((st['lo'] + st['hi']) / 2, k) if st['axis'] == 'y' else (k, (st['lo'] + st['hi']) / 2)
+
+
+def band_len(panel, v0, n):
+    nodes, _, _, _ = band_path(panel, v0, n)
+    return plen_nodes(nodes)
+
+
+def plan_bands(panel, cap, st_at):
+    """Split a panel into bands (one loop each) so that a band's tube plus a rough leader fits the loop budget."""
+    m, R = panel.local()
+    R2 = R - R % 2
+    if R2 < 2: return []
+    if cap:
+        nmax = min(cap, R2)
     else:
-        path = sup
-    return [(tx(u), ty(v)) for u, v in path]
+        x0, y0, x1, y1 = panel.rect_ft()
+        ex, ey = {'W': (x0, (y0 + y1) / 2), 'E': (x1, (y0 + y1) / 2), 'N': ((x0 + x1) / 2, y0), 'S': ((x0 + x1) / 2, y1)}[panel.entry]
+        lead = 2 * 1.3 * (abs(ex - st_at[0]) + abs(ey - st_at[1])) + 2 * RISE
+        nmax = 2
+        for n in range(2, R2 + 1, 2):
+            if band_len(panel, 0, n) + lead <= MAX_LOOP - 6: nmax = n
+            else: break
+    return band_loops(panel, nmax)
 
 
+def _sub(a, b): return (a[0] - b[0], a[1] - b[1])
+
+
+def band_rect(panel, v0, n):
+    """The floor one band of a panel heats, in feet: its tube extents plus half a spacing all round."""
+    s = panel.s
+    a = panel.to_node(0, v0); b = panel.to_node(panel.local()[0] - 1, v0 + (n - 1) * s)
+    x0, x1 = sorted((a[0], b[0])); y0, y1 = sorted((a[1], b[1]))
+    h = s * P / 2
+    return (x0 * P - h, y0 * P - h, x1 * P + h, y1 * P + h)
+
+
+def layout(caps=None, first=(), verbose=False, stop_before=None):
+    """Lay every loop out on the grid. Returns the loops (fields, leaders, lengths), the grid and a list of failures."""
+    caps = dict(caps or {})
+    grid = Grid(HOUSE, gates=GATES, no_tube=NO_TUBE, drains=DRAINS)
+    panels = {k: Panel(v[0], v[1], v[2], v[3], v[4], v[5]) for k, v in PANELS.items()}
+    for pn in panels.values():
+        grid.field.update(pn.bbox_nodes())
+    for k, st in STATIONS.items():
+        grid.add_ports(k, port_nodes(st), st['room'])
+    chained = {b: a for a, b in CHAINS}
+    loops = []
+    for k, v in PANELS.items():
+        if k in chained: continue
+        pn = panels[k]; st = v[6]
+        if k in BANDS and k not in caps:
+            bands = []; vv = 0
+            for n in BANDS[k]: bands.append((vv, n)); vv += n * pn.s
+        else:
+            bands = plan_bands(pn, caps.get(k, v[7]), station_at(STATIONS[st]))
+        for bi, (v0, n) in enumerate(bands):
+            st_b = BAND_STATION.get((k, bi), st)
+            tail = next((b for a, b in CHAINS if a == k), None)
+            if tail:
+                if n % 4 == 0: n -= 2          # an open pair must end at the far edge
+                if n < 2: continue
+                na, nb, lin, lout, ends = pair_open(pn, v0, n)
+                pb = panels[tail]
+                m2, R2 = pb.local(); n2 = R2 - R2 % 2
+                nodes2, _, lin2, lout2 = band_path(pb, 0, n2)
+                loops.append(dict(panel=k, band=bi, st=st_b, room=v[0], a=na, b=nb, lead_in=lin, lead_out=lout, ends=ends, n=n,
+                                  tail=tail, field2=nodes2, lead_in2=lin2, lead_out2=lout2, panels=[pn, pb], rooms=[v[0], PANELS[tail][0]],
+                                  rects=[band_rect(pn, v0, n), band_rect(pb, 0, n2)]))
+            else:
+                nodes, corners, lin, lout = band_path(pn, v0, n)
+                loops.append(dict(panel=k, band=bi, st=st_b, room=v[0], field=nodes, lead_in=lin, lead_out=lout, panels=[pn], rooms=[v[0]], n=n,
+                                  rects=[band_rect(pn, v0, n)]))
+    # fields and the lead nodes go down first; leaders thread between them afterwards
+    bad = []
+    for i, l in enumerate(loops):
+        l['tag'] = f'L{i + 1}'
+        if 'field' in l:
+            grid.take(l['field'], l['tag'] + 'f')
+        else:
+            grid.take(l['a'], l['tag'] + 'a'); grid.take(l['b'], l['tag'] + 'b'); grid.take(l['field2'], l['tag'] + 'f')
+            grid.used[l['ends'][0]] = l['tag'] + 'c1'; grid.used[l['ends'][1]] = l['tag'] + 'c2'
+            grid.used[l['lead_in2']] = l['tag'] + 'c1'; grid.used[l['lead_out2']] = l['tag'] + 'c2'
+        grid.used[l['lead_in']] = l['tag'] + 's'; grid.used[l['lead_out']] = l['tag'] + 'r'
+        hit = [n for n in (l.get('field') or l['a'] + l['b'] + l['field2']) if n in grid.blocked or n not in grid.room]
+        if hit: bad.append(f"{l['tag']} {l['panel']}: field over a wall, fixture or drain at {[ft(n) for n in hit[:3]]}")
+    if bad: raise ValueError('; '.join(bad))
+    fails = []
+    # connectors of the chained loops: the pair runs on from the two open ends to the second panel's lead nodes
+    for l in loops:
+        if 'tail' not in l: continue
+        e0, e1 = l['ends']; t1, t2 = l['tag'] + 'c1', l['tag'] + 'c2'
+        r = pair_route(grid, e0, e1, _sub(e0, l['a'][-1]), leads=(l['lead_in2'], l['lead_out2']))
+        if not r:
+            fails.append((l['tag'], l['panel'], 'connector')); l['conn'] = None
+            continue
+        ca, cb = r
+        grid.take(ca, t1); grid.take(cb, t2)
+        # tube A runs on from end 0; if its connector lands on lead_out2 the second panel is run the other way round
+        if ca[-1] == l['lead_out2']: l['field2'] = l['field2'][::-1]
+        l['conn'] = (ca, cb)
+    # leaders, farthest loops first (they take the outside lanes), with any hand-picked ones before them
+    def far(l):
+        sx, sy = station_at(STATIONS[l['st']]); x, y = ft(l['lead_in'])
+        return abs(x - sx) + abs(y - sy)
+    def rank(l):
+        k = l['panel']; kb = f"{k}.{l['band']}"
+        if k in first: return (0, first.index(k), 0)
+        if kb in ORDER: return (1, ORDER.index(kb), 0)
+        return (1, ORDER.index(k) if k in ORDER else 99, far(l) * (1 if k in NEAR_FIRST else -1))
+    order = sorted(loops, key=rank)
+    for l in order:
+        st = l['st']
+        kb = f"{l['panel']}.{l['band']}"
+        if stop_before and kb == stop_before: break
+        d0 = _sub(l['lead_in'], l['field'][0] if 'field' in l else l['a'][0])
+        grid.keep_out = set()
+        for x0, y0, x1, y1 in KEEP_OUT.get(kb, KEEP_OUT.get(l['panel'], [])):
+            grid.keep_out.update((i, j) for i in range(int(x0 / P), int(x1 / P) + 2) for j in range(int(y0 / P), int(y1 / P) + 2)
+                                 if x0 - 1e-6 <= i * P <= x1 + 1e-6 and y0 - 1e-6 <= j * P <= y1 + 1e-6)
+        pl = grid.ports[st]
+        if kb in PORT or l['panel'] in PORT:
+            c = int(round(PORT.get(kb, PORT.get(l['panel'])) / P)); ax = 0 if STATIONS[st]['axis'] == 'y' else 1
+            pl = [n for n in pl if n[ax] in (c, c + 1)]
+        r = pair_route(grid, l['lead_in'], l['lead_out'], d0, ports=pl)
+        grid.keep_out = set()
+        if r:
+            ps, pr = r
+            grid.take(ps, l['tag'] + 's'); grid.take(pr, l['tag'] + 'r')
+            l['sup'], l['ret'] = ps, pr
+        else:
+            l['sup'] = l['ret'] = None
+            fails.append((l['tag'], l['panel'], 'leader'))
+            if verbose: print('FAIL', l['tag'], l['panel'], st)
+    # lengths and the tube as drawn
+    for l in loops:
+        tube = []
+        if l.get('sup'): tube += l['sup'][::-1]
+        if 'field' in l:
+            tube += l['field']
+        else:
+            tube += l['a']
+            if l.get('conn'):
+                tube += l['conn'][0] + l['field2'] + l['conn'][1][::-1]
+            tube += l['b'][::-1]
+        if l.get('ret'): tube += l['ret']
+        l['tube'] = tube
+        l['in_floor'] = plen_nodes(l['field']) if 'field' in l else plen_nodes(l['a']) + plen_nodes(l['b']) + plen_nodes(l['field2']) + (plen_nodes(l['conn'][0]) + plen_nodes(l['conn'][1]) if l.get('conn') else 0)
+        l['leader'] = (plen_nodes(l['sup']) if l.get('sup') else 0) + (plen_nodes(l['ret']) if l.get('ret') else 0) + 2 * RISE
+        l['total'] = l['in_floor'] + l['leader'] + (2 * P if l.get('sup') else 0) + (2 * P if l.get('ret') else 0)   # the steps from lead nodes into the field
+        l['ports'] = (l['sup'][-1], l['ret'][-1]) if l.get('sup') and l.get('ret') else None
+    return loops, grid, fails
+
+
+def solve(verbose=False):
+    """Lay out, then trim any band whose loop came out over budget, and put loops that could not be routed first."""
+    caps = {}; first = []
+    for it in range(14):
+        loops, grid, fails = layout(caps, first, verbose)
+        over = [l for l in loops if l['total'] > MAX_LOOP]
+        if verbose:
+            print(f"pass {it}: {len(loops)} loops, {len(fails)} failures, {len(over)} over {MAX_LOOP:.0f}'")
+        if not fails and not over: return loops, grid
+        for tag, panel, what in fails:
+            if panel not in first: first.append(panel)
+        for l in over:
+            caps[l['panel']] = max(2, min(caps.get(l['panel'], 99), l['n'] - 2))
+    raise RuntimeError(f'radiant layout did not settle: failures {fails}, over budget {[l["tag"] for l in over]}')
+
+
+# ---------------------------------------------------------------- hydronics
 def lc(t): return t[:1].lower() + t[1:]
+
+
+def head_ft(L, gpm): return L * 0.0118 * (gpm / 0.5) ** 1.75
 
 
 def plen(pts): return sum(abs(a[0] - b[0]) + abs(a[1] - b[1]) for a, b in zip(pts, pts[1:]))
 
 
-def ortho(a, b, first):
-    """a to b in two straight legs, along `first` axis first."""
-    if abs(a[0] - b[0]) < 1e-6 or abs(a[1] - b[1]) < 1e-6: return [a, b]
-    return [a, (b[0], a[1]), b] if first == 'x' else [a, (a[0], b[1]), b]
-
-
-def sample(pts, step=0.5):
-    for a, b in zip(pts, pts[1:]):
-        n = max(1, int((abs(a[0] - b[0]) + abs(a[1] - b[1])) / step))
-        for i in range(n): yield (a[0] + (b[0] - a[0]) * (i + 0.5) / n, a[1] + (b[1] - a[1]) * (i + 0.5) / n), (abs(a[0] - b[0]) + abs(a[1] - b[1])) / n
-
-
-# ---------------------------------------------------------------- loads per panel
 def room_loads():
     out = {}
     for r in HOUSE['rooms']:
         if r['kind'] == 'outdoor': continue
-        l = hvac.room_load(r)
-        h = l['heat']
+        h = hvac.room_load(r)['heat']
         if r['kind'] == 'garage':
             h *= (GARAGE_F - CLIMATE['heat_design_f']) / (CLIMATE['indoor_heat_f'] - CLIMATE['heat_design_f'])
         out[r['id']] = h
     return out
 
 
-def split_loops():
-    loops, cur = [], []
-    for p in LOOPS:
-        if p is None: loops.append(cur); cur = []
-        else: cur.append(dict(room=p[0], rect=p[1:5], s=p[5]))
-    return loops
+# the 1" feed pairs from HS-1 to the stations, under the boards. Three share the run under the kitchen's west base cabinets,
+# two the run under the entry and office; each is drawn a few inches from the next so they read apart.
+FEED_ROUTES = {
+    'MF-1': [HS, (31.6, HS[1]), (31.6, 18.4), STATIONS['MF-1']['riser']],
+    'MF-2': [HS, (32.0, HS[1]), (32.0, 36.4), STATIONS['MF-2']['riser']],
+    'MF-K': [HS, (32.4, HS[1]), (32.4, 35.2), STATIONS['MF-K']['riser']],
+    'MF-5': [HS, (43.3, HS[1]), STATIONS['MF-5']['riser']],
+    'MF-4': [HS, (HS[0], 44.5), (64.9, 44.5), STATIONS['MF-4']['riser']],
+    'MF-3': [HS, (HS[0] - 0.3, HS[1]), (HS[0] - 0.3, 44.8), (65.2, 44.8), (65.2, 28.9), STATIONS['MF-3']['riser']],
+}
 
 
-def route(panels, mf, out):
-    """Lay a loop from manifold point mf: leaders, panels in series, connectors. Returns geometry and lengths."""
-    pos = mf; floor_pts = []; conns = []; cur = None
-    for i, pn in enumerate(panels):
-        x0, y0, x1, y1 = pn['rect']
-        pts = spiral(x0, y0, x1, y1, pn['s'] / 12.0, pos)
-        if cur is not None:
-            conns.append(ortho(cur, pts[0], 'x' if abs(cur[0] - pts[0][0]) > abs(cur[1] - pts[0][1]) else 'y'))
-        else:
-            start = pts[0]
-        floor_pts.append(pts); cur = pts[-1]; pos = cur
-    lead_s = ortho(mf, start, out); lead_r = ortho(mf, cur, out)[::-1]
-    in_floor = sum(plen(p) for p in floor_pts) + sum(plen(c) for c in conns)
-    leader = plen(lead_s) + plen(lead_r) + 2 * RISE
-    return dict(panels=floor_pts, conns=conns, lead=[lead_s, lead_r], in_floor=in_floor, leader=leader, total=in_floor + leader)
+def hydronics(loops, grid):
+    """Each loop's heat, flow, head and water temperature, and the feed pairs. A room's M-1 load is carried by all the tube in
+    it, fields and the leaders passing through alike, shared by length; the floor a room's tube heats is half a square foot per
+    foot of tube (6" spacing), up to the room's area, and that sets the water it needs."""
+    loads = room_loads()
+    tube_in = {}
+    for l in loops:
+        cnt = {}
+        for n in l['tube']:
+            r = grid.room.get(n)
+            if r: cnt[r] = cnt.get(r, 0) + 1
+        l['ft_in'] = {r: c * P for r, c in cnt.items()}
+        for r, f in l['ft_in'].items(): tube_in[r] = tube_in.get(r, 0.0) + f
+    heated = {r: min(ROOMS[r]['area_sf'], f * 0.5) for r, f in tube_in.items()}
+    for l in loops:
+        z = ZONE_OF[l['rooms'][0]]; l['zone'] = z; l['id'] = l['tag']
+        shares = {r: f / tube_in[r] for r, f in l['ft_in'].items()}
+        q_room = sum(loads[r] * sh for r, sh in shares.items())
+        area = sum(heated[r] * sh for r, sh in shares.items())
+        t_room = GARAGE_F if z == 'ZG' else CLIMATE['indoor_heat_f']
+        r_tot = R_SLAB[6] + (0.0 if z == 'ZG' else R_COVER) + R_SURF
+        # the water the loop needs is set by the room it heats most that needs the most (a doorway it passes through does not count)
+        main = [r for r in shares if l['ft_in'][r] >= 10 or r in l['rooms']]
+        flux = max(loads[r] / heated[r] for r in main)
+        short = sum(max(0.0, loads[r] - heated[r] * (T_SUP - DT / 2 - t_room) / r_tot) * shares[r] for r in main) if z != 'ZG' else 0.0
+        l.update(area=area, q_room=q_room, q=q_room * (1 + DOWN), t_avg=t_room + flux * r_tot, t_surf=t_room + flux * R_SURF, short=short,
+                 room_names=[ROOMS[r]['name'] for r in l['rooms']], heats=[ROOMS[r]['name'] for r in sorted(shares, key=lambda r: -l['ft_in'][r]) if l['ft_in'][r] >= 10])
+        l['gpm'] = max(0.2, l['q'] / (500 * DT)); l['head'] = head_ft(l['total'], l['gpm'])
+    unheated = [(r['id'], r['name'], loads[r['id']]) for r in HOUSE['rooms'] if r['kind'] != 'outdoor' and r['id'] not in tube_in]
+    by_leaders = [(r['id'], r['name'], loads[r['id']], tube_in[r['id']]) for r in HOUSE['rooms'] if r['kind'] != 'outdoor' and r['id'] in tube_in and r['id'] not in {rm for l in loops for rm in l['rooms']}]
+    feeds = []
+    for k, pts in FEED_ROUTES.items():
+        on = [k, 'MF-G'] if k == 'MF-2' else [k]
+        feeds.append(dict(id='F-' + k[3:], mf=k, to='MF-2 and MF-G' if k == 'MF-2' else k, pts=pts, lf=plen(pts), gpm=sum(l['gpm'] for l in loops if l['st'] in on)))
+    return loads, unheated, by_leaders, feeds
 
 
-def head_ft(L, gpm): return L * 0.0118 * (gpm / 0.5) ** 1.75
-
-
-def assign(loops, stations):
-    """Each loop to the station that makes it shortest, within the port limit."""
-    order = sorted(range(len(loops)), key=lambda i: -min(route(loops[i], at, 'x')['total'] for at in stations.values()))
-    ports = {k: 0 for k in stations}; pick = {}
-    for i in order:
-        best = sorted(stations, key=lambda k: route(loops[i], stations[k], 'x')['total'])
-        k = next(k for k in best if ports[k] < MAX_PORTS)
-        pick[i] = k; ports[k] += 1
-    return pick
-
-
-def other_zone_lf(geo, zone):
-    lf = 0.0
-    for leg in geo['lead']:
-        for (x, y), d in sample(leg):
-            r = room_at(x, y)
-            if r and ZONE_OF.get(r['id']) not in (None, zone): lf += d
-    return lf
-
-
-def evaluate(loops, stations, zones):
-    pick = assign(loops, stations)
-    geos = [route(loops[i], stations[pick[i]], 'x') for i in range(len(loops))]
-    lens = [g['total'] for g in geos]
-    feed = sum(abs(HS[0] - at[0]) + abs(HS[1] - at[1]) for k, at in stations.items() if abs(at[0] - HS[0]) + abs(at[1] - HS[1]) > 6 and k in pick.values())
-    return dict(pick=pick, tube=sum(lens), leaders=sum(g['leader'] for g in geos), longest=max(lens), shortest=min(lens), over=sum(1 for L in lens if L > MAX_LOOP),
-                cross=sum(other_zone_lf(g, zones[i]) for i, g in enumerate(geos)), feed=feed, stations=len(set(pick.values())))
+def coils(lengths, coil=1000.0):
+    """How many coils the loops cut from, one uncut length per loop, longest first into whichever coil has room."""
+    left = []
+    for L in sorted(lengths, reverse=True):
+        for i, r in enumerate(left):
+            if r >= L: left[i] -= L; break
+        else: left.append(coil - L)
+    return len(left)
 
 
 # ---------------------------------------------------------------- the sheet
+def draw_boards(sh):
+    """The boards under the slab, on the rooms layer: 4' x 4' in a running bond from the datum, with their 3" nub grid as the
+    dot pattern (a dot is a puck; tube runs between the dots), clipped to the slab."""
+    clip = ' '.join(f'{px(x):.1f},{py(y):.1f}' for x, y in plumbing.OUTLINE)
+    tile = P * S
+    sh.add(f'<defs><clipPath id="r1-slab"><polygon points="{clip}"/></clipPath>'
+           f'<pattern id="r1-nubs" patternUnits="userSpaceOnUse" x="{px(0):.1f}" y="{py(0):.1f}" width="{tile:.3f}" height="{tile:.3f}">'
+           f'<circle cx="{tile / 2:.3f}" cy="{tile / 2:.3f}" r="0.38" fill="#aaa399"/></pattern></defs>', 'rooms')
+    xs = [p[0] for p in plumbing.OUTLINE]; ys = [p[1] for p in plumbing.OUTLINE]
+    B = BOARD['size']
+    out = [f'<g clip-path="url(#r1-slab)"><polygon points="{clip}" fill="url(#r1-nubs)"/>']
+    for k in range(int(min(ys) // B), int(max(ys) // B) + 1):
+        y0 = k * B; y1 = y0 + B
+        out.append(f'<line x1="{px(min(xs)):.1f}" y1="{py(y0):.1f}" x2="{px(max(xs)):.1f}" y2="{py(y0):.1f}" stroke="#bdb6aa" stroke-width="0.7"/>')
+        off = B / 2 if k % 2 else 0.0
+        for j in range(int(min(xs) // B) - 1, int(max(xs) // B) + 2):
+            x = j * B + off
+            out.append(f'<line x1="{px(x):.1f}" y1="{py(y0):.1f}" x2="{px(x):.1f}" y2="{py(y1):.1f}" stroke="#bdb6aa" stroke-width="0.7"/>')
+    out.append('</g>')
+    sh.add(''.join(out), 'rooms')
+
+
+def station_box(st, grow=0.25, depth=0.35, into_wall=0.0):
+    """A manifold cabinet on the plan: along the wall over its port row, `depth` into the room (and `into_wall` the other way)."""
+    lo, hi = st['lo'] - grow, st['hi'] + grow
+    f, sd = st['face'], st['side']
+    if st['axis'] == 'y': return (lo, min(f - sd * into_wall, f + sd * depth), hi, max(f - sd * into_wall, f + sd * depth))
+    return (min(f - sd * into_wall, f + sd * depth), lo, max(f - sd * into_wall, f + sd * depth), hi)
+
+
 def build():
-    sh = Sheet('R-1', 'Radiant floor', f"PEX loops in the slab, four thermostat zones, manifolds and flows at {CLIMATE['name']} design ({CLIMATE['heat_design_f']:.0f}°F).")
+    sh = Sheet('R-1', 'Radiant floor', f"PEX loops on 3\" nub boards under the slab: {MAX_LOOP:.0f}' loops, nothing crossing, seven manifolds, four thermostat zones, flows at {CLIMATE['name']} design ({CLIMATE['heat_design_f']:.0f}°F).")
     sh.base()
-    loads = room_loads()
-    loops = split_loops()
-    zones = [ZONE_OF[l[0]['room']] for l in loops]
-    # tubed area per room, to share each room's load among its panels
-    room_area = {}
+    draw_boards(sh)
+    loops, grid = solve()
+    verify(grid, [(l['tag'], l['tube']) for l in loops])
+    loads, unheated, by_leaders, feeds = hydronics(loops, grid)
+    t_supply = min(T_SUP, math.ceil((max(l['t_avg'] for l in loops if l['zone'] != 'ZG') + DT / 2) / 5) * 5)
+    shorts = [l for l in loops if l['short'] > 300]
+    by_st = {k: [l for l in loops if l['st'] == k] for k in STATIONS}
+    def port_no(l):
+        row = grid.ports[l['st']]
+        return tuple(row.index(n) + 1 for n in l['ports'])
+    picks = {}
     for l in loops:
-        for pn in l:
-            x0, y0, x1, y1 = pn['rect']; room_area[pn['room']] = room_area.get(pn['room'], 0) + (x1 - x0) * (y1 - y0)
-    # drawn layout: garage loops on MF-G, the rest to whichever of MF-1, MF-2 and MF-3 makes them shortest
-    house_st = {k: STATIONS[k]['at'] for k in ('MF-1', 'MF-2', 'MF-3')}
-    hi = [i for i, z in enumerate(zones) if z != 'ZG']
-    hp = assign([loops[i] for i in hi], house_st)
-    pick = {i: hp[j] for j, i in enumerate(hi)}
-    pick.update({i: PREFER[loops[i][0]['room']] for i in hi if loops[i][0]['room'] in PREFER})
-    pick.update({i: 'MF-G' for i, z in enumerate(zones) if z == 'ZG'})
-    # number loops by manifold, then position, so each manifold's ports read in order
-    mf_order = ['MF-1', 'MF-2', 'MF-3', 'MF-G']
-    idx = sorted(range(len(loops)), key=lambda i: (mf_order.index(pick[i]), zones[i], loops[i][0]['rect'][1], loops[i][0]['rect'][0]))
-    picks, rows, L = {}, [], []
-    for n, i in enumerate(idx, 1):
-        lid = f'L{n}'; z = zones[i]; Z = ZONES[z]; mf = pick[i]; st = STATIONS[mf]
-        geo = route(loops[i], st['at'], st['out'])
-        area = sum((p['rect'][2] - p['rect'][0]) * (p['rect'][3] - p['rect'][1]) for p in loops[i])
-        q_room = sum(loads[p['room']] * (p['rect'][2] - p['rect'][0]) * (p['rect'][3] - p['rect'][1]) / room_area[p['room']] for p in loops[i])
-        q = q_room * (1 + DOWN)
-        flux = q_room / area
-        s = max(p['s'] for p in loops[i])
-        t_room = GARAGE_F if z == 'ZG' else CLIMATE['indoor_heat_f']
-        t_avg = t_room + flux * (R_SLAB[s] + (0 if z == 'ZG' else R_COVER) + R_SURF)
-        t_surf = t_room + flux * R_SURF
-        r_tot = R_SLAB[s] + (0 if z == 'ZG' else R_COVER) + R_SURF
-        short = max(0.0, q_room - area * (T_SUP - DT / 2 - t_room) / r_tot) if z != 'ZG' else 0.0
-        gpm = max(0.2, q / (500 * DT))
-        hd = head_ft(geo['total'], gpm)
-        rooms = []
-        for p in loops[i]:
-            nm = ROOMS[p['room']]['name']
-            if nm not in rooms: rooms.append(nm)
-        spacing = ', '.join(sorted({f'{p["s"]}"' for p in loops[i]}))
-        L.append(dict(id=lid, i=i, zone=z, mf=mf, geo=geo, area=area, q=q, gpm=gpm, head=hd, t_avg=t_avg, t_surf=t_surf, rooms=rooms, spacing=spacing,
-                      cross=other_zone_lf(geo, z), short=short))
-    t_supply = min(T_SUP, math.ceil((max(l['t_avg'] for l in L if l['zone'] != 'ZG') + DT / 2) / 5) * 5)
-    shorts = [l for l in L if l['short'] > 50]
-    # draw: leaders, connectors and panels per loop, then manifolds and the heat source
-    for l in L:
-        c = ZONES[l['zone']]['color']; g = l['geo']
-        title = (f"Loop {l['id']}, zone {l['zone'][1:]} ({ZONES[l['zone']]['name']}): {', '.join(l['rooms'])}. {g['in_floor']:.0f}' in the slab + {g['leader']:.0f}' of leaders = "
-                 f"{g['total']:.0f}' of 1/2\" PEX at {l['spacing']} o.c., home run to {l['mf']}. {l['q']:,.0f} Btu/h, {l['gpm']:.2f} gpm on the flow meter, {l['head']:.1f} ft of head. One continuous coil, no fittings in the slab; tag both ends {l['id']}.")
+        z = l['zone']; Z = ZONES[z]; c = Z['color']; st = l['st']; ps, pr = port_no(l)
+        rooms = ', '.join(l['room_names'])
+        title = (f"Loop {l['id']}, zone {z[1:]} ({Z['name']}): {rooms}. {l['in_floor']:.0f}' in the field + {l['leader']:.0f}' of leaders = {l['total']:.0f}' of 1/2\" PEX at 6\" o.c., "
+                 f"to {st} ports {ps} and {pr}. {l['q']:,.0f} Btu/h, {l['gpm']:.2f} gpm on the flow meter, {l['head']:.1f} ft of head. One continuous coil, no fittings in the slab; tag both ends {l['id']}.")
         sh.open_group(l['id'], title)
-        for pts in g['panels'] + g['conns'] + g['lead']:
-            sh.path(pts, 'transparent', 7)
-        for pts in g['panels'] + g['conns']:
-            sh.path(pts, c, 1.1, extra=' class="pex"')
-        for k, leg in enumerate(g['lead']):
-            o = 0.18 if k else -0.18; along_y = STATIONS[l['mf']]['out'] == 'y'
-            sh.path([(x + o * along_y, y + o * (not along_y)) for x, y in leg], c, 0.9, '5,1.5', extra=' class="lead"')
-        x0, y0, x1, y1 = max(loops[l['i']], key=lambda p: (p['rect'][2] - p['rect'][0]) * (p['rect'][3] - p['rect'][1]))['rect']
-        sh.add(f'<text x="{60 + (x0 + x1) / 2 * 11:.1f}" y="{60 + ((y0 + y1) / 2 + (1.4 if y1 - y0 > 4 else 0)) * 11:.1f}" font-size="7.5" font-weight="700" fill="{c}" text-anchor="middle" dominant-baseline="middle" stroke="#fff" stroke-width="2.5" paint-order="stroke">{l["id"]}</text>')
+        tube = l['tube']; ns, nr = len(l['sup']), len(l['ret'])
+        sh.path(corners_ft(tube), 'transparent', 7)
+        sh.path(corners_ft(tube[ns - 1:len(tube) - nr + 1]), c, 1.1, extra=' class="pex"')
+        sh.path(corners_ft(l['sup']), c, 0.9, '4,1.2', extra=' class="lead"'); sh.path(corners_ft(l['ret']), c, 0.9, '4,1.2', extra=' class="lead"')
+        x0, y0, x1, y1 = max(l['rects'], key=lambda r: (r[2] - r[0]) * (r[3] - r[1]))
+        sh.add(f'<text x="{px((x0 + x1) / 2):.1f}" y="{py((y0 + y1) / 2 + (1.4 if y1 - y0 > 4 else 0)):.1f}" font-size="7.5" font-weight="700" fill="{c}" text-anchor="middle" dominant-baseline="middle" stroke="#fff" stroke-width="2.5" paint-order="stroke">{l["id"]}</text>')
         sh.close_group()
-        picks[l['id']] = dict(tag=l['id'], sub=f"Zone {l['zone'][1:]} · {ZONES[l['zone']]['name']}", fields=[
-            ('Rooms', ', '.join(l['rooms'])), ('Tube', f"{g['total']:.0f}' of 1/2\" PEX: {g['in_floor']:.0f}' in the slab at {l['spacing']} o.c. + {g['leader']:.0f}' of leaders"),
-            ('Manifold', f"{l['mf']}, {lc(STATIONS[l['mf']]['where'])}"), ('Heat', f"{l['q']:,.0f} Btu/h at design, {l['area']:.0f} sq ft of tubed floor"),
+        picks[l['id']] = dict(tag=l['id'], sub=f"Zone {z[1:]} · {Z['name']}", fields=[
+            ('Rooms', rooms + (f" (its leaders also heat {', '.join(h for h in l['heats'] if h not in l['room_names'])})" if [h for h in l['heats'] if h not in l['room_names']] else '')), ('Tube', f"{l['total']:.0f}' of 1/2\" PEX: {l['in_floor']:.0f}' in the field at 6\" o.c. + {l['leader']:.0f}' of leaders (both ends, with the 2' rises)"),
+            ('Manifold', f"{st}, ports {ps} (supply) and {pr} (return), {lc(STATIONS[st]['where'])}"), ('Heat', f"{l['q']:,.0f} Btu/h at design, {l['area']:.0f} sq ft of heated floor"),
             ('Flow', f"{l['gpm']:.2f} gpm on the flow meter, {l['head']:.1f} ft of head in the tube"),
             ('Water / floor', f"needs about {l['t_avg']:.0f}°F average water; floor surface about {l['t_surf']:.0f}°F at design"),
-            ('Thermostat', f"{ZONES[l['zone']]['stat']}, actuator on {l['mf']} port {l['id']}")])
-    # feed pairs from the heat source to the remote manifolds
-    feeds = []
-    FEED_ROUTES = {
-        'MF-1': [HS, (32.0, HS[1]), (32.0, 21.0), (20.6, 21.0), STATIONS['MF-1']['at']],
-        'MF-2': [HS, (32.0, HS[1]), (32.0, 44.0), (20.4, 44.0), MUD],
-        'MF-3': [HS, (HS[0], 44.6), (44.2, 44.6), (44.2, 42.3), (STATIONS['MF-3']['at'][0], 42.3), STATIONS['MF-3']['at']],
-    }
-    for k, pts in FEED_ROUTES.items():
-        lf = plen(pts)
-        on = [k, 'MF-G'] if k == 'MF-2' else [k]
-        gpm = sum(l['gpm'] for l in L if l['mf'] in on)
-        to = 'MF-2 and MF-G' if k == 'MF-2' else k
-        feeds.append(dict(id='F-' + k[3:], mf=k, to=to, pts=pts, lf=lf, gpm=gpm))
-        sh.open_group('F-' + k[3:], f"1\" PEX supply and return pair, HS-1 to {to}: about {lf:.0f}' each way, {gpm:.1f} gpm, insulated end to end.")
-        sh.path(pts, 'transparent', 7); sh.path(pts, '#6a1b9a', 3.0); sh.path(pts, '#fff', 1.0)
+            ('Thermostat', f"{Z['stat']}, actuator on {st} port {pr}")])
+    for f in feeds:
+        sh.open_group(f['id'], f"1\" PEX supply and return pair, HS-1 to {f['to']}: about {f['lf']:.0f}' each way, {f['gpm']:.1f} gpm, under the boards, insulated end to end.")
+        sh.path(f['pts'], 'transparent', 7); sh.path(f['pts'], '#6a1b9a', 3.0); sh.path(f['pts'], '#fff', 1.0)
         sh.close_group()
-        picks['F-' + k[3:]] = dict(tag='F-' + k[3:], sub=f'Feed pair to {to}', fields=[('Pipe', '1" PEX supply + return, closed-cell insulated end to end, under the slab in the foam layer'),
-                                                                                    ('Run', f'about {lf:.0f}\' each way from HS-1'), ('Flow', f'{gpm:.1f} gpm with every loop on {to} calling')])
+        picks[f['id']] = dict(tag=f['id'], sub=f"Feed pair to {f['to']}", fields=[('Pipe', '1" PEX supply + return, closed-cell insulated end to end, in the base course under the nub boards'),
+                                                                                ('Run', f"about {f['lf']:.0f}' each way from HS-1"), ('Flow', f"{f['gpm']:.1f} gpm with every loop on {f['to']} calling")])
     for k, st in STATIONS.items():
-        x, y = st['at']; n = sum(1 for l in L if l['mf'] == k)
-        horiz = st['out'] == 'y'
-        w, h = (2.6, 0.9) if horiz else (0.9, 2.6)
+        on = by_st[k]; n = len(on); nports = len(grid.ports[k])
+        x, y = station_at(st)
         title = f"{k}: {n}-loop stainless manifold with flow meters and 24 V actuators, {lc(st['where'])}. {st['detail']}"
         sh.open_group(k, title, hit=(x, y, 1.4))
-        sh.rect(x - w / 2, y - h / 2, x + w / 2, y + h / 2, '#fff', '#222', 1.3, '4,2')
-        sh.text(x, y, k, 6.5, '#222', '700', rot=0 if horiz else -90, layer='disc')
+        bx = station_box(st, into_wall=0.25)
+        sh.rect(bx[0], bx[1], bx[2], bx[3], '#fff', '#222', 1.3, '4,2')
+        horiz = st['axis'] == 'y'
+        sh.text((bx[0] + bx[2]) / 2, (bx[1] + bx[3]) / 2, k, 6.5, '#222', '700', rot=0 if horiz else -90, layer='disc')
         sh.close_group()
-        loops_on = [l['id'] for l in L if l['mf'] == k]
-        picks[k] = dict(tag=k, sub=st['where'], fields=[('Manifold', f'{n}-loop stainless, flow meters, isolation ball valves, purge/fill and a 24 V actuator on every return port'),
-                                                         ('Loops', ', '.join(loops_on)), ('Flow', f"{sum(l['gpm'] for l in L if l['mf'] == k):.1f} gpm with all loops calling"),
-                                                         ('Where', st['detail'])])
+        picks[k] = dict(tag=k, sub=st['where'], fields=[
+            ('Manifold', f"{n}-loop stainless, flow meters, isolation ball valves, purge/fill and a 24 V actuator on every return port" + (' (two manifolds side by side)' if n > 8 else '')),
+            ('Loops', ', '.join(f"{l['id']} on {'/'.join(str(p) for p in port_no(l))}" for l in on) + f"; {2 * n} of {nports} 3\" port positions used"),
+            ('Flow', f"{sum(l['gpm'] for l in on):.1f} gpm with all loops calling"), ('Where', st['detail'])])
     x, y = HS
     sh.open_group('HS-1', 'HS-1, condensing boiler for the slab, with the system pump, mixing and the zone controller', hit=(x, y, 1.2))
     sh.rect(x - 1.1, y - 0.6, x + 1.1, y + 0.6, '#fff', '#6a1b9a', 1.6); sh.text(x, y, 'HS-1', 6, '#6a1b9a', '700', layer='disc')
     sh.close_group()
+    tot_q = sum(l['q'] for l in loops); house_q = sum(l['q'] for l in loops if l['zone'] != 'ZG'); tot_gpm = sum(l['gpm'] for l in loops)
     picks['HS-1'] = dict(tag='HS-1', sub='Mechanical closet', fields=[
-        ('Equipment', 'Wall-hung condensing boiler with outdoor reset, on natural gas or propane (owner\'s picks, 2026-10-13; matches E-1)'),
-        ('Output', f"{sum(l['q'] for l in L):,.0f} Btu/h with every zone calling, {sum(l['q'] for l in L if l['zone'] != 'ZG'):,.0f} Btu/h for the house alone"),
+        ('Equipment', "Wall-hung condensing boiler with outdoor reset, on natural gas or propane (owner's picks, 2026-10-13); circuit 27 on E-1"),
+        ('Output', f"{tot_q:,.0f} Btu/h with every zone calling, {house_q:,.0f} Btu/h for the house alone"),
         ('Water', f"{t_supply:.0f}°F supply at {CLIMATE['heat_design_f']:.0f}°F outside, reset down to about 80°F at 50°F outside; garage loops mix down to about 70°F"),
-        ('Pumps', 'P-R1: ECM circulator on constant ΔP for MF-1, MF-2 and MF-3; P-RG for MF-G on its own mixing valve'),
+        ('Pumps', 'P-R1: ECM circulator on constant ΔP for the six house manifolds; P-RG for MF-G on its own mixing valve'),
         ('Controls', '24 V zone controller with T1, T2, T3 and TG; outdoor sensor on the shaded rear wall')])
-    # thermostats
-    stats = {'T1': (27.6, 16.6), 'T2': (46.0, 41.6), 'T3': (66.5, 39.2), 'TG': (24.2, 40.2)}
     for z, Z in ZONES.items():
-        x, y = stats[Z['stat']]
+        x, y = STATS[Z['stat']]
         sh.tag(x, y, Z['stat'], Z['color'], id=Z['stat'], title=f"{Z['stat']}, zone {z[1:]} thermostat ({Z['name']}): {Z['where']}.", r=0.62, size=6)
-        lz = [l for l in L if l['zone'] == z]
+        lz = [l for l in loops if l['zone'] == z]
         picks[Z['stat']] = dict(tag=Z['stat'], sub=f"Zone {z[1:]} · {Z['name']}", fields=[('Where', Z['where']), ('Loops', ', '.join(l['id'] for l in lz)),
-                                                                                       ('Manifolds', ', '.join(sorted({l['mf'] for l in lz}))), ('Load', f"{sum(l['q'] for l in lz):,.0f} Btu/h at design")])
-    # legend: Zero Rd's strip under the plan
-    legend = [(Z['color'], f"Zone {z[1:]}, {Z['name']} ({Z['stat']})") for z, Z in ZONES.items()] + [('#6a1b9a', '1" feed pair from HS-1')]
+                                                                                       ('Manifolds', ', '.join(sorted({l['st'] for l in lz}))), ('Load', f"{sum(l['q'] for l in lz):,.0f} Btu/h at design")])
+    legend = [(Z['color'], f"Zone {z[1:]}, {Z['name']} ({Z['stat']})") for z, Z in ZONES.items()] + [('#6a1b9a', '1" feed pair from HS-1, under the boards')]
     sym = [(f'<line x1="-12" y1="0" x2="12" y2="0" stroke="{c}" stroke-width="1.6"/>', t) for c, t in legend[:-1]]
-    sym += [('<line x1="-12" y1="0" x2="12" y2="0" stroke="#555" stroke-width="1" stroke-dasharray="5,1.5"/>', 'leader pair (drawn spread out)'),
+    sym += [('<line x1="-12" y1="0" x2="12" y2="0" stroke="#555" stroke-width="1" stroke-dasharray="4,1.2"/>', 'leaders, supply and return side by side 3" apart'),
             ('<line x1="-12" y1="0" x2="12" y2="0" stroke="#6a1b9a" stroke-width="3"/><line x1="-12" y1="0" x2="12" y2="0" stroke="#fff" stroke-width="1"/>', legend[-1][1]),
-            ('<rect x="-9" y="-4" width="18" height="8" fill="#fff" stroke="#222" stroke-dasharray="3,2"/>', 'manifold')]
+            ('<rect x="-9" y="-4" width="18" height="8" fill="#fff" stroke="#222" stroke-dasharray="3,2"/>', 'manifold cabinet over its row of 3" ports'),
+            ('<rect x="-10" y="-6" width="20" height="12" fill="#fff" stroke="#bdb6aa"/><line x1="0" y1="-6" x2="0" y2="6" stroke="#bdb6aa"/>' + ''.join(f'<circle cx="{cx}" cy="{cy}" r="0.5" fill="#aaa399"/>' for cx in (-7.5, -5, -2.5, 2.5, 5, 7.5) for cy in (-3.5, -1, 1.5, 4)), "4' x 4' nub boards in a running bond from the datum; dots are the 3\" puck grid")]
     sh.legend(sym)
-    # options
-    opt_rows = []
-    house_loops = [l for l, z in zip(loops, zones)]
-    for oid, desc, stns in OPTIONS:
-        ev = evaluate(house_loops, stns, zones)
-        star = ' ★' if oid == DRAWN else ''
-        opt_rows.append((None, [oid + star, desc, f"{ev['tube']:,.0f}'", f"{ev['leaders']:,.0f}'", f"{ev['longest']:.0f}' / {ev['shortest']:.0f}'", str(ev['over']),
-                                f"{ev['cross']:.0f}'", f"{ev['feed']:.0f}' × 2" if ev['feed'] else 'none', str(ev['stations'])]))
-    tot_tube = sum(l['geo']['total'] for l in L)
-    tot_q = sum(l['q'] for l in L); tot_gpm = sum(l['gpm'] for l in L)
-    worst = max(L, key=lambda l: l['head'])
+    # numbers for the notes and tables
+    tot_tube = sum(l['total'] for l in loops); leaders = sum(l['leader'] for l in loops)
+    longest = max(loops, key=lambda l: l['total']); shortest = min(loops, key=lambda l: l['total'])
+    worst = max(loops, key=lambda l: l['head'])
     feed_lf = sum(f['lf'] for f in feeds)
-    loop_rows = [(l['id'], [l['id'], l['zone'][1:], ', '.join(l['rooms']), l['mf'], l['spacing'], f"{l['geo']['in_floor']:.0f}'", f"{l['geo']['leader'] / 2:.0f}'", f"{l['geo']['total']:.0f}'",
-                           f"{l['q']:,.0f}", f"{l['gpm']:.2f} gpm", f"{l['head']:.1f} ft", f"{l['t_surf']:.0f}°F"]) for l in L]
-    for z, Z in ZONES.items():
-        lz = [l for l in L if l['zone'] == z]
-        loop_rows.append((Z['stat'], [f"Zone {z[1:]}", z[1:], Z['name'], ', '.join(sorted({l['mf'] for l in lz})), '', f"{len(lz)} loops", '', f"{sum(l['geo']['total'] for l in lz):,.0f}'",
-                                       f"{sum(l['q'] for l in lz):,.0f}", f"{sum(l['gpm'] for l in lz):.1f} gpm", '', '']))
-    mf_rows = [(k, [k, f"{sum(1 for l in L if l['mf'] == k)} loops: " + ', '.join(l['id'] for l in L if l['mf'] == k), st['where'], ', '.join(sorted({l['zone'][1:] for l in L if l['mf'] == k})),
-                    next(f"1\" pair F-{('2' if k == 'MF-G' else k[3:])}, {f['lf']:.0f}' each way" for f in feeds if f['mf'] == ('MF-2' if k == 'MF-G' else k))]) for k, st in STATIONS.items()]
-    cross_lf = sum(l['cross'] for l in L)
+    slab_sf = HOUSE['totals']['heated_gross_sf'] + HOUSE['totals']['garage_gross_sf']
+    boards = math.ceil(slab_sf / BOARD['sf'] * 1.05); bundles = max(BOARD['min_bundles'], math.ceil(boards / BOARD['per_bundle']))
+    n_coils = coils([l['total'] * 1.02 for l in loops])
+    unheated_txt = ', '.join(f"{nm} ({q:,.0f} Btu/h)" for _, nm, q in unheated)
+    leaders_txt = ', '.join(f"{nm} ({ft:.0f}' of leaders for {q:,.0f} Btu/h)" for _, nm, q, ft in by_leaders)
+    gates_txt = 'under the master bed wall into MF-1, under the kitchen wall into MF-K, under the entry wall into MF-5, under the living room wall into MF-4, under the master hall wall into the powder room, and under the bath 1 wall from the bedroom 2 closet'
+    station_txt = '; '.join(f"{k} ({lc(STATIONS[k]['where'])}, {len(by_st[k])} loops) serves " + ', '.join(sorted({r for l in by_st[k] for r in l['room_names']}, key=lambda n: [r['name'] for r in HOUSE['rooms']].index(n))) for k in STATIONS)
     notes = [
-        'Positions are taped from the nearest wall face, exterior walls first. Every panel stops 6" off the walls, so interior wall plates fasten in that band; mark every tube crossing under a wall line on the vapor barrier and keep shots and anchors 12" from it.',
-        f"Tube: 1/2\" O2-barrier PEX in counterflow spirals (supply in, return out between), tied to the mesh at mid-depth of a 4\" slab. {sum(1 for l in L if l['spacing'] != '12"')} loops run at 9\" o.c. or 6\" (baths, and rooms needing 15 Btu/h per sq ft or more; 6\" in the dining room and Bath 1), the rest at 12\". One continuous coil per loop, no fittings in the slab. Tag both ends of every loop at its manifold.",
-        'No tube under the kitchen base cabinets, island, fridge or back cabinet, the tubs, the vanities, the laundry cabinets or the fireplace hearth. Keep tube 6" from toilet flanges and 12" from floor and shower drains; the showers\' floors are heated.',
-        'Under the slab: R-10 (2") rigid foam under the whole heated slab and the garage slab, with R-10 at the slab edge (IECC 2021 zone 6 for a heated slab), and a 10-mil vapor barrier over the foam.',
+        f"The layout is drawn on the boards' own grid. {BOARD['name']}s ({BOARD['size']:.0f}' x {BOARD['size']:.0f}', {BOARD['thick_in']:.0f}\" thick: {BOARD['eps_in']:.0f}\" of EPS, R-{BOARD['r']:.0f}, under a {BOARD['puck_in']:.0f}\" grid of pucks on {BOARD['pitch_in']:.0f}\" centres) go down in a running bond with their puck rows on the 3\" lines from the datum at 0,0 (the garage-door wall's outside face and the master bed's rear wall line, as on every sheet), so every tube on this sheet sits in a channel between pucks. Lay the first board's corner at the datum and the rest follow; a board cut at a wall keeps its grid.",
+        f"Tube: {len(loops)} loops of 1/2\" O2-barrier PEX, none over {MAX_LOOP:.0f}' with its leaders and the 2' rises at the cabinet ({longest['id']} is the longest at {longest['total']:.0f}', {shortest['id']} the shortest at {shortest['total']:.0f}'). Fields at 6\" o.c. (every other channel), supply and return side by side so each loop's two ends leave its field together; leaders run as 3\" pairs through doorways and along walls to their manifold. Nothing crosses anything: the whole layout was checked tube by tube on the grid. One continuous coil per loop, no fittings in the slab; tag both ends with the loop number at the cabinet.",
+        f"Under a wall only where drawn, straight across and only for the length drawn: {gates_txt}. Mark every wall crossing on the boards before the pour so the plate anchors and shots stay 12\" off it; everywhere else the leaders go through the doorway.",
+        f"Nothing under the kitchen base cabinets' footprint except the leaders drawn there, nor under the island, fridge, back cabinet, range, washer, dryer, tubs, vanities or the fireplace hearth. 12\" clear of the floor drains and shower drains, 3\" of a toilet flange; the showers' floors are heated. The bathroom loops heat the open floor; the closets and halls get their heat from the leaders passing through, and the laundry has a small field of its own.",
+        f"Manifolds, seven stations, each with a 3\" port position per tube end in one row along its wall (the schedule gives every loop's two port numbers, counted from the low end of the row): {station_txt}. HS-1 in the mechanical closet feeds all seven on six 1\" insulated pairs under the boards, {feed_lf:.0f}' each way in all; MF-2 and MF-G share one pair rising in the garage wall.",
+        f"The leaders rise straight up out of the slab at their port positions into the cabinet (sleeve each rise in 12\" of pipe insulation where it leaves the concrete) and bundle up to the manifold; they may be gathered sideways in the last 12\" below the cabinet. Cabinets are recessed in the kitchen and entry walls (MF-K, MF-5) and the hall wall (MF-3, MF-4) and surface-mounted on the laundry's sound wall (MF-1) and both faces of the garage wall (MF-2, MF-G).",
         f"Zoning is by thermostat: four zones (master suite, great room and utility, bedroom wing and office, garage) on 24 V actuators at each loop's manifold port, so a room can get its own thermostat later by rewiring, without new tube.",
-        'Manifolds, three stations: ' + '; '.join(f"{k} ({lc(STATIONS[k]['where'])}) serves " + ', '.join(sorted({r for l in L if l['mf'] == k for r in l['rooms']}, key=lambda n: [r['name'] for r in HOUSE['rooms']].index(n))) for k in STATIONS) + '. HS-1 in the mechanical closet feeds all three.',
-        f"Leaders run in the slab as tight pairs (drawn spread out). Sleeve them in 3/8\" foam where they pass under another zone ({cross_lf:.0f}' in all) and wherever they cross a sawcut control joint. Feed pairs from HS-1 to the three stations are 1\" PEX, insulated end to end, {feed_lf:.0f}' each way in all.",
-        f"Flow: {tot_gpm:.1f} gpm with every loop calling, each loop set on its flow meter at a {DT:.0f}°F drop. Design heat {tot_q:,.0f} Btu/h, of which {sum(l['q'] for l in L if l['zone'] == 'ZG'):,.0f} is the garage at {GARAGE_F:.0f}°F; {DOWN * 100:.0f}% is added for heat lost down and out the edge.",
-        f"Water: {t_supply:.0f}°F supply at {CLIMATE['heat_design_f']:.0f}°F outside, reset lower as it warms, so any low-temperature source can run it. Floor surfaces stay at or under {max(l['t_surf'] for l in L if l['zone'] != 'ZG'):.0f}°F."
-        + (' At that supply ' + ', '.join(f"{l['id']} ({', '.join(l['rooms'])}) falls about {l['short']:,.0f} Btu/h short" for l in shorts) + ' at design; see the open items.' if shorts else ''),
-        f"Pump: the hardest loop is {worst['id']} at {worst['head']:.1f} ft in the tube; add about 3 ft for the feed pair, manifold and actuator. A constant-ΔP ECM circulator at about {math.ceil(max(l['head'] for l in L) + 3)} ft covers it.",
-        'Pressure test every loop at 100 psi water or 60 psi air for 24 hours before the pour and keep it under pressure through the pour. Photograph the layout with a tape in frame before concrete.',
+        f"Flow: {tot_gpm:.1f} gpm with every loop calling, each loop set on its flow meter at a {DT:.0f}°F drop. Design heat {tot_q:,.0f} Btu/h, of which {tot_q - house_q:,.0f} is the garage at {GARAGE_F:.0f}°F; {DOWN * 100:.0f}% is added for heat lost down through the R-{BOARD['r']:.0f} boards and out the slab edge. Rooms with no field of their own are heated by the leader bundles running through them: {leaders_txt}. Nothing heats the {unheated_txt}; they borrow from the rooms around them.",
+        f"Water: {t_supply:.0f}°F supply at {CLIMATE['heat_design_f']:.0f}°F outside, reset lower as it warms, so a condensing boiler stays condensing. Floor surfaces stay at or under {max(l['t_surf'] for l in loops if l['zone'] != 'ZG'):.0f}°F."
+        + (' At that supply ' + ', '.join(f"{l['id']} ({', '.join(l['room_names'])}) falls about {l['short']:,.0f} Btu/h short" for l in shorts) + ' at design; see the open items.' if shorts else ''),
+        f"Pump: the hardest loop is {worst['id']} at {worst['head']:.1f} ft in the tube; add about 3 ft for the feed pair, manifold and actuator. A constant-ΔP ECM circulator at about {math.ceil(worst['head'] + 3)} ft covers the house; the garage has its own.",
+        f"Under the boards: 10-mil vapor barrier over the compacted base, lapped and taped; R-10 (2\") rigid foam at the slab edge. The 4\" slab goes over the pucks with the tube tops about 1\" below the surface of the boards; no mesh ties are needed, the pucks hold the tube. Pressure test every loop at 100 psi water or 60 psi air for 24 hours before the pour and keep it under pressure through the pour. Photograph every room with a tape in frame before concrete.",
+        'HS-1 is circuit 27 on E-1 (200 A panel in the garage); E-1 also gives each manifold cabinet an outlet for its actuators and the zone controller.',
     ]
-    open_items = [f"{l['id']} ({', '.join(l['rooms'])}): the floor carries all but about {l['short']:,.0f} Btu/h of the room at {CLIMATE['heat_design_f']:.0f}°F with {T_SUP:.0f}°F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days." for l in shorts] + [
-        'Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1\'s 50 gal heater; propane needs the boiler\'s LP conversion kit.',
+    open_items = [f"{l['id']} ({', '.join(l['room_names'])}): the floor carries all but about {l['short']:,.0f} Btu/h of the room at {CLIMATE['heat_design_f']:.0f}°F with {T_SUP:.0f}°F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days." for l in shorts] + [
+        "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
         'Garage: kept at 50°F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.',
-        'Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10°F warmer water for that loop, or 9" spacing there.',
-        'Mechanical closet: HS-1, pump P-R1 and the zone controller share it with P-1\'s water manifold and water heater; that is why no manifold is drawn there (O5 in the options shows the fourth manifold saves little tube). A combi boiler removes the water heater and makes room.',
-        'MF-3 cabinet depth in the hall\'s 2x4 west wall (S-1), and the boiler, pump and zone controller circuits (E-1).',
+        'Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10°F warmer water for that loop.',
+        "P-1's hot and cold PEX runs at 6.5\" to 8\" below the slab top, which is now inside the 5\" board layer. Either drop them into the base course under the boards (about 10\" down) or cut channels in the EPS for them; P-1 to pick.",
+        "Cabinet depths on S-1: MF-3 and MF-4 recess into the hall's 2x4 west wall (3-1/2\" deep; fur locally if the chosen manifold needs more), MF-K into the kitchen wall and MF-5 into the entry wall.",
+        f"E-1: an outlet at each of the seven manifold cabinets for the actuators (MF-1, MF-2, MF-G, MF-K, MF-5, MF-3, MF-4), and the boiler, pump and zone controller on circuit 27.",
+        f"The {BOARD['name']}s come {BOARD['per_bundle']} to a bundle ({BOARD['per_bundle'] * BOARD['sf']:.0f} sq ft), {BOARD['min_bundles']} bundles minimum: {bundles} bundles cover the {slab_sf:,} sq ft slab with 5% for cuts. Confirm the lead time; the board layout can start at any corner as long as the grid holds the datum.",
     ]
-    sh.title_block([f"{len(L)} loops, {tot_tube:,.0f}' of 1/2\" PEX, {len(STATIONS)} manifolds.", 'Red zone 1, orange zone 2, blue zone 3, green garage.',
-                    f"{tot_q / 1000:,.0f} kBtu/h at design, {t_supply:.0f}°F supply.", 'Zones are thermostats on loop actuators, not manifolds.'])
-    coils = math.ceil(tot_tube * 1.05 / 1000) * 2
+    sh.title_block([f"{len(loops)} loops, {tot_tube:,.0f}' of 1/2\" PEX, {len(STATIONS)} manifolds, no loop over {MAX_LOOP:.0f}'.", 'Red zone 1, orange zone 2, blue zone 3, green garage.',
+                    f"{tot_q / 1000:,.0f} kBtu/h at design, {t_supply:.0f}°F supply.", f"{BOARD['name']}s on the 3\" grid from the datum; nothing crosses."])
+    loop_rows = [(l['id'], [l['id'], l['zone'][1:], ', '.join(l['room_names']), l['st'], '/'.join(str(p) for p in port_no(l)), f"{l['in_floor']:.0f}'", f"{l['leader'] / 2:.0f}'", f"{l['total']:.0f}'",
+                           f"{l['q']:,.0f}", f"{l['gpm']:.2f} gpm", f"{l['head']:.1f} ft", f"{l['t_surf']:.0f}°F"]) for l in loops]
+    for z, Z in ZONES.items():
+        lz = [l for l in loops if l['zone'] == z]
+        loop_rows.append((Z['stat'], [f"Zone {z[1:]}", z[1:], Z['name'], ', '.join(sorted({l['st'] for l in lz})), '', f"{len(lz)} loops", '', f"{sum(l['total'] for l in lz):,.0f}'",
+                                       f"{sum(l['q'] for l in lz):,.0f}", f"{sum(l['gpm'] for l in lz):.1f} gpm", '', '']))
+    mf_rows = []
+    for k, st in STATIONS.items():
+        on = by_st[k]; fk = 'MF-2' if k == 'MF-G' else k; f = next(f for f in feeds if f['mf'] == fk)
+        mf_rows.append((k, [k, f"{len(on)} loops: " + ', '.join(l['id'] for l in on), f"{2 * len(on)} of {len(grid.ports[k])}", st['where'], ', '.join(sorted({l['zone'][1:] for l in on})),
+                            f"1\" pair {f['id']}, {f['lf']:.0f}' each way" + (' (shared with MF-2)' if k == 'MF-G' else '')]))
     tables = [
-        dict(key='loops', title='Loop schedule', lede='Leader is each way. Heat includes the share lost downward. Pick a row to find the loop.',
-             cols=['Loop', 'Zone', 'Rooms', 'Manifold', 'Spacing', 'In slab', 'Leader', 'Total', 'Btu/h', 'Flow', 'Head', 'Floor'], rows=loop_rows),
-        dict(key='manifolds', title='Manifolds', cols=['Tag', 'Loops', 'Where', 'Zones', 'Feed'], rows=mf_rows),
-        dict(key='options', title='Manifold options',
-             lede='The same loops routed to each layout, every loop to its nearest station (two 12-port manifolds at most per station). Leaders count both ends and the 2\' rise at the manifold. ★ is drawn.',
-             cols=['Option', 'Layout', '1/2" PEX', 'Leaders', 'Longest / shortest loop', 'Loops over 300\'', 'Leader under another zone', 'Feed pairs', 'Stations'], rows=opt_rows),
+        dict(key='loops', title='Loop schedule', lede='Ports are the supply and return positions counted from the low end of the manifold\'s row. Leader is each way. Heat includes the share lost downward. Pick a row to find the loop.',
+             cols=['Loop', 'Zone', 'Rooms', 'Manifold', 'Ports', 'In field', 'Leader', 'Total', 'Btu/h', 'Flow', 'Head', 'Floor'], rows=loop_rows),
+        dict(key='manifolds', title='Manifolds', lede='Each station\'s row of 3" port positions along its wall; a loop takes two next to each other.', cols=['Tag', 'Loops', 'Ports used', 'Where', 'Zones', 'Feed'], rows=mf_rows),
         dict(key='bom', title='Bill of materials', lede='Rough-order quantities from the drawing geometry, for pricing. The installer takes off the final list.', cols=['Item', 'Qty', 'Notes'], rows=[
-            (None, ['1/2" O2-barrier PEX, 1,000\' coils', f'{coils // 2} coils', f"{tot_tube:,.0f}' + 5% waste; one length per loop, no splices"]),
-            (None, ['1" PEX supply + return, insulated', f"{feed_lf * 2:.0f} lf", 'HS-1 to the three manifold stations, under the slab']),
-            (None, ['Stainless manifolds with flow meters', f"{len(STATIONS)}", ', '.join(f"{k} {sum(1 for l in L if l['mf'] == k)}-loop" for k in STATIONS)]),
-            (None, ['24 V thermal actuators', str(len(L)), 'one per loop']),
+            (None, ['1/2" O2-barrier PEX, 1,000\' coils', f'{n_coils} coils', f"{tot_tube:,.0f}' in {len(loops)} uncut lengths of {shortest['total']:.0f}' to {longest['total']:.0f}' (the schedule), cut longest first"]),
+            (None, [BOARD['name'] + f", {BOARD['size']:.0f}' x {BOARD['size']:.0f}'", f'{boards} boards ({bundles} bundles of {BOARD["per_bundle"]})', f"{slab_sf:,} sq ft of slab + 5% for cuts; R-{BOARD['r']:.0f}, 1/2\" tube channels on 3\" centres"]),
+            (None, ['1" PEX supply + return, insulated', f"{feed_lf * 2 * 1.05:.0f} lf", 'HS-1 to the stations, in the base course under the boards']),
+            (None, ['Stainless manifolds with flow meters', f"{len(STATIONS)} stations", ', '.join(f"{k} {len(by_st[k])}-loop" for k in STATIONS) + ' (MF-G as two manifolds side by side)']),
+            (None, ['24 V thermal actuators', str(len(loops)), 'one per loop, on the return port']),
             (None, ['Zone controller + thermostats', '1 + 4', 'T1, T2, T3, TG; outdoor reset sensor']),
             (None, ['Circulators', '2', 'P-R1 constant ΔP for the house, P-RG for the garage with its mixing valve']),
-            (None, ['Manifold cabinets', str(len(STATIONS)), 'recessed at MF-3, surface at MF-1 (sound wall), MF-2 and MF-G']),
-            (None, ['R-10 rigid foam, 2"', f"{HOUSE['totals']['heated_gross_sf'] + HOUSE['totals']['garage_gross_sf']:,} sf", 'under the heated slab and the garage, plus the slab edge']),
-            (None, ['10-mil vapor barrier', f"{(HOUSE['totals']['heated_gross_sf'] + HOUSE['totals']['garage_gross_sf']) * 1.1:,.0f} sf", 'over the foam, lapped and taped']),
-            (None, ['Foam sleeve 3/8" for 1/2" PEX', f"{cross_lf * 1.1 + 40:.0f} lf", 'leaders under other zones and at control joints']),
-            (None, ['PEX staples / ties, 18" o.c.', f"{tot_tube / 1.5 / 1000:.1f}k", 'to the mesh or foam']),
+            (None, ['Manifold cabinets', str(len(STATIONS)), 'recessed at MF-K, MF-5, MF-3 and MF-4; surface at MF-1, MF-2 and MF-G']),
+            (None, ['R-10 rigid foam, 2", slab edge', f"{round(plen(plumbing.OUTLINE + plumbing.OUTLINE[:1]) * 1.05):,} lf", 'the perimeter of the slab, full depth']),
+            (None, ['10-mil vapor barrier', f"{slab_sf * 1.1:,.0f} sf", 'under the boards, lapped and taped']),
+            (None, ['Pipe insulation, 1/2" x 12"', f"{2 * len(loops)} pcs", 'one sleeve on every tube end where it rises out of the concrete']),
         ]),
     ]
-    summary = dict(loops=len(L), tube_ft=round(tot_tube), heat=round(tot_q), house_heat=round(sum(l['q'] for l in L if l['zone'] != 'ZG')), gpm=round(tot_gpm, 1), supply_f=t_supply, manifolds=len(STATIONS))
-    # 3D model (build/app_template.html, the radiant section): one tube mesh per loop in the slab, the manifold cabinets with their
-    # riser bundles, the 1" feed pairs under the slab, HS-1 and the thermostats. Heights are feet from the slab top.
+    summary = dict(loops=len(loops), tube_ft=round(tot_tube), heat=round(tot_q), house_heat=round(house_q), gpm=round(tot_gpm, 1), supply_f=t_supply, manifolds=len(STATIONS), boards=boards)
+    # 3D model (build/app_template.html, the radiant section): one tube mesh per loop on the boards, the manifold cabinets with their
+    # riser bundles, the 1" feed pairs under the boards, HS-1, the thermostats and the board layer as a ghost. Heights are feet from the slab top.
     loops3d = []
-    for l in L:
-        g = l['geo']
-        loops3d.append(dict(id=l['id'], zone=l['zone'], color=ZONES[l['zone']]['color'], mf=l['mf'], rise=list(STATIONS[l['mf']]['at']),
-                            name=f"{l['id']} · zone {l['zone'][1:]}, {', '.join(l['rooms'])}",
-                            text=f"{g['total']:.0f}' of 1/2\" PEX at {l['spacing']} o.c. in the slab, {l['gpm']:.2f} gpm, home run to {l['mf']} (R-1)",
-                            paths=[[list(p) for p in pts] for pts in g['panels'] + g['conns'] + g['lead']],
-                            panels=[list(pn['rect']) for pn in loops[l['i']]]))
+    for l in loops:
+        loops3d.append(dict(id=l['id'], zone=l['zone'], color=ZONES[l['zone']]['color'], mf=l['st'], rise=list(station_at(STATIONS[l['st']])),
+                            name=f"{l['id']} · zone {l['zone'][1:]}, {', '.join(l['room_names'])}",
+                            text=f"{l['total']:.0f}' of 1/2\" PEX at 6\" o.c. on the nub boards, {l['gpm']:.2f} gpm, to {l['st']} ports {'/'.join(str(p) for p in port_no(l))} (R-1)",
+                            paths=[[list(p) for p in corners_ft(l['tube'])]], panels=[list(r) for r in l['rects']]))
     stations3d = []
     for k, st in STATIONS.items():
-        x, y = st['at']; lo, hi = st['mount']; w = 0.9
-        if st['out'] == 'y': bx = [x - w, min(st['face'], y - 0.12), x + w, max(st['face'], y + 0.12)]
-        else: bx = [min(st['face'], x - 0.12), y - w, max(st['face'], x + 0.12), y + w]
-        loops_on = [l['id'] for l in L if l['mf'] == k]
-        stations3d.append(dict(id=k, at=[x, y], box=bx, z=[lo, hi], name=f"{k} · radiant manifold, {len(loops_on)} loops",
-                               text=f"{st['detail']} Loops {', '.join(loops_on)}; {sum(l['gpm'] for l in L if l['mf'] == k):.1f} gpm with all calling (R-1)."))
-    feeds3d = [dict(id=f['id'], mf=f['mf'], pts=[list(p) for p in f['pts']], name=f"{f['id']} · 1\" feed pair to {f['mf']}",
-                    text=f"1\" PEX supply and return from HS-1, about {f['lf']:.0f}' each way, insulated, under the slab in the foam (R-1)") for f in feeds]
+        on = by_st[k]; lo, hi = st['mount']
+        stations3d.append(dict(id=k, at=list(station_at(st)), box=list(station_box(st, grow=0.2, depth=0.35)), z=[lo, hi], name=f"{k} · radiant manifold, {len(on)} loops",
+                               text=f"{st['detail']} Loops {', '.join(l['id'] for l in on)}; {sum(l['gpm'] for l in on):.1f} gpm with all calling (R-1)."))
+    feeds3d = [dict(id=f['id'], mf=f['mf'], pts=[list(p) for p in f['pts']], name=f"{f['id']} · 1\" feed pair to {f['to']}",
+                    text=f"1\" PEX supply and return from HS-1, about {f['lf']:.0f}' each way, insulated, in the base course under the boards (R-1)") for f in feeds]
     hs3d = dict(id='HS-1', box=[33.0, 48.0, 33.9, 49.6], z=[2.5, 5.0], name='HS-1 · condensing boiler',
-                text='Gas or propane condensing boiler for the slab, wall-hung on the mechanical closet\'s east wall, with P-R1, P-RG, the mixing valves and the zone controller (R-1)')
-    stats3d = [dict(id=Z['stat'], at=list(stats[Z['stat']]), color=Z['color'], name=f"{Z['stat']} · zone {z[1:]} thermostat", text=f"{Z['name']}: {Z['where']} (R-1)") for z, Z in ZONES.items()]
-    foam3d = dict(z=[-0.46, -0.40], name='Foam · 2" R-10 under the slab', ref='Foam',
-                  text='2" rigid foam and a 10-mil vapor barrier under the whole slab and up its edge; the loops are tied to the mesh 2" below the slab top, the feed pairs run in the foam (R-1)')
-    r3d = dict(slab_h=-0.17, feed_h=-0.30, loops=loops3d, stations=stations3d, feeds=feeds3d, hs=hs3d, stats=stats3d, foam=foam3d)
-    return dict(sheet=sh, picks=picks, tables=tables, notes=notes, open=open_items, summary=summary, legend=legend, r3d=r3d, loops=L)
-
-
-if __name__ == '__main__':
-    b = build()
-    print(b['summary'])
-    for l in b['loops']:
-        print(f"{l['id']:4s} {l['zone']} {l['mf']:5s} {l['spacing']:8s} {l['geo']['in_floor']:5.0f} {l['geo']['leader']:4.0f} {l['geo']['total']:5.0f} {l['q']:6.0f} {l['gpm']:.2f} {l['head']:.1f} {l['t_avg']:.0f} {l['t_surf']:.0f} {l['cross']:.0f} {l['rooms']}")
-    for r in b['tables'][2]['rows']: print(r[1])
+                text="Gas or propane condensing boiler for the slab, wall-hung on the mechanical closet's east wall, with P-R1, P-RG, the mixing valves and the zone controller; circuit 27 (R-1)")
+    stats3d = [dict(id=Z['stat'], at=list(STATS[Z['stat']]), color=Z['color'], name=f"{Z['stat']} · zone {z[1:]} thermostat", text=f"{Z['name']}: {Z['where']} (R-1)") for z, Z in ZONES.items()]
+    foam3d = dict(z=[BOARD_Z[0], BOARD_Z[0] + BOARD['eps_in'] / 12], name=f"Boards · {BOARD['name']}, R-{BOARD['r']:.0f}", ref='Board',
+                  text=f"{BOARD['thick_in']:.0f}\" nub boards under the whole slab: {BOARD['eps_in']:.0f}\" of EPS under a {BOARD['puck_in']:.0f}\" grid of pucks on {BOARD['pitch_in']:.0f}\" centres that hold the tube; 4\" of concrete over the pucks (R-1)")
+    r3d = dict(slab_h=SLAB_H, feed_h=FEED_H, loops=loops3d, stations=stations3d, feeds=feeds3d, hs=hs3d, stats=stats3d, foam=foam3d)
+    return dict(sheet=sh, picks=picks, tables=tables, notes=notes, open=open_items, summary=summary, legend=legend, r3d=r3d, loops=loops)

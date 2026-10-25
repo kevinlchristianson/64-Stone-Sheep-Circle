@@ -761,6 +761,23 @@ tbody tr:last-child td { border-bottom: 0; }
   }
 })();
 </script>
+<script>
+// ---------------------------------------------------------------- 3D watchdog: if the model hasn't started after a while, say why on the 3D view
+// instead of leaving "Building the model…" up forever (an old browser, a script that didn't load, an error while building).
+(function () {
+  const errs = [];
+  addEventListener('error', e => { const t = e.target; errs.push(e.message || (t && t.src ? 'could not load ' + t.src.split('/').pop() : 'a script did not load')); }, true);
+  addEventListener('unhandledrejection', e => { const r = e.reason; errs.push(String((r && (r.message || r.code)) || r)); });
+  const noMap = !(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('importmap'));
+  setTimeout(() => {
+    if (window.ssc3dReady) return;
+    const el = document.getElementById('status'); if (!el) return;
+    el.hidden = false;
+    el.textContent = noMap ? 'The 3D view needs a newer browser (Safari or iOS 16.4 or later, or current Chrome). The sheets work without it.'
+      : '3D didn’t start' + (errs.length ? ': ' + errs[errs.length - 1] : '') + '. Reload the page; if this stays, send a screenshot of this line.';
+  }, 20000);
+})();
+</script>
 <script type="importmap">
 { "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }
 </script>
@@ -1231,7 +1248,10 @@ function applyLayers() {
 }
 for (const cb of document.querySelectorAll('#side input[id^="ly-"]')) cb.addEventListener('input', applyLayers);
 $('cut').addEventListener('input', applyLayers);
-applyLayers(); status('');
+applyLayers(); status(''); window.ssc3dReady = true;
+// a phone that runs short of graphics memory drops the WebGL context: say so rather than showing a frozen or blank view
+renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); status('The 3D view lost its graphics memory (the device ran short). Close other tabs and reload the page.'); });
+renderer.domElement.addEventListener('webglcontextrestored', () => status(''));
 const needle = $('needle');
 function frame() {
   requestAnimationFrame(frame);

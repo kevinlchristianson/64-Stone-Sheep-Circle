@@ -45,8 +45,8 @@ CIRCUITS = [
     ('15', '20A GFCI/AFCI', '#12', 'Disposal', 'island sink base', 'rec', 900),
     ('16', '15A AFCI', '#14', 'Range hood', 'over the range', 'rec', 400),
     ('17', '20A AFCI', '#12', 'Laundry: washer + counter', 'laundry; the counter GFCI protects the washer receptacle', 'rec', 1500),
-    ('18', '20A', '#12', 'Bath receptacles west', 'master bath, powder', 'rec', 360),
-    ('19', '20A', '#12', 'Bath receptacles east', 'bath 1, bath 2', 'rec', 360),
+    ('18', '20A', '#12', 'Bath receptacles east', 'master bath, powder', 'rec', 360),
+    ('19', '20A', '#12', 'Bath receptacles west', 'bath 1, bath 2', 'rec', 360),
     ('20', '15A AFCI', '#14', 'Master suite + mud room receptacles', 'master bedroom, master closet, mud room', 'rec', 0),
     ('21', '15A AFCI', '#14', 'Living receptacles', 'living, TV wall, floor box, fireplace blower', 'rec', 200),
     ('22', '15A AFCI', '#14', 'Entry + office receptacles', 'entry, office', 'rec', 0),
@@ -369,7 +369,7 @@ at(WP, 'patio', 63.0, 16.39, 'front', 24, '', '26')
 at(EXT, 'outside', 5.15, 36.67, 'front', 78, '', '32', ['garage-ext'], note='service door')
 for y in (39.1, 52.1, 65.1):
     at(EXT, 'outside', 0.0, y, 'right', 84, '', '32', ['garage-ext'], note='garage door coach light')
-at(DISC, 'outside', 31.0, 3.5, 'left', 54, '', '5-6', legend='fused disconnect DS1, CU-1', note='rear alcove, on the master bedroom\'s east wall, in sight of the unit (M-1)')
+at(DISC, 'outside', 31.0, 3.5, 'left', 54, '', '5-6', legend='fused disconnect DS1, CU-1', note='rear alcove, on the master bedroom\'s west wall, in sight of the unit (M-1)')
 at(WP, 'outside', 31.0, 1.5, 'left', 24, '', '26', note='rear alcove; service receptacle within 25 ft of CU-1 (210.63)')
 at(DISC, 'outside', 83.44, 40.6, 'left', 54, '', '7-8', legend='fused disconnect DS2, CU-2', note='right side yard, on the Bath 2 wall beside the unit (M-1)')
 at(WP, 'outside', 83.44, 42.6, 'left', 24, '', '26', note='right side yard; service receptacle within 25 ft of CU-2 (210.63)')

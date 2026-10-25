@@ -110,11 +110,11 @@ UNITS = {
     # nobody looks into, with the dining attic right above it, so the three heads are all within about 70 ft
     'CU-1': dict(at=(40.5, 5.08 - OFF - CU_D / 2), axis='y', wall=5.08, stand=1.0, sleeve=(42.9, 5.08), ds=(31.0, 3.5, 'y'),
                  sub='Rear alcove, against the dining room\'s rear wall',
-                 why='The rear of the house steps in 5\' between the master bedroom and the covered patio, which leaves a 13\' x 5\' alcove that is out of sight from the yard, the front and the patio. The dining attic is right above it, so the master and dining sets are short and the living set gets to the vault without going around anything. It discharges north into the open yard. The nearest bedroom window (the master\'s) is about 11 ft away around a corner; the patio edge is 2 ft east of the unit, so it is heard on the patio when it runs.'),
+                 why='The rear of the house steps in 5\' between the master bedroom and the covered patio, which leaves a 13\' x 5\' alcove that is out of sight from the yard, the front and the patio. The dining attic is right above it, so the master and dining sets are short and the living set gets to the vault without going around anything. It discharges south into the open yard. The nearest bedroom window (the master\'s) is about 11 ft away around a corner; the patio edge is 2 ft west of the unit, so it is heard on the patio when it runs.'),
     # on the bedroom wing's right wall at Bath 2, a blank wall between the Bedroom 2 windows and the Bedroom 3 closet
     'CU-2': dict(at=(83.44 + OFF + CU_D / 2, 37.2), axis='x', wall=83.44, stand=1.0, sleeve=(83.44, 37.2), ds=(83.44, 40.6, 'x'),
                  sub='Right side yard, on the Bath 2 wall',
-                 why='Bath 2\'s outside wall is the blank stretch of the bedroom wing\'s right wall nearest the middle of the three heads: Bedroom 2\'s head is on the same wall 9 ft north, Bedroom 3\'s is around the closet corner 12 ft south, and only Bedroom 1 needs an attic run. The nearest bedroom window (Bedroom 2\'s W14) is 3 ft north of the unit; the Bath 1 wall is the quieter spot, 8 ft from any bedroom window, at the cost of about 10 ft more line.'),
+                 why='Bath 2\'s outside wall is the blank stretch of the bedroom wing\'s right wall nearest the middle of the three heads: Bedroom 2\'s head is on the same wall 9 ft south, Bedroom 3\'s is around the closet corner 12 ft north, and only Bedroom 1 needs an attic run. The nearest bedroom window (Bedroom 2\'s W14) is 3 ft south of the unit; the Bath 1 wall is the quieter spot, 8 ft from any bedroom window, at the cost of about 10 ft more line.'),
 }
 
 # (id, room, wall face side, centre along the wall, unit, rooms it serves, condensate, controller spot)

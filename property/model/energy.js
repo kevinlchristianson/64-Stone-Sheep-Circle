@@ -8,7 +8,7 @@
 // settings on the page. Nothing here knows about the DOM.
 
 export const DEFAULTS = {
-  front: 180,            // azimuth the front porch faces (deg from north); the plans give a north arrow but no lot
+  front: 0,              // azimuth the front porch faces (deg from north): north (owner, 2026-10-25)
   wallR: 22, ceilingR: 49, vaultR: 38, windowU: 0.28, shgc: 0.40, doorU: 0.20,
   slabF: 0.54,           // slab-edge F-factor, BTU/h·ft·°F (R-10 edge insulation)
   ach50: 3.0, nFactor: 16, // blower-door target and the LBL divisor for a one-story house

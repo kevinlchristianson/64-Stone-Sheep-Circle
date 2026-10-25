@@ -29,7 +29,7 @@ TABLE = {
 PLUMBED = [f for f in HOUSE['fixtures'] if f['kind'] in TABLE]
 MANIFOLD = (32.85, 46.4)
 COLD_DROP, HOT_DROP = (32.7, 46.4), (33.0, 46.4)   # where the PEX leaves the manifold down into the slab: between R-1's feed pairs (x 32.4 and 33.25)
-SERVICE = (31.2, 46.4)                             # the 1" service rises here, west of R-1's feed pairs
+SERVICE = (31.2, 46.4)                             # the 1" service rises here, east of R-1's feed pairs
 WATER_HEATER = (32.4, 51.0)
 EXIT = (25.0, 0.0)    # where every drain leaves the house: the rear wall line, 25' from the datum (Kevin, 2026-10-13); sewer or septic beyond
 
@@ -41,12 +41,12 @@ STACKS = [
     dict(id='ST5', name='Bath 2', at=(78.6, 37.0), fixtures=['B2-WC', 'B2-LAV1', 'B2-LAV2', 'B2-TUB'], pipe='D2'),
 ]
 # One drain tree to the exit. Each line flows from its first point to its last; the last point sits on the line it drains into.
-# The 4" building drain runs straight out the rear at X 25; one 3" trunk at Y 26.8 picks up the kitchen and both east baths;
+# The 4" building drain runs straight out the rear at X 25; one 3" trunk at Y 26.8 picks up the kitchen and both west baths;
 # the master bath comes in on its own 3" branch at Y 12; the two floor drains share a 2" line down X 25 from the garage.
 TRUNK_Y = 26.8
 PIPES = [
     dict(id='BD', name='4" building drain', size='4"', pts=[(25.0, TRUNK_Y), (25.0, 0.0), (25.0, -10.0)], into=None),
-    dict(id='DT', name='East trunk: kitchen, bath 1, bath 2', size='3"', pts=[(80.5, 7.13), (80.5, TRUNK_Y), (25.0, TRUNK_Y)], into='BD'),
+    dict(id='DT', name='West trunk: kitchen, bath 1, bath 2', size='3"', pts=[(80.5, 7.13), (80.5, TRUNK_Y), (25.0, TRUNK_Y)], into='BD'),
     dict(id='D2', name='Bath 2 branch', size='3"', pts=[(71.3, 38.2), (78.5, 38.2), (78.5, TRUNK_Y)], into='DT'),
     dict(id='DM', name='Master bath branch', size='3"', pts=[(7.9, 21.08), (7.9, 12.0), (25.0, 12.0)], into='BD'),
     dict(id='DF', name='Floor drain line, garage and mechanical', size='2"', pts=[(14.96, 52.14), (25.0, 52.14), (25.0, TRUNK_Y)], into='BD'),
@@ -64,7 +64,7 @@ DRAIN_TOP = -1.2                      # the highest any drain's crown (invert + 
 OD = {'4"': 4.5 / 12, '3"': 3.5 / 12, '2"': 2.375 / 12, '1-1/2"': 1.9 / 12}   # PVC DWV outside diameters
 CLEANOUTS = [('CO1', (25.0, -1.5), '4" two-way cleanout outside the rear wall, at grade, where the building drain leaves'),
              ('CO2', (25.0, TRUNK_Y), '4" cleanout to the floor where the trunk, the floor drain line and the building drain meet'),
-             ('CO3', (80.5, 7.13), '3" cleanout to the floor at the head of the east trunk (bath 1)')]
+             ('CO3', (80.5, 7.13), '3" cleanout to the floor at the head of the west trunk (bath 1)')]
 # Water: a 3/4" or 1/2" cold and hot pair from the closet manifold to each fixture group, in one piece under the slab (no joints
 # under the slab), to a small manifold in that group's vanity or wet wall, then short 1/2" lines to the fixtures.
 GROUPS = [
@@ -466,7 +466,7 @@ def build():
     notes = [
         'Slab on grade assumed (A-5 shows floor drains in the garage and mechanical closet). All drains and supply runs are under the slab or in walls; no water lines in the attic.',
         f'One drain tree, every line falling to where the building drain leaves the house at 25,0 (the rear wall line) at an invert of {depth(NET["exit_invert"])} below the finished floor: a 4" building drain straight out the rear at X 25, '
-        f'a 3" east trunk at Y {TRUNK_Y:g} for the kitchen and both east baths, a 3" master bath branch at Y 12, and a 2" line from the garage and mechanical floor drains. {dfu_total} DFU in all.',
+        f'a 3" west trunk at Y {TRUNK_Y:g} for the kitchen and both west baths, a 3" master bath branch at Y 12, and a 2" line from the garage and mechanical floor drains. {dfu_total} DFU in all.',
         'Slopes are the IPC minimums (1/8" per ft at 3" and 4", 1/4" per ft below 3"), worked back from the exit; the shallowest invert is ' + depth(top_inv) + ' under the slab.',
         f'Under the slab, top down: 4" of concrete; R-1\'s 5" nub boards with the radiant loops on them ({depth(BOARD_BOTTOM)} to their underside); R-1\'s 1" feed pairs right under the boards; then P-1 in the base course, each in its own band so nothing crosses at the same depth: '
         f'cold PEX about {depth(COLD_H)} down, hot PEX about {depth(HOT_H)} down, and every drain below both (crowns no higher than {depth(DRAIN_TOP)}). Vent legs under the slab leave their drain at its own depth. '
@@ -568,7 +568,7 @@ def model3d(NET, SUP, VENTS, wsfu):
     out.append(dict(shape='box', m='cold', box=[mx - 0.15, my - 1.1, mx + 0.15, my + 1.1, 3.0, 4.2], ref='MAN', name='MAN · main manifold', text=f'Main manifold and shutoff, {wsfu:.1f} WSFU; one cold and hot pair to each fixture group, plus the hose bibbs'))
     wx, wy = WATER_HEATER
     out.append(dict(shape='cyl', m='hot', at=[wx, wy], r=0.95, h=[0.0, 5.0], ref='WH', name='WH · water heater, 50 gal', text='On a pan; T&P and pan drain to the closet floor drain; feeds the hot side of the manifold'))
-    tube('hot', 0.06, [(wx, wy - 0.95, 4.6), (wx, my + 0.8, 4.6), (mx, my + 0.8, 4.6), (mx, my + 0.8, 4.2)], 'WH', 'WH · hot to the manifold', '3/4" hot from the water heater to the hot side of the manifold (clear of HS-1 on the east wall)')
+    tube('hot', 0.06, [(wx, wy - 0.95, 4.6), (wx, my + 0.8, 4.6), (mx, my + 0.8, 4.6), (mx, my + 0.8, 4.2)], 'WH', 'WH · hot to the manifold', '3/4" hot from the water heater to the hot side of the manifold (clear of HS-1 on the west wall)')
     band = f"in the base course under the radiant boards and feed pairs"
     for g in SUP:
         gx, gy = g['at']

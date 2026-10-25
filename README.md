@@ -53,4 +53,4 @@ The chat tab is off until a Firebase project is set up for it. See `contractor/C
 
 ## Assumptions to confirm
 
-The plans have no site dimensions, structural or MEP sheets. The house is in Powell, WY; weather and design temperatures come from Cody, the nearest station. The apps assume an all-electric house with a cold-climate heat pump, and a south-facing front porch. Each sheet lists its open questions, and `property/rooms.html` gathers them in one place.
+The plans have no site dimensions, structural or MEP sheets. The house is in Powell, WY; weather and design temperatures come from Cody, the nearest station. The apps assume an all-electric house with a cold-climate heat pump, and a north-facing front porch (owner, 2026-10-25: the top of every sheet is south, the garage side east). Each sheet lists its open questions, and `property/rooms.html` gathers them in one place.

@@ -46,7 +46,7 @@ def build():
         'Datum for every sheet in this app: X in feet from the outside of the garage-door wall, Y in feet from the outside of the master bedroom\'s rear wall.',
     ]
     open_items = [
-        'Where the house is (address, lot, orientation): the site plan has a north arrow but no dimensions, setbacks or street.',
+        'Where the house is (address, lot): the site plan has no dimensions, setbacks or street. Orientation is settled: the front porch faces north (owner, 2026-10-25).',
         'Sheet numbering: the site plan and the front/rear elevations are both A-3 on the owner\'s set.',
         'Living room width (17\'-4" printed vs. ~20\'-5" measured).',
         'Powder room sink, fireplace chimney route, bedroom 3 egress window.',

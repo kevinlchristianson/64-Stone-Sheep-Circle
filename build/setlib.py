@@ -1,7 +1,8 @@
 """SVG sheet library for the 64 Stone Sheep Circle build set.
 
 Datum is plan/house.json's: feet, X to the right and Y down the sheet as A-1
-is drawn (front porch at the bottom, garage on the left). 11 px per foot with
+is drawn (front porch at the bottom, garage on the left). The porch faces north, so
+the top of a sheet is south, the left is east and the right is west. 11 px per foot with
 60/60 px margins; every sheet has the same plan position, so they overlay.
 
 A Sheet draws the house in grey as a base, then a trade draws its layer in
@@ -161,9 +162,13 @@ class Sheet:
                 self.text(cx, cy - 0.5, r['name'], 8 if r['area_sf'] > 40 else 6.5, '#7a7268', layer='base-lab')
                 if colour and r.get('label'):
                     self.text(cx, cy + 0.8, r['label'], 6.5, '#8f897f', layer='base-lab')
-        # plan directions, where the Zero Rd sheets print N / S and the street sides
-        self.text(PW / 2, -4.6, 'REAR · PATIO', 8, '#6f685d', '600', layer='base-lab')
-        self.text(PW / 2, PH + 3.6, 'FRONT · PORCH', 8, '#6f685d', '600', layer='base-lab')
+        # compass directions as the Zero Rd sheets print them: the two side letters in bold at mid-height and the
+        # direction named with the yard on the top and bottom edges. The front porch faces north (owner, 2026-10-25),
+        # so the top of every sheet is south, the garage side (left) is east and the bedroom wing (right) is west.
+        self.text(PW / 2, -4.6, 'SOUTH — Rear · Patio', 8, '#6f685d', '600', layer='base-lab')
+        self.text(PW / 2, PH + 3.6, 'NORTH — Front · Porch', 8, '#6f685d', '600', layer='base-lab')
+        self.text(-4.3, PH / 2, 'E', 13, '#555', '700', layer='base-lab')
+        self.text(PW + 4.3, PH / 2, 'W', 13, '#555', '700', layer='base-lab')
 
     def datum(self):
         """The 0,0 datum every grid line is measured from: where the outside face of the garage-door wall (X = 0) meets

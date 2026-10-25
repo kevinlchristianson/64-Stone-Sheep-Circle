@@ -369,7 +369,7 @@ tbody tr:last-child td { border-bottom: 0; }
         </section>
         <section>
           <p class="eyebrow">Reading it</p>
-          <p class="lede">Plan view puts the rear (patio) at the top and the front porch at the bottom, like the drawings; the garage is on the left. Click anything to read what it is: windows and doors carry their A-1 tag, devices their E-1 tag, fixtures and pipes their P-1 tag, radiant loops their R-1 tag. The exterior walls show the siding outside and drywall inside, so turning them off leaves the finished interior. The radiant loops in the slab and the plumbing under it sit below the plan drawing: turn the drawing off to see them.</p>
+          <p class="lede">Plan view puts south (the rear patio) at the top and north (the front porch) at the bottom, like the drawings; the garage is on the left (east) and the bedroom wing on the right (west). The compass in the corner turns with the view. Click anything to read what it is: windows and doors carry their A-1 tag, devices their E-1 tag, fixtures and pipes their P-1 tag, radiant loops their R-1 tag. The exterior walls show the siding outside and drywall inside, so turning them off leaves the finished interior. The radiant loops in the slab and the plumbing under it sit below the plan drawing: turn the drawing off to see them.</p>
           <p class="lede">To point a comment at one thing, pick it and press Comment, or name the sheet and the tag in the chat (A-1 W12, E-1 R12, P-1 WC1, M-1 S3).</p>
         </section>
         <section>
@@ -808,7 +808,7 @@ const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(
 const ftIn = v => { let f = Math.floor(v + 1e-9), i = Math.round((v - f) * 12); if (i === 12) { f += 1; i = 0; } return `${f}'-${i}"`; };
 const status = t => { const el = $('status'); el.textContent = t; el.hidden = !t; };
 // plan feet (X right toward the bedroom wing, Y down the sheet toward the porch) -> model feet (x right, z toward the porch, y up), centred.
-// The porch is taken to face south (still to confirm), so north is -z, the way the compass reads.
+// The porch faces north (owner, 2026-10-25), so north is +z, toward the porch, and east is -x, the garage side.
 const CX = 41.7, CY = 35.0;
 const M = (x, y) => ({ x: x - CX, z: y - CY });
 
@@ -1269,11 +1269,12 @@ applyLayers(); status(layerErrs.length ? 'Part of the model didn’t build (' + 
 renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); status('The 3D view lost its graphics memory (the device ran short). Close other tabs and reload the page.'); });
 renderer.domElement.addEventListener('webglcontextrestored', () => status(''));
 const needle = $('needle');
+const NORTH_DEG = 180;   // north is +z (toward the porch), half a turn from the -z the needle reads at azimuth 0
 function frame() {
   requestAnimationFrame(frame);
   if (document.hidden || $('sheet-3d').hidden) return;
   controls.update();
-  needle.style.transform = `rotate(${THREE.MathUtils.radToDeg(controls.getAzimuthalAngle()).toFixed(1)}deg)`;
+  needle.style.transform = `rotate(${(THREE.MathUtils.radToDeg(controls.getAzimuthalAngle()) + NORTH_DEG).toFixed(1)}deg)`;
   renderer.render(scene, camera);
 }
 requestAnimationFrame(frame);

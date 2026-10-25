@@ -29,13 +29,15 @@
 <nav class="bar" aria-label="Contractor app">
   <a href="home.html">‹ Home</a>
   <b id="label">Contractor app</b>
-  <a class="out" id="out" href="../contractor/" target="_blank" rel="noopener">Open on its own ↗</a>
+  <a class="out" id="out" href="https://kevinlchristianson.github.io/64-Stone-Sheep-Circle/contractor/" target="_blank" rel="noopener">Open on its own ↗</a>
 </nav>
-<iframe id="app" src="../contractor/" title="64 Stone Sheep Circle contractor app" allow="clipboard-write; fullscreen"></iframe>
+<iframe id="app" src="https://kevinlchristianson.github.io/64-Stone-Sheep-Circle/contractor/" title="64 Stone Sheep Circle contractor app" allow="clipboard-write; fullscreen"></iframe>
 <script>
   // contractor.html#3d (or #s1, #e1, #p1, #m1 ...) opens the app on that tab.
   (function () {
-    const APP = '../contractor/';
+    // The public GitHub Pages copy, the same one the crews use. The copy on this Worker sits behind Cloudflare Access,
+    // which stopped the 3D model's script files loading inside this frame in Safari (2026-10-25).
+    const APP = 'https://kevinlchristianson.github.io/64-Stone-Sheep-Circle/contractor/';
     const frame = document.getElementById('app'), label = document.getElementById('label');
     function open() {
       const tab = location.hash.slice(1);

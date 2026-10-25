@@ -766,15 +766,26 @@ tbody tr:last-child td { border-bottom: 0; }
 // instead of leaving "Building the model…" up forever (an old browser, a script that didn't load, an error while building).
 (function () {
   const errs = [];
-  addEventListener('error', e => { const t = e.target; errs.push(e.message || (t && t.src ? 'could not load ' + t.src.split('/').pop() : 'a script did not load')); }, true);
+  addEventListener('error', e => { const t = e.target; if (e.message) errs.push(e.message); else if (t && t.tagName === 'SCRIPT') errs.push(t.src ? 'could not load ' + t.src.split('/').pop() : 'a script did not load'); }, true);
   addEventListener('unhandledrejection', e => { const r = e.reason; errs.push(String((r && (r.message || r.code)) || r)); });
   const noMap = !(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('importmap'));
+  // the 3D files, fetched again to see which one fails and how (a sign-in redirect, a 404, the network)
+  const FILES = ['vendor/three/build/three.module.min.js', 'vendor/three/examples/jsm/controls/OrbitControls.js'];
+  const probe = f => fetch(f, { cache: 'no-store' }).then(r => {
+    const name = f.split('/').pop(), type = (r.headers.get('content-type') || '').split(';')[0];
+    if (r.redirected && new URL(r.url).origin !== location.origin) return name + ' was sent to a sign-in page (' + new URL(r.url).hostname + ')';
+    if (!r.ok) return name + ' answered ' + r.status;
+    if (!/javascript/.test(type)) return name + ' came back as ' + (type || 'no type') + (r.redirected ? ' after a redirect to ' + new URL(r.url).pathname : '');
+    return '';
+  }, err => f.split('/').pop() + ' failed: ' + (err.message || err));
   setTimeout(() => {
     if (window.ssc3dReady) return;
     const el = document.getElementById('status'); if (!el) return;
     el.hidden = false;
-    el.textContent = noMap ? 'The 3D view needs a newer browser (Safari or iOS 16.4 or later, or current Chrome). The sheets work without it.'
-      : '3D didn’t start' + (errs.length ? ': ' + errs[errs.length - 1] : '') + '. Reload the page; if this stays, send a screenshot of this line.';
+    if (noMap) { el.textContent = 'The 3D view needs a newer browser (Safari or iOS 16.4 or later, or current Chrome). The sheets work without it.'; return; }
+    const say = why => { el.textContent = '3D didn’t start' + (why ? ': ' + why : '') + '. Reload the page; if this stays, send a screenshot of this line. (' + location.host + ')'; };
+    say(errs[errs.length - 1]);
+    Promise.all(FILES.map(probe)).then(r => { const bad = r.filter(Boolean); if (bad.length) say(bad.join('; ')); });
   }, 20000);
 })();
 </script>

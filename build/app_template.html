@@ -864,6 +864,10 @@ function setCut(h) { const on = h < CUT_MAX - 0.01; cutPlane.constant = h; for (
 const LAYERS = ['floor', 'walls', 'ext', 'framing', 'furn', 'trusses', 'roof', 'elec', 'plumb', 'hvac', 'radiant'];
 const G = {}; for (const k of ['ground', ...LAYERS]) { G[k] = new THREE.Group(); scene.add(G[k]); }
 const pickables = [], PICK_FX = [];   // PICK_FX: layer hooks run after a pick (mesh) and on clear (null)
+// each trade layer builds on its own: one that throws is left out and named on the 3D view, and the rest still draw
+const layerErrs = [];
+function layer(name, fn) { try { fn(); } catch (e) { console.error(name, e); layerErrs.push(name + ': ' + (e && e.message || e)); } }
+const append = (dst, src) => { for (let i = 0; i < src.length; i++) dst.push(src[i]); };   // dst.push(...src) without the spread
 function box(x0, y0, x1, y1, bottom, top, material, data, group) {
   // a box over the plan rectangle [x0,x1] × [y0,y1] from height bottom to top (feet)
   const a = M(Math.min(x0, x1), Math.min(y0, y1)), b = M(Math.max(x0, x1), Math.max(y0, y1));
@@ -983,7 +987,7 @@ for (const f of H.fixtures) {
 }
 
 // ---------------------------------------------------------------- roof massing from A-2: hips over the wings at 6:12, eaves 1'-6" past the walls, a 2:12 porch shed
-(function roof() {
+layer('roof', function roof() {
   const OH = 1.5, top = CEIL + 1.0;
   function hip(x0, y0, x1, y1, pitch) {
     x0 -= OH; y0 -= OH; x1 += OH; y1 += OH;
@@ -1005,7 +1009,7 @@ for (const f of H.fixtures) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute([a.x, top, a.z, b.x, top, a.z, b.x, top - rise, b.z, a.x, top, a.z, b.x, top - rise, b.z, a.x, top - rise, b.z], 3)); g.computeVertexNormals();
   const m = new THREE.Mesh(g, MAT.roof); m.userData = { kind: 'roof', name: 'Front porch roof', text: '2:12 shed (A-2)' }; pickables.push(m); G.roof.add(m);
-})();
+});
 
 // ---------------------------------------------------------------- trade overlays: devices, fixtures and registers from E-1, P-1 and M-1
 for (const t of T3) {
@@ -1016,7 +1020,7 @@ for (const t of T3) {
 }
 // ---------------------------------------------------------------- electrical (E-1), as Zero Rd's buildElectrical(): plates flush on the wall faces
 // at their heights, ceiling lights and alarms as discs, pendants hung on a cord. side = the wall the device is on (rear/front/left/right of its room), c = ceiling/floor.
-(function buildElectrical() {
+layer('buildElectrical', function buildElectrical() {
   const N = { rear: [0, 1], front: [0, -1], left: [1, 0], right: [-1, 0], c: [0, 0] };
   const SWT = ['sw', 'sw3', 'dim', 'occ'], LIT = ['can', 'wet', 'surf', 'closet', 'pend', 'fanbox', 'ef', 'sconce', 'strip', 'ext'];
   for (const d of DATA.elec3d) {
@@ -1043,11 +1047,11 @@ for (const t of T3) {
     if (ny) box(x - sz, y, x + sz, y + ny * dp, h - hz, h + hz, m, data, G.elec);
     else box(x, y - sz, x + nx * dp, y + sz, h - hz, h + hz, m, data, G.elec);
   }
-})();
+});
 // ---------------------------------------------------------------- plumbing (P-1), as Zero Rd's buildPlumbing(): pipes as tubes at their real depth.
 // Drains under the slab with a riser to each fixture, stacks through the roof, vents up the walls and across the attic, and the
 // group PEX feeds and fixture runs, all in the base course below R-1's boards and feed pairs (build/plumbing.py model3d()).
-(function buildPlumbing() {
+layer('buildPlumbing', function buildPlumbing() {
   const P = DATA.plumb3d; if (!P) return;
   const tube = (a, b, r, material, data) => {
     const p = M(a[0], a[1]), q = M(b[0], b[1]);
@@ -1067,7 +1071,7 @@ for (const t of T3) {
     }
     for (let i = 1; i < p.pts.length; i++) tube(p.pts[i - 1], p.pts[i], p.r, material, data);
   }
-})();
+});
 for (const line of DATA.lines3d) {
   const g = G[line.layer], material = line.color ? (MAT[line.color] ??= mat(parseInt(line.color.slice(1), 16))) : line.layer === 'plumb' ? MAT.plumb : MAT.hvac, r = line.r || 0.2;
   if (!g) continue;
@@ -1077,7 +1081,7 @@ for (const line of DATA.lines3d) {
   }
 }
 // ---------------------------------------------------------------- structure layers: framing and roof trusses (build/structure3d.py)
-(function structure() {
+layer('structure', function structure() {
   const ST = DATA.struct3d; if (!ST) return;
   const SM = { wood: mat(0xc9a46a, { roughness: 0.8 }), sound: mat(0xa8c49a, { roughness: 0.8 }), header: mat(0xa9824a, { roughness: 0.8 }), pt: mat(0x8f9f7a, { roughness: 0.8 }), block: mat(0xc2369a, { roughness: 0.7 }), wood6: mat(0x9fb6c9, { roughness: 0.8 }),
               truss: mat(0xa98a5c, { roughness: 0.8 }), girder: mat(0x8a6a3c, { roughness: 0.8 }), rafter: mat(0xb89a6e, { roughness: 0.8 }), beam: mat(0x8a6a3c, { roughness: 0.8 }) };
@@ -1085,9 +1089,10 @@ for (const line of DATA.lines3d) {
   // merge a list of [w, h, d, x, y, z, rotX, rotZ] boxes into one geometry: one mesh per wall run or truss keeps phones happy
   function merged(parts) {
     const pos = [], nor = [];
-    for (const [w, h, d, x, y, z, rx, rz] of parts) {
-      const g = new THREE.BoxGeometry(w, h, d); if (rx) g.rotateX(rx); if (rz) g.rotateZ(rz); g.translate(x, y, z);
-      const ng = g.toNonIndexed(); pos.push(...ng.attributes.position.array); nor.push(...ng.attributes.normal.array); g.dispose(); ng.dispose();
+    // plain index loops, no destructuring or spread: Safari's JavaScript engine threw "undefined is not a function" here (Oct 2026)
+    for (let i = 0; i < parts.length; i++) {
+      const q = parts[i], g = new THREE.BoxGeometry(q[0], q[1], q[2]); if (q[6]) g.rotateX(q[6]); if (q[7]) g.rotateZ(q[7]); g.translate(q[3], q[4], q[5]);
+      const ng = g.toNonIndexed(); append(pos, ng.attributes.position.array); append(nor, ng.attributes.normal.array); g.dispose(); ng.dispose();
     }
     const out = new THREE.BufferGeometry();
     out.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
@@ -1116,13 +1121,13 @@ for (const line of DATA.lines3d) {
     add(merged(parts), SM[t.k === 'girder' ? 'girder' : t.k === 'rafter' ? 'rafter' : 'truss'], G.trusses, { kind: 'truss', name: t.name, text: t.text, ref: t.ref });
   }
   for (const b of ST.beams) { const [x0, y0, x1, y1, lo, hi] = b.box; box(x0, y0, x1, y1, lo, hi, SM.beam, { kind: 'truss', name: b.name, text: b.text }, G.trusses); }
-})();
+});
 
 // ---------------------------------------------------------------- HVAC (M-1): ductless mini-splits
 // Outdoor units on stands, wall heads 6" below the ceiling, line sets from each unit up inside the wall to the attic,
 // across the attic and down to the heads; condensate out the wall or by pump. Not clipped by the wall-height cut.
 const HI_FREE = new THREE.MeshStandardMaterial({ color: 0xe08a00, emissive: 0x4a2a00, roughness: 0.9 });   // highlight for unclipped things
-(function buildHVAC() {
+layer('buildHVAC', function buildHVAC() {
   const hv = DATA.hvac3d; if (!hv) return;
   const m3 = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, metalness: 0, ...o });
   const M3 = {
@@ -1147,11 +1152,11 @@ const HI_FREE = new THREE.MeshStandardMaterial({ color: 0xe08a00, emissive: 0x4a
   for (const h of hv.heads) box(h.x0, h.y0, h.x1, h.y1, h.b, h.t, M3.head, { kind: 'hvac', name: h.name, ref: ref(h.name), text: h.text }, G.hvac);
   for (const p of hv.parts) box(p.x0, p.y0, p.x1, p.y1, p.b, p.t, M3.part, { kind: 'hvac', name: p.name, ref: ref(p.name), text: p.text }, G.hvac);
   for (const l of hv.lines) for (let i = 1; i < l.pts.length; i++) pipe(l.pts[i - 1], l.pts[i], l.kind === 'ls' ? 0.1 : 0.035, M3[l.kind], { kind: 'hvac', name: l.name, ref: ref(l.name), text: l.text });
-})();
+});
 
 // ---------------------------------------------------------------- radiant floor heat (R-1), as Zero Rd's buildRadiant(): one tube per loop in the slab, the
 // manifold cabinets with their leader bundles rising out of the slab, the 1" feed pairs under the slab in the foam, HS-1 and the thermostats (build/radiant.py)
-(function radiant() {
+layer('radiant', function radiant() {
   const R = DATA.radiant3d; if (!R) return;
   const RM = { manifold: mat(0xb8b4ad, { roughness: 0.35, metalness: 0.4 }), feed: mat(0x6a1b9a, { roughness: 0.4 }), boiler: mat(0xe8e6e1, { roughness: 0.5, metalness: 0.2 }),
                dim: mat(0x9a9a9a, { transparent: true, opacity: 0.25 }) };
@@ -1160,12 +1165,12 @@ const HI_FREE = new THREE.MeshStandardMaterial({ color: 0xe08a00, emissive: 0x4a
   // one geometry for a whole run of pipe: a cylinder per segment, each stretched r past its ends so the corners close
   function tubes(segs, rad) {
     const pos = [], nor = [];
-    for (const [a, b] of segs) {
-      const va = new THREE.Vector3(a.x, a.h, a.z), vb = new THREE.Vector3(b.x, b.h, b.z), dir = vb.clone().sub(va), len = dir.length();
+    for (let i = 0; i < segs.length; i++) {
+      const a = segs[i][0], b = segs[i][1], va = new THREE.Vector3(a.x, a.h, a.z), vb = new THREE.Vector3(b.x, b.h, b.z), dir = vb.clone().sub(va), len = dir.length();
       if (len < 1e-3) continue;
       const g = new THREE.CylinderGeometry(rad, rad, len + 2 * rad, 8, 1, true);
       g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(up, dir.normalize())); g.translate((va.x + vb.x) / 2, (va.y + vb.y) / 2, (va.z + vb.z) / 2);
-      const ng = g.toNonIndexed(); pos.push(...ng.attributes.position.array); nor.push(...ng.attributes.normal.array); g.dispose(); ng.dispose();
+      const ng = g.toNonIndexed(); append(pos, ng.attributes.position.array); append(nor, ng.attributes.normal.array); g.dispose(); ng.dispose();
     }
     const out = new THREE.BufferGeometry();
     out.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
@@ -1210,7 +1215,7 @@ const HI_FREE = new THREE.MeshStandardMaterial({ color: 0xe08a00, emissive: 0x4a
   for (const t of R.stats) box(t.at[0] - 0.18, t.at[1] - 0.18, t.at[0] + 0.18, t.at[1] + 0.18, 4.6, 5.05, zone(t.color), { kind: 'radiant', name: t.name, ref: t.id, text: t.text }, G.radiant);
   // picking a loop dims the others, as the R-1 sheet does
   PICK_FX.push(mesh => { const on = mesh && loops.includes(mesh); for (const m of loops) if (m !== mesh) m.material = on ? RM.dim : m.userData.mat0; });
-})();
+});
 
 // ---------------------------------------------------------------- picking
 const raycaster = new THREE.Raycaster(); let picked = null, downAt = null;
@@ -1259,7 +1264,7 @@ function applyLayers() {
 }
 for (const cb of document.querySelectorAll('#side input[id^="ly-"]')) cb.addEventListener('input', applyLayers);
 $('cut').addEventListener('input', applyLayers);
-applyLayers(); status(''); window.ssc3dReady = true;
+applyLayers(); status(layerErrs.length ? 'Part of the model didn’t build (' + layerErrs.join('; ') + '). Send a screenshot of this line.' : ''); window.ssc3dReady = true;
 // a phone that runs short of graphics memory drops the WebGL context: say so rather than showing a frozen or blank view
 renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); status('The 3D view lost its graphics memory (the device ran short). Close other tabs and reload the page.'); });
 renderer.domElement.addEventListener('webglcontextrestored', () => status(''));

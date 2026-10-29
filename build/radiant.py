@@ -38,7 +38,7 @@ ZONES = {
                rooms=['master_bed', 'master_bath', 'master_closet', 'master_hall']),
     'Z2': dict(name='Great room and utility', color='#e65100', stat='T2', where='Kitchen side of the living room, on the entry wall, away from the fireplace and the patio glass',
                rooms=['kitchen', 'dining', 'pantry', 'living', 'entry', 'laundry', 'powder', 'mud']),
-    'Z3': dict(name='Bedroom wing and office', color='#1565c0', stat='T3', where='Bedroom hall, south end',
+    'Z3': dict(name='Bedroom wing and office', color='#1565c0', stat='T3', where='Bedroom hall, north end',
                rooms=['bed1', 'bath1', 'bed2', 'bed2_closet', 'bath2', 'bed3', 'bed3_closet', 'hall', 'office']),
     'ZG': dict(name='Garage (held at 50°F)', color=GARAGE_COLOR, stat='TG', where='Garage, wall by the mud room door',
                rooms=['garage']),
@@ -49,30 +49,30 @@ STATS = {'T1': (27.6, 16.6), 'T2': (46.0, 41.6), 'T3': (66.5, 39.2), 'TG': (24.2
 # Heat source and the manifold stations. A station hangs on a wall face ('face' is that coordinate along 'axis'; 'side' is
 # the room side of it); its loop ends rise out of the slab in one row of 3" ports on the first grid line in front of the
 # face, between 'lo' and 'hi' along the wall. 'riser' is where the 1" feed pair comes up to it.
-HS = (33.55, 48.8)         # wall-hung on the mechanical closet's east wall (P-1's water manifold and heater share the closet)
+HS = (33.55, 48.8)         # wall-hung on the mechanical closet's west wall (P-1's water manifold and heater share the closet)
 T_SUP = 110.0              # design supply cap, °F: keeps a condensing boiler condensing
 STATIONS = {
     'MF-1': dict(room='laundry', axis='y', face=18.0, side=+1, lo=18.75, hi=22.0, mount=(2.5, 4.1), riser=(22.6, 18.4),
-                 where='Laundry, on the north wall west of the dryer',
-                 detail='Surface-mounted manifold cabinet on the laundry\'s north wall, between the linen alcove and the dryer. That wall is the staggered-stud sound wall to the master bed, so the cabinet is not recessed. The master bed, bath and hall loops come under that wall straight up into it; the closet, bath and laundry loops come up from the laundry side.'),
+                 where='Laundry, on the south wall east of the dryer',
+                 detail='Surface-mounted manifold cabinet on the laundry\'s south wall, between the linen alcove and the dryer. That wall is the staggered-stud sound wall to the master bed, so the cabinet is not recessed. The master bed, bath and hall loops come under that wall straight up into it; the closet, bath and laundry loops come up from the laundry side.'),
     'MF-2': dict(room='mud', axis='y', face=36.84, side=-1, lo=17.0, hi=18.75, mount=(2.5, 4.1), riser=(19.4, 36.4),
-                 where='Mud room, on the south wall (garage wall), west end',
+                 where='Mud room, on the north wall (garage wall), east end',
                  detail='Surface-mounted cabinet on the mud room side of the garage wall, back to back with MF-G; the feed pair rises in that wall and serves both.'),
     'MF-G': dict(room='garage', axis='y', face=37.133, side=+1, lo=16.5, hi=24.75, mount=(4.0, 5.6), riser=(19.4, 37.6),
                  where='Garage, on the mud room wall (two 7-loop manifolds side by side)',
                  detail='Surface-mounted cabinets on the garage face of the mud room wall, 4\' above the slab, back to back with MF-2, with the garage\'s own pump P-RG and mixing valve. Surface mounting keeps the garage fire separation whole.'),
     'MF-K': dict(room='mud', axis='x', face=30.54, side=-1, lo=31.75, hi=34.5, mount=(2.5, 4.1), riser=(30.0, 35.2),
-                 where='Mud room, east wall (kitchen wall), south of the powder room',
-                 detail='Recessed cabinet in the mud room side of the kitchen wall. The kitchen and dining loops come under that wall, under the base cabinets south of the range, straight into it.'),
+                 where='Mud room, west wall (kitchen wall), north of the powder room',
+                 detail='Recessed cabinet in the mud room side of the kitchen wall. The kitchen and dining loops come under that wall, under the base cabinets north of the range, straight into it.'),
     'MF-5': dict(room='pantry', axis='x', face=43.707, side=-1, lo=46.75, hi=50.75, mount=(2.5, 4.1), riser=(43.3, 51.2),
-                 where='Pantry, on the east wall (entry wall)',
+                 where='Pantry, on the west wall (entry wall)',
                  detail='Recessed cabinet in the pantry side of the entry wall. The entry, office and living room loops come under that wall straight into it; the pantry loop comes up on the pantry side. Ten feet of 1" feed from HS-1 under the pantry floor.'),
     'MF-3': dict(room='hall', axis='x', face=64.46, side=+1, lo=24.0, hi=28.25, mount=(2.5, 4.1), riser=(64.9, 28.9),
-                 where='Bedroom hall, west wall north of the fireplace',
-                 detail='Recessed manifold cabinet in the hall\'s west wall between the living room opening and the fireplace chase. A 2x4 wall takes a 3-1/2" deep cabinet; fur it to 2x6 locally if the chosen manifold needs more (S-1).'),
+                 where='Bedroom hall, east wall south of the fireplace',
+                 detail='Recessed manifold cabinet in the hall\'s east wall between the living room opening and the fireplace chase. A 2x4 wall takes a 3-1/2" deep cabinet; fur it to 2x6 locally if the chosen manifold needs more (S-1).'),
     'MF-4': dict(room='hall', axis='x', face=64.46, side=+1, lo=33.5, hi=36.75, mount=(2.5, 4.1), riser=(64.9, 37.4),
-                 where='Bedroom hall, west wall south of the fireplace',
-                 detail='Recessed cabinet in the hall\'s west wall south of the fireplace chase, across from the bath 2 door. The living room\'s east loops come under that wall straight into it.'),
+                 where='Bedroom hall, east wall north of the fireplace',
+                 detail='Recessed cabinet in the hall\'s east wall north of the fireplace chase, across from the bath 2 door. The living room\'s west loops come under that wall straight into it.'),
 }
 # tube passes under these stretches of wall (x0, y0, x1, y1 is the wall itself; 'into' names the room on the far side).
 # Under a wall a tube only goes straight across; the gates in front of a manifold match its port row, so each tube
@@ -95,62 +95,63 @@ DRAINS = []
 PENETRATIONS = ([f for f in HOUSE['fixtures'] if f['kind'] in ('drain', 'wc', 'tub')]      # where P-1 comes up through the slab inside a field
                 + [dict(id=st['id'], kind='stack', name=f"{st['name']} vent stack", at=st['at']) for st in plumbing.STACKS])
 # Panels: room, rectangle in plan feet, the edge the loop ends sit on ('W', 'E', 'N', 'S'; 'r' starts the bands from the
-# other end of that edge), the manifold, and how many 6" rows a band (one loop) may take (0 = whatever 200' allows).
+# other end of that edge). The letters are sheet sides, not compass ones: 'N' is the top of the sheet (the house's
+# south), 'W' the left (east), 'E' the right (west) and 'S' the bottom (north, the porch side), the manifold, and how many 6" rows a band (one loop) may take (0 = whatever 200' allows).
 # Rectangles stay 6" off the walls where tube would be near a plate, clear of the cabinets, tubs, vanities, the island,
 # the fridge and the hearth, and leave lanes beside the entry edge for the leaders of their own bands and of the loops
 # that pass by (those lanes are heated by the leaders).
 PANELS = {
     # zone 1, master suite: MF-1
-    'MB':  ('master_bed', 16.76, 0.76, 30.24, 15.5, 'Sr', 'MF-1', 0),     # three bands; the rows south of it carry the bath leaders east to the gate
+    'MB':  ('master_bed', 16.76, 0.76, 30.24, 15.5, 'Sr', 'MF-1', 0),     # three bands; the rows north of it carry the bath leaders west to the gate
     'BAM': ('master_bath', 6.13, 11.25, 14.75, 17.25, 'Er', 'MF-1', 0),   # the bath between the toilet partition and the shower, vanity and tub included; ends at the bedroom door
-    'BAN': ('master_bath', 8.75, 6.25, 15.87, 11.1, 'Sr', 'MF-1', 0),     # north end by the vanity, running on into the toilet nook (BAW); its leaders go down the vanity wall to the door
+    'BAN': ('master_bath', 8.75, 6.25, 15.87, 11.1, 'Sr', 'MF-1', 0),     # south end by the vanity, running on into the toilet nook (BAW); its leaders go down the vanity wall to the door
     'BAW': ('master_bath', 6.13, 5.84, 8.5, 9.0, 'E', 'MF-1', 0),         # the toilet nook, tail of BAN
-    'MCN': ('master_closet', 6.75, 25.25, 15.0, 28.0, 'E', 'MF-1', 0),   # closet, north half, running on through the bath door into the shower end of the bath (BAS)
+    'MCN': ('master_closet', 6.75, 25.25, 15.0, 28.0, 'E', 'MF-1', 0),   # closet, south half, running on through the bath door into the shower end of the bath (BAS)
     'BAS': ('master_bath', 6.13, 19.0, 15.87, 23.0, 'Sr', 'MF-1', 0),     # shower end of the bath, tail of MCN
-    'LA':  ('laundry', 20.25, 19.0, 24.6, 28.5, 'N', 'MF-1', 0),          # laundry under the washer and dryer, straight up into the ports, running on through the pocket door into the closet's south half (MCS)
-    'MCS': ('master_closet', 6.13, 28.25, 15.25, 33.54, 'E', 'MF-1', 0),  # closet, south half, tail of LA
+    'LA':  ('laundry', 20.25, 19.0, 24.6, 28.5, 'N', 'MF-1', 0),          # laundry under the washer and dryer, straight up into the ports, running on through the pocket door into the closet's north half (MCS)
+    'MCS': ('master_closet', 6.13, 28.25, 15.25, 33.54, 'E', 'MF-1', 0),  # closet, north half, tail of LA
     # zone 2, great room and utility: MF-2, MF-K, MF-5
-    'MUW': ('mud', 17.25, 30.75, 24.75, 35.6, 'W', 'MF-2', 0),            # mud room west of the garage door, straight down into the ports; runs on through the powder room (PW) into the master hall (MH)
+    'MUW': ('mud', 17.25, 30.75, 24.75, 35.6, 'W', 'MF-2', 0),            # mud room east of the garage door, straight down into the ports; runs on through the powder room (PW) into the master hall (MH)
     'PW':  ('powder', 26.0, 22.5, 30.24, 27.25, 'S', 'MF-2', 0),         # the powder room, under the toilet and lav; tail of MUW
     'MH':  ('master_hall', 25.34, 18.25, 28.74, 21.5, 'Sr', 'MF-2', 0),    # the master hall, last panel of MUW's loop, fed under the powder room wall
-    'MUE': ('mud', 26.5, 29.0, 30.0, 41.9, 'W', 'MF-2', 0),              # mud room east leg, from the powder door to the garage door; the lane west of it carries the leaders
-    'KNN': ('kitchen', 32.75, 5.9, 43.4, 17.0, 'Wr', 'MF-K', 0),          # kitchen and dining north of the living room opening, out to the dining's east wall; two bands
-    'KN':  ('kitchen', 32.75, 17.5, 41.0, 44.1, 'Wr', 'MF-K', 0),          # dining and kitchen as one field from the rear wall to the pantry wall, under the island, sink, range and back cabinets; the lane under the west wall carries the leaders to MF-K
-    'KE':  ('kitchen', 41.5, 17.15, 44.6, 41.0, 'Sr', 'MF-5', 0),         # the strip where the kitchen opens to the living room, north of the coat closet; its leaders drop down the entry's west side into MF-5
-    'PA':  ('pantry', 34.51, 46.5, 43.25, 52.97, 'N', 'MF-K', 0),         # the pantry, wall to wall; its leaders run out through the pantry door and under the kitchen's west wall to MF-K
-    'EN':  ('entry', 46.75, 43.1, 50.0, 52.1, 'Wr', 'MF-5', 0),           # 18 rows; the rows below are OF1's lane to the gate           # the entry between the leader lanes, straight under the pantry wall into MF-5; runs on through the office doors into the office's north half (OF0)
-    'OF0': ('office', 51.75, 43.1, 63.87, 47.1, 'Wr', 'MF-5', 0),         # office north half, tail of EN
-    'OF1': ('office', 51.75, 47.4, 63.87, 52.97, 'W', 'MF-5', 0),         # office south half; out through the doors, down the entry's east side and west along the front door rows into MF-5
-    'LW':  ('living', 45.0, 17.15, 51.3, 41.5, 'S', 'MF-5', 0),           # living, west part: two bands whose leaders go down the entry's west side into MF-5
-    'LE0': ('living', 51.25, 18.0, 62.8, 23.6, 'E', 'MF-3', 0),           # living east in four bands of 12 rows; LE0 and LE2 keep a lane to reach their gate, LE1 and LE3 sit on theirs
+    'MUE': ('mud', 26.5, 29.0, 30.0, 41.9, 'W', 'MF-2', 0),              # mud room west leg, from the powder door to the garage door; the lane east of it carries the leaders
+    'KNN': ('kitchen', 32.75, 5.9, 43.4, 17.0, 'Wr', 'MF-K', 0),          # kitchen and dining south of the living room opening, out to the dining's west wall; two bands
+    'KN':  ('kitchen', 32.75, 17.5, 41.0, 44.1, 'Wr', 'MF-K', 0),          # dining and kitchen as one field from the rear wall to the pantry wall, under the island, sink, range and back cabinets; the lane under the east wall carries the leaders to MF-K
+    'KE':  ('kitchen', 41.5, 17.15, 44.6, 41.0, 'Sr', 'MF-5', 0),         # the strip where the kitchen opens to the living room, south of the coat closet; its leaders drop down the entry's east side into MF-5
+    'PA':  ('pantry', 34.51, 46.5, 43.25, 52.97, 'N', 'MF-K', 0),         # the pantry, wall to wall; its leaders run out through the pantry door and under the kitchen's east wall to MF-K
+    'EN':  ('entry', 46.75, 43.1, 50.0, 52.1, 'Wr', 'MF-5', 0),           # 18 rows; the rows below are OF1's lane to the gate           # the entry between the leader lanes, straight under the pantry wall into MF-5; runs on through the office doors into the office's south half (OF0)
+    'OF0': ('office', 51.75, 43.1, 63.87, 47.1, 'Wr', 'MF-5', 0),         # office south half, tail of EN
+    'OF1': ('office', 51.75, 47.4, 63.87, 52.97, 'W', 'MF-5', 0),         # office north half; out through the doors, down the entry's west side and east along the front door rows into MF-5
+    'LW':  ('living', 45.0, 17.15, 51.3, 41.5, 'S', 'MF-5', 0),           # living, east part: two bands whose leaders go down the entry's east side into MF-5
+    'LE0': ('living', 51.25, 18.0, 62.8, 23.6, 'E', 'MF-3', 0),           # living west in four bands of 12 rows; LE0 and LE2 keep a lane to reach their gate, LE1 and LE3 sit on theirs
     'LE1': ('living', 51.25, 24.0, 63.6, 29.6, 'E', 'MF-3', 0),
     'LE2': ('living', 51.25, 30.0, 62.8, 35.6, 'E', 'MF-4', 0),
-    'LE3': ('living', 51.25, 36.0, 63.6, 41.6, 'E', 'MF-4', 0),           # living, east part: four bands, the two north ones out the hall opening to MF-3, the two south ones under the hall wall into MF-4; the lane east of it carries their leaders
+    'LE3': ('living', 51.25, 36.0, 63.6, 41.6, 'E', 'MF-4', 0),           # living, west part: four bands, the two south ones out the hall opening to MF-3, the two north ones under the hall wall into MF-4; the lane west of it carries their leaders
     # zone 3, bedroom wing and office: MF-3, MF-4, MF-5
     'B1':  ('bed1', 65.0, 5.9, 77.3, 17.6, 'Sr', 'MF-3', 0),              # bedroom 1 wall to wall; both bands' leaders run along the hall wall to the door and down the hall
-    'C2':  ('bed2_closet', 79.5, 17.0, 82.3, 20.9, 'S', 'MF-3', 0),       # one loop with bath 1: out through the closet door, west along bedroom 2's rear wall and down the hall
+    'C2':  ('bed2_closet', 79.5, 17.0, 82.3, 20.9, 'S', 'MF-3', 0),       # one loop with bath 1: out through the closet door, east along bedroom 2's rear wall and down the hall
     'BT1': ('bath1', 78.5, 5.9, 82.3, 15.3, 'S', 'MF-3', 0),              # the tail of that loop: all of bath 1, under the vanity, toilet and shower
-    'B2':  ('bed2', 70.25, 22.6, 82.9, 33.3, 'Wr', 'MF-3', 0),            # bedroom 2 in two bands; the lane under its hall wall carries the closet loop and the north band to the door
-    'BT2': ('bath2', 69.25, 34.75, 82.9, 39.7, 'W', 'MF-4', 0),           # bath 2 wall to wall, under the vanity, toilet and tub; out the door and round the hall's east side into MF-4
-    'B3':  ('bed3', 65.5, 41.25, 72.1, 52.85, 'N', 'MF-4', 0),             # bedroom 3, west part, straight out the door
-    'B3E': ('bed3', 72.5, 41.25, 76.1, 52.85, 'N', 'MF-4', 0),             # bedroom 3, east part; runs on round the foot of the room into the closet (B3C)
+    'B2':  ('bed2', 70.25, 22.6, 82.9, 33.3, 'Wr', 'MF-3', 0),            # bedroom 2 in two bands; the lane under its hall wall carries the closet loop and the south band to the door
+    'BT2': ('bath2', 69.25, 34.75, 82.9, 39.7, 'W', 'MF-4', 0),           # bath 2 wall to wall, under the vanity, toilet and tub; out the door and round the hall's west side into MF-4
+    'B3':  ('bed3', 65.5, 41.25, 72.1, 52.85, 'N', 'MF-4', 0),             # bedroom 3, east part, straight out the door
+    'B3E': ('bed3', 72.5, 41.25, 76.1, 52.85, 'N', 'MF-4', 0),             # bedroom 3, west part; runs on round the foot of the room into the closet (B3C)
     'B3C': ('bed3_closet', 78.5, 41.4, 82.75, 44.75, 'W', 'MF-4', 0),     # bedroom 3 closet, tail of B3E
     # garage, 6" like the house (owner, 2026-10-13): MF-G
-    # garage west half in six bands, 4 columns wide at the west end where the leaders are longest, 6 toward the ports; the
-    # leaders fan east along the north wall into the ports, the first two straight up out of their own columns, so those
-    # two bands reach further north and the next two start a little lower, which brings all six out near the same length
+    # garage east half in six bands, 4 columns wide at the east end where the leaders are longest, 6 toward the ports; the
+    # leaders fan west along the south wall into the ports, the first two straight up out of their own columns, so those
+    # two bands reach further south and the next two start a little lower, which brings all six out near the same length
     'GW0': ('garage', 1.0, 38.5, 2.6, 66.6, 'N', 'MF-G', 0),
     'GW1': ('garage', 3.0, 39.0, 4.6, 66.6, 'N', 'MF-G', 0),
     'GW2': ('garage', 5.0, 42.5, 7.6, 66.6, 'N', 'MF-G', 0),
     'GW3': ('garage', 8.0, 42.0, 10.6, 66.6, 'N', 'MF-G', 0),
     'GW4': ('garage', 11.0, 41.5, 13.6, 66.6, 'N', 'MF-G', 0),
     'GW5': ('garage', 14.0, 41.5, 16.6, 66.6, 'N', 'MF-G', 0),
-    'GS':  ('garage', 17.0, 41.5, 19.6, 66.6, 'Nr', 'MF-G', 0),           # the strip under the west ports, straight up into them
+    'GS':  ('garage', 17.0, 41.5, 19.6, 66.6, 'Nr', 'MF-G', 0),           # the strip under the east ports, straight up into them
     'GM1': ('garage', 20.0, 38.0, 22.6, 66.6, 'N', 'MF-G', 0),            # under the middle ports, straight up into them
-    'GE0': ('garage', 24.5, 43.0, 30.1, 51.6, 'W', 'MF-G', 0),           # 18 rows            # east of the mud room, north part; runs on through the mechanical door into the mechanical closet (MECH)
+    'GE0': ('garage', 24.5, 43.0, 30.1, 51.6, 'W', 'MF-G', 0),           # 18 rows            # west of the mud room, south part; runs on through the mechanical door into the mechanical closet (MECH)
     'MECH': ('mechanical', 31.5, 46.75, 33.6, 52.9, 'W', 'MF-G', 0),      # the mechanical closet, tail of GE0
-    'GE1': ('garage', 24.5, 52.0, 30.1, 62.6, 'W', 'MF-G', 0),            # south-east, middle rows; leaders up the lane east of GM1
-    'GE2': ('garage', 24.5, 63.0, 30.1, 68.6, 'W', 'MF-G', 0),            # south-east corner at the garage door wall; leaders up the same lane; runs on west along the door wall (GSS)
+    'GE1': ('garage', 24.5, 52.0, 30.1, 62.6, 'W', 'MF-G', 0),            # north-west, middle rows; leaders up the lane west of GM1
+    'GE2': ('garage', 24.5, 63.0, 30.1, 68.6, 'W', 'MF-G', 0),            # north-west corner at the garage door wall; leaders up the same lane; runs on east along the door wall (GSS)
     'GSS': ('garage', 15.75, 67.0, 22.6, 68.6, 'Er', 'MF-G', 0),          # the strip along the garage door wall under GS and GM1, tail of GE2
 }
 # loops that run on through more panels (open pairs through all but the last, routed pair connectors between, closed pair in the last)
@@ -159,7 +160,7 @@ OPEN_AT_ENTRY = {'GE2', 'B3E'}
 CHAINS = [('C2', 'BT1'), ('BAN', 'BAW'), ('MCN', 'BAS'), ('LA', 'MCS'), ('MUW', 'PW', 'MH'), ('EN', 'OF0'), ('B3E', 'B3C'), ('GE0', 'MECH'), ('GE2', 'GSS')]
 # where the bands of one panel go to different stations
 BAND_STATION = {}
-# bands set by hand (6" rows per loop, from the first row): LE1's two north bands keep their lead nodes clear of the
+# bands set by hand (6" rows per loop, from the first row): LE1's two south bands keep their lead nodes clear of the
 # fireplace chase, which sits beside rows 27.5 to 31.5
 BANDS = {'MB': [8, 8, 10], 'B1': [12, 12], 'B2': [10, 10], 'GW0': [4], 'GW1': [4], 'GW2': [6], 'GW3': [6], 'GW4': [6], 'GW5': [6], 'GS': [6], 'GM1': [6], 'GE0': [18], 'GE1': [22], 'GE2': [12], 'KNN': [12, 10], 'KN': [18, 18, 18]}
 # the order the leaders are routed in: the loop routed first takes the lane along the wall, the next hugs it, so the
@@ -172,17 +173,17 @@ ORDER = ['BAM', 'BAN', 'MCN', 'LA', 'MB', 'MUW', 'MUE', 'PA', 'KN.0', 'KN.1', 'K
          'GW0', 'GW1', 'GW2', 'GW3', 'GW4', 'GW5', 'GS', 'GM1', 'GE0', 'GE1', 'GE2']
 NEAR_FIRST = set()
 # floor a loop's leaders keep off (x0, y0, x1, y1 in feet), so the pair routed first takes the inside of a bundle and
-# the ones after it wrap round the outside: LE1's second band stays off the wall side of the lane east of LE2 so the
-# first band can come down outside it; the closet loop crosses the hall under the bedroom 2 door before turning north
+# the ones after it wrap round the outside: LE1's second band stays off the wall side of the lane west of LE2 so the
+# first band can come down outside it; the closet loop crosses the hall under the bedroom 2 door before turning south
 KEEP_OUT = {
     # the lane beside GM1 carries three pairs: GE0's next to its field, GE1's in the middle, GE2's by GM1
     'GE0': [(22.7, 38.0, 23.8, 42.9)], 'GE1': [(22.7, 38.0, 23.3, 62.9)],
-            # the three loops that reach MF-3 through the bedroom 2 door turn north at the door, one column further
-            # west each, and the first lands on the farthest ports so the others nest inside it
+            # the three loops that reach MF-3 through the bedroom 2 door turn south at the door, one column further
+            # east each, and the first lands on the farthest ports so the others nest inside it
             'C2': [(64.5, 28.5, 67.5, 33.75)], 'B2.1': [(64.5, 28.5, 67.0, 33.75)], 'B2.0': [(64.5, 28.5, 66.5, 33.75)],
-            # bath 2's loop goes round the hall's east side and comes into MF-4 north of the bedroom 3 leaders
+            # bath 2's loop goes round the hall's west side and comes into MF-4 south of the bedroom 3 leaders
             'BT2': [(64.5, 34.5, 67.25, 39.5)],
-            # bedroom 1's west band takes the west side of its door so the east band can come round outside it
+            # bedroom 1's east band takes the east side of its door so the west band can come round outside it
             'B1.1': [(66.5, 18.25, 68.5, 22.0)]}
 # a loop held to one pair of ports: the coordinate along the port row of its first port (the next one is its second)
 PORT = {'BAM': 18.75, 'BAN': 19.75, 'MUW': 17.0, 'PA': 34.25, 'KN.0': 33.75, 'KN.1': 33.25, 'KNN.1': 31.75, 'KNN.0': 32.25, 'KN.2': 32.75,
@@ -465,7 +466,7 @@ def room_loads():
     return out
 
 
-# the 1" feed pairs from HS-1 to the stations, under the boards. Three share the run under the kitchen's west base cabinets,
+# the 1" feed pairs from HS-1 to the stations, under the boards. Three share the run under the kitchen's east base cabinets,
 # two the run under the entry and office; each is drawn a few inches from the next so they read apart.
 FEED_ROUTES = {
     'MF-1': [HS, (31.6, HS[1]), (31.6, 18.4), STATIONS['MF-1']['riser']],
@@ -668,11 +669,11 @@ def build():
         f"P-1's water lines, vents and drains are all in the base course below the boards and the feed pairs (cold PEX {plumbing.ft_in(-plumbing.COLD_H)} down, hot {plumbing.ft_in(-plumbing.HOT_H)}, drains below both), so the boards go down whole, with no channels cut for plumbing.",
     ]
     open_items = [f"{l['id']} ({', '.join(l['room_names'])}): the floor carries all but about {l['short']:,.0f} Btu/h of the room at {CLIMATE['heat_design_f']:.0f}°F with {T_SUP:.0f}°F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days." for l in shorts] + [
-        "Not tubed: the coat closet (about 6 sq ft), the bedroom 1 bypass closet (about 17 sq ft) the 3' x 10' notch at the garage's north wall beside the master closet (about 31 sq ft) and an 18\" strip along the laundry's east wall under the washer and dryer (about 11 sq ft). The first three are too small for a loop of their own at the lengths on their manifold, and none can be added to a neighbouring loop without crossing another; the laundry loop is already 178' and a wider field would take it past 200'. All four sit inside heated floor and borrow from it.",
+        "Not tubed: the coat closet (about 6 sq ft), the bedroom 1 bypass closet (about 17 sq ft) the 3' x 10' notch at the garage's south wall beside the master closet (about 31 sq ft) and an 18\" strip along the laundry's west wall under the washer and dryer (about 11 sq ft). The first three are too small for a loop of their own at the lengths on their manifold, and none can be added to a neighbouring loop without crossing another; the laundry loop is already 178' and a wider field would take it past 200'. All four sit inside heated floor and borrow from it.",
         "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
         'Garage: kept at 50°F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.',
         'Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10°F warmer water for that loop.',
-        "Cabinet depths on S-1: MF-3 and MF-4 recess into the hall's 2x4 west wall (3-1/2\" deep; fur locally if the chosen manifold needs more), MF-K into the kitchen wall and MF-5 into the entry wall.",
+        "Cabinet depths on S-1: MF-3 and MF-4 recess into the hall's 2x4 east wall (3-1/2\" deep; fur locally if the chosen manifold needs more), MF-K into the kitchen wall and MF-5 into the entry wall.",
         f"E-1: an outlet at each of the seven manifold cabinets for the actuators (MF-1, MF-2, MF-G, MF-K, MF-5, MF-3, MF-4), and the boiler, pump and zone controller on circuit 27.",
         f"The {BOARD['name']}s come {BOARD['per_bundle']} to a bundle ({BOARD['per_bundle'] * BOARD['sf']:.0f} sq ft), {BOARD['min_bundles']} bundles minimum: {bundles} bundles cover the {slab_sf:,} sq ft slab with 5% for cuts. Confirm the lead time; the board layout can start at any corner as long as the grid holds the datum.",
     ]
@@ -724,7 +725,7 @@ def build():
     feeds3d = [dict(id=f['id'], mf=f['mf'], pts=[list(p) for p in f['pts']], name=f"{f['id']} · 1\" feed pair to {f['to']}",
                     text=f"1\" PEX supply and return from HS-1, about {f['lf']:.0f}' each way, insulated, in the base course under the boards (R-1)") for f in feeds]
     hs3d = dict(id='HS-1', box=[33.0, 48.0, 33.9, 49.6], z=[2.5, 5.0], name='HS-1 · condensing boiler',
-                text="Gas or propane condensing boiler for the slab, wall-hung on the mechanical closet's east wall, with P-R1, P-RG, the mixing valves and the zone controller; circuit 27 (R-1)")
+                text="Gas or propane condensing boiler for the slab, wall-hung on the mechanical closet's west wall, with P-R1, P-RG, the mixing valves and the zone controller; circuit 27 (R-1)")
     stats3d = [dict(id=Z['stat'], at=list(STATS[Z['stat']]), color=Z['color'], name=f"{Z['stat']} · zone {z[1:]} thermostat", text=f"{Z['name']}: {Z['where']} (R-1)") for z, Z in ZONES.items()]
     foam3d = dict(z=[BOARD_Z[0], BOARD_Z[0] + BOARD['eps_in'] / 12], name=f"Boards · {BOARD['name']}, R-{BOARD['r']:.0f}", ref='Board',
                   text=f"{BOARD['thick_in']:.0f}\" nub boards under the whole slab: {BOARD['eps_in']:.0f}\" of EPS under a {BOARD['puck_in']:.0f}\" grid of pucks on {BOARD['pitch_in']:.0f}\" centres that hold the tube; 4\" of concrete over the pucks (R-1)")

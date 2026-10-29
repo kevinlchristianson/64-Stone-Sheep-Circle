@@ -1,5 +1,5 @@
 {
- "version": "v32",
+ "version": "v33",
  "meta": {
   "address": "64 Stone Sheep Circle",
   "plan_name": "Larson House",
@@ -622,7 +622,7 @@
  },
  "open_items": {
   "A-1": [
-   "Where the house is (address, lot, orientation): the site plan has a north arrow but no dimensions, setbacks or street.",
+   "Where the house is (address, lot): the site plan has no dimensions, setbacks or street. Orientation is settled: the front porch faces north (owner, 2026-10-25).",
    "Sheet numbering: the site plan and the front/rear elevations are both A-3 on the owner's set.",
    "Living room width (17'-4\" printed vs. ~20'-5\" measured).",
    "Powder room sink, fireplace chimney route, bedroom 3 egress window."
@@ -673,11 +673,11 @@
   ],
   "R-1": [
    "L32 (Bedroom 3, Closet (Bedroom 3)): the floor carries all but about 345 Btu/h of the room at -11\u00b0F with 110\u00b0F water. Add a small electric towel warmer, or run the boiler hotter on the coldest days.",
-   "Not tubed: the coat closet (about 6 sq ft), the bedroom 1 bypass closet (about 17 sq ft) the 3' x 10' notch at the garage's north wall beside the master closet (about 31 sq ft) and an 18\" strip along the laundry's east wall under the washer and dryer (about 11 sq ft). The first three are too small for a loop of their own at the lengths on their manifold, and none can be added to a neighbouring loop without crossing another; the laundry loop is already 178' and a wider field would take it past 200'. All four sit inside heated floor and borrow from it.",
+   "Not tubed: the coat closet (about 6 sq ft), the bedroom 1 bypass closet (about 17 sq ft) the 3' x 10' notch at the garage's south wall beside the master closet (about 31 sq ft) and an 18\" strip along the laundry's west wall under the washer and dryer (about 11 sq ft). The first three are too small for a loop of their own at the lengths on their manifold, and none can be added to a neighbouring loop without crossing another; the laundry loop is already 178' and a wider field would take it past 200'. All four sit inside heated floor and borrow from it.",
    "Boiler model: HS-1 is a condensing boiler on natural gas or propane (decided 2026-10-13). Pick a combi or a boiler with an indirect tank if it should also make the domestic hot water and replace P-1's 50 gal heater; propane needs the boiler's LP conversion kit.",
    "Garage: kept at 50\u00b0F on its own manifold, pump and thermostat. Decide whether it runs a glycol mix behind a plate heat exchanger, which protects it if the house loses power in a cold snap with the doors open.",
    "Flooring: the loops assume hard-surface floors. Carpet in a bedroom needs about 10\u00b0F warmer water for that loop.",
-   "Cabinet depths on S-1: MF-3 and MF-4 recess into the hall's 2x4 west wall (3-1/2\" deep; fur locally if the chosen manifold needs more), MF-K into the kitchen wall and MF-5 into the entry wall.",
+   "Cabinet depths on S-1: MF-3 and MF-4 recess into the hall's 2x4 east wall (3-1/2\" deep; fur locally if the chosen manifold needs more), MF-K into the kitchen wall and MF-5 into the entry wall.",
    "E-1: an outlet at each of the seven manifold cabinets for the actuators (MF-1, MF-2, MF-G, MF-K, MF-5, MF-3, MF-4), and the boiler, pump and zone controller on circuit 27.",
    "The EPS25 Super 4 nub boards come 5 to a bundle (80 sq ft), 3 bundles minimum: 55 bundles cover the 4,167 sq ft slab with 5% for cuts. Confirm the lead time; the board layout can start at any corner as long as the grid holds the datum."
   ]
